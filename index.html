@@ -686,8 +686,12 @@ function indexLines(){
   lines.forEach(x=>{const total=x.w.reduce((s,w)=>s+w.textContent.length+1,0)||1;let acc=0;x.ws=x.w.map(w=>{const s=x.a+(x.b-x.a)*acc/total;acc+=w.textContent.length+1;return s})});
   segList=[...$("out").querySelectorAll(".seg")];lastNow=lastLn=lastW=null;
 }
-const nowT=()=>clk.t+(playing?(performance.now()-clk.at)/1000*rate:0);
+const nowT=()=>clk.t+(playing?Math.min(0.6,(performance.now()-clk.at)/1000)*rate:0);
 function scrollUnder(el){const topH=$("top").hidden?0:$("top").offsetHeight;const y=el.getBoundingClientRect().top+scrollY-topH-10;scrollTo({top:Math.max(0,y),behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"})}
+let userScrollUntil=0;
+["touchstart","wheel"].forEach(ev=>addEventListener(ev,()=>{userScrollUntil=performance.now()+4000},{passive:true}));
+const followOn=()=>$("fol")&&$("fol").checked&&performance.now()>userScrollUntil;
+function keepVisible(el){const topH=$("top").hidden?0:$("top").offsetHeight;const r=el.getBoundingClientRect();if(r.top<topH+4||r.bottom>innerHeight-70)scrollUnder(el)}
 function tick(){
   requestAnimationFrame(tick);
   if($("out").hidden||!clk.at)return;
@@ -695,7 +699,7 @@ function tick(){
   // paragraph highlight (yellow)
   const segs=segList;let best=null,bs=-1;
   for(const s of segs){const v=+s.dataset.sec;if(v<=ct+0.3&&v>=bs){bs=v;best=s}}
-  if(best!==lastNow){if(lastNow)lastNow.classList.remove("now");lastNow=best;if(best){best.classList.add("now");const d2=best.closest("details");if($("fol")&&$("fol").checked&&d2&&!d2.open)d2.open=true}}
+  if(best!==lastNow){if(lastNow)lastNow.classList.remove("now");lastNow=best;if(best){best.classList.add("now");const d2=best.closest("details");if(followOn()){if(d2&&!d2.open)d2.open=true;scrollUnder(best)}}}
   // line + word highlight
   if(!lines.length)return;
   let ln=null;for(const x of lines){if(x.a<=ct+0.15)ln=x;else break}
@@ -703,7 +707,7 @@ function tick(){
   if(ln!==lastLn){
     if(lastLn){lastLn.el.classList.remove("cur");lastLn.w.forEach(w=>w.classList.remove("cw","nw","pw"))}
     lastLn=ln;lastW=null;
-    if(ln){ln.el.classList.add("cur");if($("fol")&&$("fol").checked){const d2=ln.el.closest("details");if(d2&&!d2.open)d2.open=true;scrollUnder(ln.el)}}
+    if(ln){ln.el.classList.add("cur");if(followOn()){const par=lastNow&&lastNow.contains(ln.el)?lastNow:null;const room=innerHeight-($("top").hidden?0:$("top").offsetHeight)-80;if(!par||par.offsetHeight>room)setTimeout(()=>keepVisible(ln.el),700)}}
   }
   if(!ln)return;
   let k=0;for(let i=0;i<ln.ws.length;i++){if(ln.ws[i]<=ct)k=i;else break}
@@ -720,7 +724,7 @@ addEventListener("message",e=>{
   if(d&&d.info&&typeof d.info.playerState==="number"){playing=d.info.playerState===1;$("pp").textContent=playing?"⏸":"▶"}
   if(d&&d.info&&typeof d.info.playbackRate==="number"&&d.info.playbackRate!==rate){rate=d.info.playbackRate;$("spd").value=String(rate)}
   const ct=d&&d.info&&typeof d.info.currentTime==="number"?d.info.currentTime:null;
-  if(ct!=null){curT=ct;clk={t:ct,at:performance.now()};if(typeof d.info.playerState!=="number"&&ct>0)playing=true}
+  if(ct!=null){if(Math.abs(ct-clk.t)>0.01||!clk.at){curT=ct;clk={t:ct,at:performance.now()}}}
 });
 /* ---------- fixed player spacer ---------- */
 const fitTop=()=>{const h=$("top").hidden?0:$("top").offsetHeight;$("spacer").style.height=h+"px";document.documentElement.style.scrollPaddingTop=(h+10)+"px"};
