@@ -116,7 +116,7 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
 <div class="top" id="top" hidden>
   <div class="frame"><iframe id="yt" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
   <div class="bar"><div class="nm" id="nm"></div><button id="mn" type="button"></button></div>
-  <div class="ctl" id="ctl"><button type="button" data-c="back" aria-label="-5s">−5</button><button type="button" data-c="toggle" id="pp" aria-label="Play/Pause">▶</button><button type="button" data-c="fwd" aria-label="+5s">+5</button><button type="button" id="ocrBtn" aria-label="Text on screen">📷 Aa</button><label class="sp" aria-label="Speed">⏱<select id="spd"></select></label></div>
+  <div class="ctl" id="ctl"><button type="button" data-c="back" aria-label="-5s">−5</button><button type="button" data-c="toggle" id="pp" aria-label="Play/Pause">▶</button><button type="button" data-c="fwd" aria-label="+5s">+5</button><button type="button" id="ocrBtn" aria-label="Text on screen">📷 Aa</button><span id="dbg" style="color:#ffb3a3;font:700 12px Rubik,system-ui,sans-serif;white-space:nowrap"></span><label class="sp" aria-label="Speed">⏱<select id="spd"></select></label></div>
 </div>
 <div id="spacer"></div>
 <div class="wrap">
@@ -165,7 +165,7 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
   </details>
   </details>
 
-  <footer>Lingvid · tdbuser.github.io/lingvid · v21.11-20:05</footer>
+  <footer>Lingvid · tdbuser.github.io/lingvid · v21.11-20:10</footer>
 </div>
 <button id="up" type="button" aria-label="Yuqoriga" hidden>↑</button>
 <div class="toast" id="toast" hidden></div>
@@ -310,6 +310,7 @@ async function bindPlayer(){
 }
 function syncClock(){if(ytReady&&ytP.getCurrentTime){const t=ytP.getCurrentTime();curT=t;clk={t,at:performance.now()}}}
 setInterval(()=>{if(ytReady&&ytP&&ytP.getPlayerState){playing=ytP.getPlayerState()===1;syncClock()}},200);
+ytApi();
 function play(v){
   if(!v)return;curVid=v;$("top").hidden=false;$("top").classList.remove("min");
   $("yt").src="https://www.youtube.com/embed/"+v+"?enablejsapi=1&playsinline=1&rel=0&cc_load_policy=1&cc_lang_pref="+L+"&hl="+L+"&origin="+encodeURIComponent(location.origin);
@@ -703,8 +704,10 @@ let userScrollUntil=0;
 ["touchstart","wheel"].forEach(ev=>addEventListener(ev,()=>{userScrollUntil=performance.now()+4000},{passive:true}));
 const followOn=()=>$("fol")&&$("fol").checked&&performance.now()>userScrollUntil;
 function keepVisible(el){const topH=$("top").hidden?0:$("top").offsetHeight;const r=el.getBoundingClientRect();if(r.top<topH+4||r.bottom>innerHeight-70)scrollUnder(el)}
+let dbgAt=0;
 function tick(){
   requestAnimationFrame(tick);
+  if(performance.now()-dbgAt>250){dbgAt=performance.now();const d=$("dbg");if(d)d.textContent=(clk.at?fmt(nowT()):"--:--")+(playing?" ▶":" ⏸")+(ytReady?" ✓":(clk.at?" ~":" ✗"))}
   if($("out").hidden||!clk.at)return;
   const ct=nowT();
   // paragraph highlight (yellow)
