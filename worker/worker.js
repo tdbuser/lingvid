@@ -121,17 +121,27 @@ Write all translations by MEANING (natural ${lname}), not word by word. Never in
 }
 speech: cover the WHOLE video in order, one item per sentence or short phrase (about 2-8 seconds), accurate start times. If nobody speaks, use an empty array.
 onscreen: every caption, title, label or written amount that appears on screen; skip channel logos and watermarks.`;
-  const model = (env && env.GEMINI_MODEL) || "gemini-flash-latest";
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-    body: JSON.stringify({
-      contents: [{ parts: [{ file_data: { file_uri: "https://www.youtube.com/watch?v=" + v, mime_type: "video/*" } }, { text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json", temperature: 0.2, maxOutputTokens: 60000 },
-    }),
+  const body = JSON.stringify({
+    contents: [{ parts: [{ file_data: { file_uri: "https://www.youtube.com/watch?v=" + v, mime_type: "video/*" } }, { text: prompt }] }],
+    generationConfig: { responseMimeType: "application/json", temperature: 0.2, maxOutputTokens: 60000 },
   });
-  const d = await r.json().catch(() => ({}));
-  if (!r.ok) return json({ error: "gemini_" + r.status, detail: (d.error && d.error.message || "").slice(0, 300) }, 502);
+  // Try several models; on "busy" (429/500/503) wait and try again / next model.
+  const models = [...new Set([env && env.GEMINI_MODEL, "gemini-flash-latest", "gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-2.5-flash-lite"].filter(Boolean))];
+  let d = {}, r = null, lastErr = "";
+  outer: for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key }, body,
+      });
+      d = await r.json().catch(() => ({}));
+      if (r.ok) break outer;
+      lastErr = model + ": " + r.status + " " + ((d.error && d.error.message) || "").slice(0, 200);
+      if (r.status === 404 || r.status === 400) continue outer;
+      if (![429, 500, 503].includes(r.status)) return json({ error: "gemini_" + r.status, detail: lastErr }, 502);
+      await new Promise(res => setTimeout(res, 2500 * (attempt + 1)));
+    }
+  }
+  if (!r || !r.ok) return json({ error: "gemini_busy", detail: lastErr }, 503);
   const txt = (((d.candidates || [])[0] || {}).content || {}).parts?.map(p => p.text || "").join("") || "";
   let out;
   try { out = JSON.parse(txt.replace(/^```(json)?|```$/g, "").trim()); } catch (e) { return json({ error: "gemini_bad_json", detail: txt.slice(0, 300) }, 502); }
