@@ -9,9 +9,10 @@
 <style>
 :root{color-scheme:light dark;--bg:light-dark(#f6b81c,#1d1420);--card:light-dark(#ffffff,#2a1f2e);--ink:light-dark(#2b1530,#f6eef7);--soft:light-dark(#6d5a70,#bfaec2);--line:light-dark(#eadfe9,#40324a);--acc:light-dark(#d8432b,#ff7a5c);--chip:light-dark(#fff3d1,#3a2b40)}
 *{box-sizing:border-box;min-width:0}
-html,body{overflow-x:hidden;max-width:100%}
+html,body{max-width:100%}body{overflow-x:clip}
+#spacer{height:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Nunito,system-ui,sans-serif;-webkit-text-size-adjust:100%}
-.top{position:sticky;top:0;z-index:10;background:#000;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+.top{position:fixed;top:0;left:0;right:0;z-index:10;background:#000;box-shadow:0 4px 16px rgba(0,0,0,.35)}
 .frame{position:relative;width:100%;max-width:720px;margin:0 auto;aspect-ratio:16/9;max-height:42vh;background:#000}
 .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .top.min .frame{height:0;aspect-ratio:auto;overflow:hidden}
@@ -81,6 +82,7 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
   <div class="frame"><iframe id="yt" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
   <div class="bar"><div class="nm" id="nm"></div><button id="mn" type="button"></button></div>
 </div>
+<div id="spacer"></div>
 <div class="wrap">
   <header><h1>Lingvid</h1>
     <div class="lang" role="group" aria-label="Til / Язык"><button type="button" data-l="uz" aria-pressed="true">O'zbekcha</button><button type="button" data-l="ru" aria-pressed="false">Русский</button></div>
@@ -365,6 +367,11 @@ async function buildDocx(){
 
 
 
+/* ---------- fixed player spacer ---------- */
+const fitTop=()=>{const h=$("top").hidden?0:$("top").offsetHeight;$("spacer").style.height=h+"px";document.documentElement.style.scrollPaddingTop=(h+10)+"px"};
+const roTop=new ResizeObserver(fitTop);roTop.observe($("top"));
+new MutationObserver(fitTop).observe($("top"),{attributes:true,attributeFilter:["hidden","class"]});
+addEventListener("resize",fitTop);
 /* ---------- start ---------- */
 function decode(h){const m=h.match(/[#&]d=([^&]+)/);if(!m)return null;
   try{let b=m[1].replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b),c=>c.charCodeAt(0))))}catch(e){return null}}
