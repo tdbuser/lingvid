@@ -244,22 +244,41 @@ function ui(){
   if(cur)render();
   if(!$("top").hidden)$("mn").textContent=$("top").classList.contains("min")?t.show:t.hide;
 }
+// Translate many short strings with Google (free, in the visitor's browser). Robust: several methods, never all-or-nothing.
+async function gtMany(list,tl,sl){
+  const out=new Array(list.length).fill(null);
+  const asText=x=>Array.isArray(x)?asText(x[0]):(typeof x==="string"?x:null);
+  // method 1: translate_a/t with many q= (one result per string)
+  for(let i=0;i<list.length;i+=25){
+    const part=list.slice(i,i+25);
+    try{
+      const body=part.map(s=>"q="+encodeURIComponent(s)).join("&");
+      const r=await fetch("https://translate.googleapis.com/translate_a/t?client=gtx&dt=t&sl="+(sl||"auto")+"&tl="+tl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body});
+      if(r.ok){const d=await r.json();const arr=Array.isArray(d)?d:[d];
+        if(arr.length===part.length)arr.forEach((x,k)=>{const s=asText(x);if(s)out[i+k]=s});
+        else if(part.length===1&&asText(arr))out[i]=asText(arr)}
+    }catch(e){}
+  }
+  // method 2: one string per request for anything still missing (small, sequential)
+  for(let i=0;i<list.length;i++){
+    if(out[i])continue;
+    try{const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl="+(sl||"auto")+"&tl="+tl+"&q="+encodeURIComponent(list[i]));
+      if(r.ok){const d=await r.json();const s=(d[0]||[]).map(p=>p[0]||"").join("").trim();if(s)out[i]=s}}catch(e){}
+  }
+  return out;
+}
 async function translateUI(code){
-  // translate English strings into any language with Google (in the visitor's browser), cache it
   const flat=[];const walk=(o,path)=>{for(const k in o){const v=o[k],pp=path.concat(k);if(typeof v==="string")flat.push([pp,v]);else walk(v,pp)}};walk(T.en,[]);
-  const src=flat.map(x=>x[1].replace(/\n/g," "));const outv=[];let i=0;
-  while(i<src.length){let j=i,len=0;while(j<src.length&&len+src[j].length+1<1500){len+=src[j].length+1;j++}if(j===i)j=i+1;
-    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&dt=t&tl="+code+"&q="+encodeURIComponent(src.slice(i,j).join("\n")));
-    if(!r.ok)throw new Error(r.status);const d=await r.json();const lines=[];let c="";
-    for(const p of d[0]||[]){c+=p[0]||"";if(/\n\s*$/.test(p[1]||"")){lines.push(c.trim());c=""}}if(c.trim())lines.push(c.trim());
-    if(lines.length!==j-i)throw new Error("align");outv.push(...lines);i=j}
-  const o=JSON.parse(JSON.stringify(T.en));flat.forEach(([pp],k)=>{let x=o;for(let q=0;q<pp.length-1;q++)x=x[pp[q]];x[pp[pp.length-1]]=outv[k].replace(/\{ ?lang ?\}/i,"{lang}")});
+  const res=await gtMany(flat.map(x=>x[1]),code,"en");
+  const ok=res.filter(Boolean).length;if(ok<flat.length*0.6)throw new Error("too few "+ok);
+  const o=JSON.parse(JSON.stringify(T.en));
+  flat.forEach(([pp],k)=>{if(!res[k])return;let x=o;for(let q=0;q<pp.length-1;q++)x=x[pp[q]];x[pp[pp.length-1]]=T.en[pp[0]]&&String(T.en[pp[0]]).includes("{lang}")&&!/\{lang\}/.test(res[k])?res[k].replace(/\{[^}]*\}/,"{lang}")+(/\{/.test(res[k])?"":" {lang}"):res[k]});
   ["svc","aiName"].forEach(k=>o[k].forEach((r,n)=>r[0]=T.en[k][n][0]));o.word="Word (.docx)";o.tg="Telegram";
   return o;
 }
 async function setLang(code){
   try{localStorage.setItem("lv_lang",code)}catch(e){}
-  if(!T[code]){toast((T[L]||T.en).uiWait);try{T[code]=await translateUI(code);try{localStorage.setItem("lv_ui_"+code,JSON.stringify(T[code]))}catch(e){}}catch(e){toast("Translation unavailable — English");code="en"}}
+  if(!T[code]){toast((T[L]||T.en).uiWait);try{T[code]=await translateUI(code);try{localStorage.setItem("lv_ui_"+code,JSON.stringify(T[code]))}catch(e){}}catch(e){toast("Translation service unavailable right now — English");code="en";try{localStorage.setItem("lv_lang","en")}catch(_){}}}
   L=code;ui();
 }
 $("uiLang").addEventListener("change",e=>setLang(e.target.value));
