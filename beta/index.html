@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>[BETA] Lingvid — video va matn</title>
+<title>[BETA 1: перевод] Lingvid — video va matn</title>
 <meta name="description" content="Lingvid: YouTube video and its text on one page — contents, folding sections, time links, Word export.">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -116,7 +116,7 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
     <div class="step"><span class="num">2</span><h2 data-t="s2"></h2></div>
     <div id="auto" hidden style="margin-bottom:12px">
       <button class="go" id="autoBtn" type="button" style="width:100%"></button>
-      <label style="display:flex;gap:10px;align-items:center;margin-top:10px;font-weight:600;font-size:15px;cursor:pointer"><input type="checkbox" id="tl" checked style="width:22px;height:22px"><span id="tlT"></span></label>
+      <label style="display:flex;gap:10px;align-items:center;margin-top:10px;font-weight:600;font-size:15px;cursor:pointer"><input type="checkbox" id="tl" checked style="width:22px;height:22px"><span id="tlT"></span><select id="tlTo" aria-label="Translate into" style="font:700 15px Nunito,system-ui,sans-serif;padding:6px 8px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);max-width:55vw"></select></label>
       <p class="hint" id="autoSt"></p>
     </div>
     <div class="svc" id="svc"></div>
@@ -219,7 +219,8 @@ function ui(){
   $("ai").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{const pr=buildPrompt();copy(pr);toast(t.promptCopied);
     const i=+a.dataset.i;if(i<2&&pr.length<6000)a.href=A[i][0]+"?q="+encodeURIComponent(pr);else a.href=A[i][0]}));
   const sel=$("tlang"),keep=sel.value||L;sel.innerHTML=LANGS.map(([c,n])=>`<option value="${c}">${esc(n)}</option>`).join("");sel.value=keep;
-  $("auto").hidden=!WORKER;$("autoBtn").textContent=t.auto;$("tlT").textContent=t.tl.replace("{lang}",(UIL.find(x=>x[0]===L)||[0,L])[1]);
+  $("auto").hidden=!WORKER;$("autoBtn").textContent=t.auto;$("tlT").textContent=t.tl.replace(/[:：]?\s*\{lang\}.*$/,"").trim()+":";
+  {const s=$("tlTo");if(!s.options.length){s.innerHTML=UIL.map(([c,n])=>`<option value="${c}">${esc(n)}</option>`).join("");let v="uz";try{v=localStorage.getItem("lv_to")||((navigator.language||"").slice(0,2)==="ru"?"ru":"uz")}catch(e){}s.value=v;s.onchange=()=>{try{localStorage.setItem("lv_to",s.value)}catch(e){}}}}
   if(cur)render();
   if(!$("top").hidden)$("mn").textContent=$("top").classList.contains("min")?t.show:t.hide;
 }
@@ -438,22 +439,27 @@ async function buildDocx(){
 
 /* ---------- auto text (Cloudflare helper) ---------- */
 const WORKER="https://lingvid.3307999.workers.dev/";
-async function gtrans(segs,tl){
-  const out=segs.map(x=>({...x}));let i=0;
-  while(i<out.length){
-    let j=i,len=0;while(j<out.length&&len+out[j].text.length+1<1800){len+=out[j].text.length+1;j++}
-    if(j===i)j=i+1;
-    const q=out.slice(i,j).map(x=>x.text.replace(/\n/g," ")).join("\n");
-    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&dt=t&tl="+tl+"&q="+encodeURIComponent(q));
-    if(!r.ok)throw new Error("translate "+r.status);
-    const d=await r.json();const lines=[];let c="";
-    for(const p of d[0]||[]){c+=p[0]||"";if(/\n\s*$/.test(p[1]||"")||/\n\s*$/.test(p[0]||"")){lines.push(c.trim());c=""}}
-    if(c.trim())lines.push(c.trim());
-    if(lines.length===j-i)lines.forEach((t,k)=>out[i+k].text=t);
-    else{out[i].text=lines.join(" ");for(let k=i+1;k<j;k++)out[k].text=""}
-    i=j;$("autoSt").textContent=T[L].autoTrWait+" "+Math.round(i/out.length*100)+"%";
+async function gtMany(list,tl){
+  const out=new Array(list.length).fill(null);
+  const asText=x=>Array.isArray(x)?asText(x[0]):(typeof x==="string"?x:null);
+  for(let i=0;i<list.length;i+=25){
+    const part=list.slice(i,i+25);
+    try{const body=part.map(s=>"q="+encodeURIComponent(s)).join("&");
+      const r=await fetch("https://translate.googleapis.com/translate_a/t?client=gtx&dt=t&sl=auto&tl="+tl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body});
+      if(r.ok){const d=await r.json();const arr=Array.isArray(d)?d:[d];
+        if(arr.length===part.length)arr.forEach((x,k)=>{const s=asText(x);if(s)out[i+k]=s});
+        else if(part.length===1&&asText(arr))out[i]=asText(arr)}}catch(e){}
+    $("autoSt").textContent=T[L].autoTrWait+" "+Math.round(Math.min(1,(i+25)/list.length)*100)+"%";
   }
-  return out.filter(x=>x.text);
+  for(let i=0;i<list.length;i++){if(out[i])continue;
+    try{const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=auto&tl="+tl+"&q="+encodeURIComponent(list[i]));
+      if(r.ok){const d=await r.json();const s=(d[0]||[]).map(p=>p[0]||"").join("").trim();if(s)out[i]=s}}catch(e){}}
+  return out;
+}
+async function gtrans(segs,tl){
+  const res=await gtMany(segs.map(x=>x.text),tl);
+  if(res.filter(Boolean).length<segs.length*0.5)throw new Error("translate");
+  return segs.map((x,k)=>({...x,text:res[k]||x.text}));
 }
 async function autoText(){
   const t=T[L];if(!curVid){toast(t.badLink);return}
@@ -462,12 +468,13 @@ async function autoText(){
     const r=await fetch(WORKER+"?v="+curVid);const d=await r.json();
     if(!d.segments||!d.segments.length){$("autoSt").textContent=t.autoFail;return}
     let segs=d.segments,tr=false;
-    if($("tl").checked&&(d.original||"").split("-")[0]!==L){
-      try{segs=await gtrans(segs,L);tr=true}catch(e){$("autoSt").textContent=t.autoNoTr}
+    const to=$("tlTo").value||L;
+    if($("tl").checked&&(d.original||"").split("-")[0]!==to.split("-")[0]){
+      try{segs=await gtrans(segs,to);tr=true}catch(e){$("autoSt").textContent=t.autoNoTr}
     }
     $("txt").value=segs.map(s=>`[${s.t}] ${s.text}`).join("\n");
-    if(!tr||$("autoSt").textContent!==t.autoNoTr)$("autoSt").textContent=(tr?t.autoTr:t.autoOrig)+" ("+(tr?L:d.original||"?")+")";
-    cur=parse($("txt").value);cur.r.title=d.title||cur.r.title;render();$("c4").hidden=false;
+    if(!tr||$("autoSt").textContent!==t.autoNoTr)$("autoSt").textContent=(tr?t.autoTr:t.autoOrig)+" ("+(tr?to:d.original||"?")+")";
+    cur=parse($("txt").value);cur.r.title=d.title||cur.r.title;cur.lang=tr?to:(d.original||L);render();$("c4").hidden=false;
     try{localStorage.setItem("lv_txt",$("txt").value)}catch(e){}
     $("out").scrollIntoView({block:"start"});
   }catch(e){$("autoSt").textContent=t.autoFail}
