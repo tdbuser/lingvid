@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>A1 · Lingvid</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#fff8e6,#1d1420);--card:light-dark(#ffffff,#2a1f2e);--ink:light-dark(#2b1530,#f6eef7);--soft:light-dark(#6d5a70,#bfaec2);--line:light-dark(#eadfe9,#40324a);--acc:light-dark(#d8432b,#ff7a5c);--chip:light-dark(#fff3d1,#3a2b40)}
+*{box-sizing:border-box;min-width:0}
+html,body{overflow-x:hidden;max-width:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Nunito,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.top{position:sticky;top:0;z-index:10;background:#000;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+.frame{position:relative;width:100%;max-width:720px;margin:0 auto;aspect-ratio:16/9;max-height:45vh;background:#000}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.top.min .frame{height:0;aspect-ratio:auto;overflow:hidden}
+.bar{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:6px 14px;background:#120a14;color:#fff}
+.bar .nm{flex:1;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar button{flex:none;min-height:40px;padding:0 14px;border:2px solid rgba(255,255,255,.35);border-radius:12px;background:transparent;color:#fff;font:700 15px Rubik,sans-serif;cursor:pointer}
+.wrap{max-width:720px;margin:0 auto;padding:18px 14px 60px}
+.card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 6px 20px rgba(43,21,48,.12)}
+h1{font:700 clamp(26px,6vw,34px)/1.1 Rubik,sans-serif;margin:0 0 10px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.meta span{background:var(--chip);border-radius:999px;padding:3px 12px;font-weight:700;font-size:15px}
+h3{font:700 21px Rubik,sans-serif;margin:22px 0 8px;padding-top:16px;border-top:2px dashed var(--line)}
+h4{margin:12px 0 4px;font-size:16px;color:var(--acc)}
+ul.ing{list-style:none;margin:0;padding:0}
+ul.ing li{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;min-height:44px}
+.nm2{flex:1;display:flex;flex-wrap:wrap;column-gap:10px;align-items:baseline}
+.nm2 b{margin-left:auto;white-space:nowrap}.nm2 i{flex-basis:100%;font-style:normal;font-size:14px;color:var(--soft)}
+.box{flex:none;width:24px;height:24px;border:2px solid var(--soft);border-radius:7px;display:grid;place-items:center;font-size:15px;color:#fff}
+li.done .box{background:var(--acc);border-color:var(--acc)}li.done .nm2{text-decoration:line-through;opacity:.5}
+ol.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;padding:10px 0;cursor:pointer}
+ol.steps li::before{content:counter(s);width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--card);display:grid;place-items:center;font:700 17px Rubik}
+ol.steps li.done::before{content:"✓";background:var(--acc)}ol.steps li.done>span{opacity:.5}
+.ts{display:inline-flex;align-items:center;margin-left:8px;padding:2px 12px;border-radius:999px;background:var(--acc);color:#fff;font-weight:700;font-size:14px;border:0;cursor:pointer;min-height:30px}
+.warn{background:var(--chip);border-radius:14px;padding:12px 16px;margin-top:16px}
+.toc{background:var(--chip);border-radius:16px;padding:12px 14px;margin:14px 0}.toc b{display:block;margin-bottom:6px}.toc ol{margin:0;padding:0;list-style:none}.toc a{display:block;padding:8px 6px;color:var(--ink);font-weight:700;text-decoration:none}
+details.sec{border:2px solid var(--line);border-radius:16px;margin:10px 0}details.sec>summary{padding:14px;cursor:pointer;font:700 19px Rubik,sans-serif}.sb{padding:4px 16px 14px}.back{display:inline-block;margin-top:8px;font-size:14px;font-weight:700;color:var(--soft);text-decoration:none}
+html{scroll-padding-top:calc(45vh + 60px)}
+#up{position:fixed;right:16px;bottom:20px;width:52px;height:52px;border-radius:50%;border:0;background:var(--ink);color:var(--card);font:700 22px Rubik;z-index:20}
+.empty{text-align:center;padding:40px 10px;color:var(--soft)}
+</style>
+</head>
+<body>
+<div class="top" id="top" hidden>
+  <div class="frame"><iframe id="yt" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+  <div class="bar"><div class="nm" id="nm"></div><button id="mn" type="button"></button></div>
+</div>
+<div class="wrap"><div class="card" id="out"><div class="empty" id="empty"><p>Retsept Claude dasturidagi «Video bilan birga ochish» tugmasi orqali keladi.<br>Рецепт приходит из программы в Claude кнопкой «Открыть вместе с видео».</p><p style="margin-top:18px">Videoni sinash / Проверить видео:</p><input id="lnk" placeholder="https://youtu.be/..." style="width:100%;font:16px Nunito;padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:transparent;color:var(--ink)"><button id="tst" type="button" style="margin-top:10px;min-height:48px;width:100%;border:0;border-radius:12px;background:var(--acc);color:#fff;font:700 17px Rubik">▶ Ochish / Открыть</button></div></div></div>
+<button id="up" type="button" onclick="scrollTo({top:0})">↑</button>
+<script>
+{
+const T={uz:{ing:"Masalliqlar",steps:"Tayyorlash",tips:"Maslahatlar",unc:"Videoda aniq aytilmagan",portion:"Porsiya",time:"Vaqt",hide:"▴ Yashirish",show:"▾ Videoni ko'rsatish"},
+         ru:{ing:"Ингредиенты",steps:"Приготовление",tips:"Советы",unc:"В видео не сказано точно",portion:"Порции",time:"Время",hide:"▴ Скрыть",show:"▾ Показать видео"}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function decode(h){
+  const m=h.match(/[#&]d=([^&]+)/);if(!m)return null;
+  try{let b=m[1].replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";
+    const bytes=Uint8Array.from(atob(b),c=>c.charCodeAt(0));return JSON.parse(new TextDecoder().decode(bytes))}catch(e){return null}
+}
+const toSec=t=>{const m=String(t||"").match(/^(\d+):(\d{2})(?::(\d{2}))?$/);if(!m)return null;return m[3]!=null?+m[1]*3600+ +m[2]*60+ +m[3]:+m[1]*60+ +m[2]};
+let data=decode(location.hash);
+try{if(data)localStorage.setItem("rx_last",JSON.stringify(data));else data=JSON.parse(localStorage.getItem("rx_last")||"null")}catch(e){}
+const tb=document.getElementById("tst");
+if(tb)tb.onclick=()=>{const m=document.getElementById("lnk").value.match(/(?:youtu\.be\/|v=|shorts\/|live\/|embed\/)([A-Za-z0-9_-]{11})/);if(!m)return;
+  document.getElementById("top").hidden=false;document.getElementById("nm").textContent="Video";document.getElementById("mn").hidden=true;
+  document.getElementById("yt").src="https://www.youtube.com/embed/"+m[1]+"?playsinline=1&rel=0";};
+if(data&&data.r){
+  const L=data.L==="ru"?"ru":"uz",r=data.r;document.documentElement.lang=L;
+  const t=L==="ru"?{toc:"Содержание",back:"↑ К содержанию",sum:"Кратко",full:"Полный текст (смысловой перевод)",hide:"▴ Скрыть",show:"▾ Показать видео"}:{toc:"Mundarija",back:"↑ Mundarijaga",sum:"Qisqacha",full:"To'liq matn (ma'noli tarjima)",hide:"▴ Yashirish",show:"▾ Videoni ko'rsatish"};
+  const hasV=data.v&&/^[A-Za-z0-9_-]{11}$/.test(data.v);
+  if(hasV){$("top").hidden=false;$("nm").textContent=r.title||"";
+    $("yt").src="https://www.youtube.com/embed/"+data.v+"?enablejsapi=1&playsinline=1&rel=0&origin="+encodeURIComponent(location.origin);
+    const lab=()=>$("mn").textContent=$("top").classList.contains("min")?t.show:t.hide;lab();
+    $("mn").onclick=()=>{$("top").classList.toggle("min");lab()};}
+  const tb=tm=>{const s=toSec(tm);return hasV&&s!=null?`<button class="ts" type="button" data-s="${s}">▶ ${esc(tm)}</button>`:""};
+  const S=[{title:t.sum,kind:"text",items:[{text:r.summary}]}].concat(r.sections||[]);
+  if(data.full)S.push({title:t.full,kind:"text",items:data.full});
+  const body=s=>{const it=s.items||[];
+    if(s.kind==="checklist")return`<ul class="ing">${it.map(i=>`<li><span class="box">✓</span><span class="nm2"><span>${esc(i.text)}</span>${i.amount?`<b>${esc(i.amount)}</b>`:""}${i.note?`<i>${esc(i.note)}</i>`:""}</span></li>`).join("")}</ul>`;
+    if(s.kind==="steps")return`<ol class="steps">${it.map(i=>`<li><span>${esc(i.text)}${tb(i.t)}</span></li>`).join("")}</ol>`;
+    if(s.kind==="text")return it.map(i=>`<p>${tb(i.t)} ${esc(i.text)}</p>`).join("");
+    return`<ul>${it.map(i=>`<li>${esc(i.text)}${tb(i.t)}</li>`).join("")}</ul>`};
+  $("out").innerHTML=`<h1>${esc(r.title)}</h1>
+   ${(r.meta||[]).filter(m=>m&&m.value).length?`<div class="meta">${r.meta.filter(m=>m&&m.value).map(m=>`<span>${esc(m.label)}: ${esc(m.value)}</span>`).join("")}</div>`:""}
+   <nav class="toc" id="toc"><b>${t.toc}</b><ol>${S.map((s,i)=>`<li><a href="#s${i}" data-i="${i}">${i+1}. ${esc(s.title)}</a></li>`).join("")}</ol></nav>
+   ${S.map((s,i)=>`<details class="sec" id="s${i}"${i===0?" open":""}><summary>${i+1}. ${esc(s.title)}</summary><div class="sb">${body(s)}<a class="back" href="#toc">${t.back}</a></div></details>`).join("")}`;
+  $("out").addEventListener("click",e=>{
+    const a=e.target.closest(".toc a");if(a){e.preventDefault();const d=$("s"+a.dataset.i);d.open=true;d.scrollIntoView({block:"start"});return}
+    const bk=e.target.closest("a.back");if(bk){e.preventDefault();$("toc").scrollIntoView({block:"start"});return}
+    const b=e.target.closest(".ts");
+    if(b){const w=$("yt").contentWindow;$("top").classList.remove("min");$("mn").textContent=t.hide;
+      const send=(func,args)=>w.postMessage(JSON.stringify({event:"command",func,args:args||[]}),"*");
+      send("seekTo",[+b.dataset.s,true]);send("playVideo");return}
+    const li=e.target.closest("ul.ing li, ol.steps li");if(li)li.classList.toggle("done");
+  });
+}
+}
+</script>
+<div style="position:fixed;left:8px;bottom:8px;z-index:99;background:#d8432b;color:#fff;font:700 14px system-ui;padding:6px 10px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.3)">A1 · 15:37</div></body>
+</html>
