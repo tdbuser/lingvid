@@ -81,9 +81,23 @@ async function gtranslate(segments, tl) {
     });
     if (!r.ok) throw new Error("gt " + r.status);
     const d = await r.json();
-    const lines = (d[0] || []).map(p => p[0] || "").join("").split("\n");
-    if (lines.length === j - i) lines.forEach((t, k) => { out[i + k].text = t.trim(); });
-    else throw new Error("gt lines");
+    // Align by Google's own sentence pieces: a piece whose original ends with "\n" closes a line.
+    const lines = [];
+    let cur = "";
+    for (const p of d[0] || []) {
+      const tr = p[0] || "", orig = p[1] || "";
+      cur += tr;
+      if (/\n\s*$/.test(orig) || /\n\s*$/.test(tr)) { lines.push(cur.trim()); cur = ""; }
+    }
+    if (cur.trim()) lines.push(cur.trim());
+    const n = j - i;
+    if (lines.length === n) lines.forEach((t, k) => { out[i + k].text = t; });
+    else {
+      // counts differ: spread the translated text over the block so nothing is lost
+      const all = lines.join(" ");
+      out[i].text = all;
+      for (let k = 1; k < n; k++) out[i + k].text = "";
+    }
     i = j;
   }
   return out;
@@ -115,7 +129,7 @@ export default {
     if (!segments || !segments.length) return json({ ...base, error: "captions_blocked", segments: [] }, 200);
     let via = translated ? "youtube" : "";
     if (lang && lang !== own && !translated) {
-      try { segments = await gtranslate(segments, lang); translated = true; via = "google"; } catch (e) {}
+      try { segments = (await gtranslate(segments, lang)).filter(x => x.text); translated = true; via = "google"; } catch (e) { via = "error: " + (e && e.message || e); }
     }
     return json({ ...base, lang: translated ? lang : own, original: own, translated, via, segments });
   },
