@@ -505,7 +505,7 @@ async function autoText(){
   const b=$("autoBtn");b.disabled=true;$("autoSt").textContent=t.autoWait;
   try{
     const r=await fetch(WORKER+"?v="+curVid);const d=await r.json();
-    if(!d.segments||!d.segments.length){$("autoSt").textContent=t.autoFail;return}
+    if(!d.segments||!d.segments.length){$("autoSt").textContent=t.autoFail+(d.error?" ("+d.error+")":"");return}
     let segs=d.segments,tr=false;
     if($("tl").checked&&(d.original||"").split("-")[0]!==L){
       try{segs=await gtrans(segs,L);tr=true}catch(e){$("autoSt").textContent=t.autoNoTr}
@@ -515,7 +515,7 @@ async function autoText(){
     cur=parse($("txt").value);cur.r.title=d.title||cur.r.title;cur.lang=tr?L:(d.original||L);render();$("c4").hidden=false;
     try{localStorage.setItem("lv_txt",$("txt").value)}catch(e){}
     $("out").scrollIntoView({block:"start"});
-  }catch(e){$("autoSt").textContent=t.autoFail}
+  }catch(e){$("autoSt").textContent=t.autoFail+" ("+(e&&e.message||e)+")"}
   finally{b.disabled=false}
 }
 $("autoBtn").onclick=autoText;
