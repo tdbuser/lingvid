@@ -22,9 +22,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Nunito,system
 .ctl{max-width:720px;margin:0 auto;display:flex;gap:4px;align-items:center;padding:0 8px 8px;background:#120a14}
 .top.min .ctl{display:none}
 .ctl button{min-height:36px;min-width:36px;padding:0 6px;flex:none;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:transparent;color:#fff;font:700 13px Rubik,system-ui,sans-serif;cursor:pointer}
-.ctl .sp{display:flex;gap:3px;margin-left:auto}
-.ctl .sp button{min-width:0;padding:0 5px}
-.ctl .sp button[aria-pressed=true]{background:#ff7a5c;border-color:#ff7a5c}
+.ctl .sp{display:flex;align-items:center;gap:4px;margin-left:auto;color:#fff;font:700 14px Rubik,system-ui,sans-serif;border:2px solid rgba(255,255,255,.3);border-radius:10px;padding:0 6px;min-height:36px}
+.ctl .sp select{background:transparent;color:#fff;border:0;font:700 15px Rubik,system-ui,sans-serif;min-height:32px}
+.ctl .sp option{color:#000}
 .wrap{max-width:720px;margin:0 auto;padding:18px 14px 90px}
 header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
 h1{font:700 clamp(34px,8vw,48px)/1 Rubik,sans-serif;margin:0;color:#2b1530;flex:1}
@@ -86,6 +86,9 @@ ul.bl{margin:0;padding-left:20px}ul.bl li{margin:6px 0}
 .wd.cw{background:var(--acc);color:#fff;box-shadow:0 0 0 2px var(--acc);font-weight:700}
 .wd.nw{text-decoration:underline 2px var(--acc);text-underline-offset:4px}
 @media (prefers-reduced-motion:reduce){.wd{transition:none}}
+.sheet{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+.sheetIn{background:var(--card);color:var(--ink);width:100%;max-width:720px;max-height:85vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px 26px}
+#ocrBtn{background:#ff7a5c;border-color:#ff7a5c}
 .follow{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700;color:var(--soft);margin:2px 0 8px;cursor:pointer}.follow input{width:20px;height:20px;accent-color:var(--acc)}
 mark{background:#ffe066;color:#2b1530;border-radius:3px}
 #up{position:fixed;right:16px;bottom:20px;width:52px;height:52px;border-radius:50%;border:0;background:var(--ink);color:var(--card);font:700 22px Rubik;box-shadow:0 6px 18px rgba(0,0,0,.3);cursor:pointer;z-index:20}
@@ -97,7 +100,7 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
 <div class="top" id="top" hidden>
   <div class="frame"><iframe id="yt" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
   <div class="bar"><div class="nm" id="nm"></div><button id="mn" type="button"></button></div>
-  <div class="ctl" id="ctl"><button type="button" data-c="back" aria-label="-5s">−5</button><button type="button" data-c="toggle" id="pp" aria-label="Play/Pause">▶</button><button type="button" data-c="fwd" aria-label="+5s">+5</button><span class="sp" id="sp"></span></div>
+  <div class="ctl" id="ctl"><button type="button" data-c="back" aria-label="-5s">−5</button><button type="button" data-c="toggle" id="pp" aria-label="Play/Pause">▶</button><button type="button" data-c="fwd" aria-label="+5s">+5</button><button type="button" id="ocrBtn" aria-label="Text on screen">📷 Aa</button><label class="sp" aria-label="Speed">⏱<select id="spd"></select></label></div>
 </div>
 <div id="spacer"></div>
 <div class="wrap">
@@ -145,12 +148,26 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
 </div>
 <button id="up" type="button" aria-label="Yuqoriga" hidden>↑</button>
 <div class="toast" id="toast" hidden></div>
+<div class="sheet" id="ocr" hidden role="dialog" aria-modal="true" aria-labelledby="ocrT">
+  <div class="sheetIn">
+    <div class="step" style="margin-bottom:6px"><span class="num">Aa</span><h2 id="ocrT" data-t="ocrT"></h2><button class="ghost" id="ocrX" type="button" style="margin-left:auto;min-height:40px" aria-label="Close">✕</button></div>
+    <p class="hint" style="margin:0 0 10px" data-t="ocrH"></p>
+    <label class="go" style="cursor:pointer"><input type="file" id="ocrFile" accept="image/*" hidden><span data-t="ocrPick"></span></label>
+    <p class="hint" data-t="ocrPaste"></p>
+    <div id="ocrSt" class="hint" role="status"></div>
+    <div id="ocrOut" hidden>
+      <h3 style="margin:12px 0 4px" data-t="ocrTr"></h3><p id="ocrTrT" style="margin:0 0 8px;font-weight:700"></p>
+      <details><summary class="hint" data-t="ocrOrig"></summary><p id="ocrOrT" style="white-space:pre-wrap"></p></details>
+      <div class="row"><button class="go" type="button" id="ocrAdd"></button><button class="ghost" type="button" id="ocrCopy"></button></div>
+    </div>
+  </div>
+</div>
 
 <script>
 {
 const T={
-en:{"lead": "A YouTube video and its text on one page: contents, folding sections, time buttons, live highlighting, Word file. Free, no sign-up.", "s1": "Paste a YouTube link", "open": "▶ Open video", "s2": "Get the video text", "s2h": "These services don't allow being shown inside other sites, so they open in a new tab. The link is copied automatically — paste it there, copy the text and come back here.", "s3": "Paste the text here", "make": "Organize", "clr": "Clear", "s3h": "If the text has times ([0:12] or 0:12), time buttons play the video from that moment. Text with headings (#, 1., -) is split into sections.", "s4": "Translate with AI (optional)", "s4h": "Press a button: the task and the text are copied and the AI opens (short text is pasted automatically). Paste the answer back into step 3 — it will be split into sections.", "toLang": "Into which language", "oSense": "Meaning-based translation", "oSenseH": "On: natural, by meaning. Off: word for word, precise.", "oStruct": "Split into sections", "oStructH": "On: title, summary, sections. Off: only the full translation with times.", "follow": "Follow the video", "copyAll": "Copy all text", "toc": "Contents", "back": "↑ Contents", "top": "↑ Top", "sum": "Summary", "full": "Full text", "open2": "Expand all", "close": "Collapse all", "word": "Word (.docx)", "copy": "Copy", "tg": "Telegram", "find": "Search in text…", "hide": "▴ Hide", "show": "▾ Show video", "copied": "Copied ✓", "linkCopied": "Link copied — paste it there", "promptCopied": "Task and text copied — paste them there", "badLink": "Paste a YouTube link", "noText": "Paste the text first", "part": "Part", "text": "Text", "auto": "⚡ Get text automatically", "tl": "Translate into: {lang}", "autoWait": "Getting the text…", "autoFail": "Couldn't get the text for this video. Use the services below.", "autoTr": "Done — Google translation", "autoTrWait": "Translating…", "autoNoTr": "Translation failed — showing the original text", "autoOrig": "Done — original language", "siteLang": "Site language", "uiWait": "Translating the site…", "types": {"other": "Video text"}, "svc": [["DownSub", "Text + auto-translation into 100+ languages"], ["vidIQ Transcript", "Full text with times"], ["YouTube", "«…more» → «Show transcript»"]], "aiName": [["ChatGPT", "OpenAI, free"], ["Claude", "Anthropic, free"], ["Gemini", "Google, free"]]},
-uz:{top:"↑ Boshiga",sum:"Qisqacha",full:"To'liq matn",siteLang:"Sayt tili",uiWait:"Sayt tarjima qilinmoqda…",lead:"YouTube video va uning matni bir sahifada: mundarija, ochiladigan bo'limlar, vaqt tugmalari, Word fayl. Bepul, ro'yxatdan o'tishsiz.",
+en:{"ocrT": "Text on the screen", "ocrH": "For words shown in the video but not spoken. The video is paused. Take a screenshot (iPhone: side + volume up; Android: power + volume down), then choose it below — the text is read and translated right here.", "ocrPick": "📷 Choose screenshot", "ocrPaste": "On a computer you can also press Ctrl+V to paste a screenshot.", "ocrTr": "Translation", "ocrOrig": "Original text", "ocrAdd": "Add to the text at this moment", "ocrRead": "Reading the text… (first time takes ~20 s)", "ocrNone": "No text found in this picture.", "ocrFail": "Couldn't read the picture.","lead": "A YouTube video and its text on one page: contents, folding sections, time buttons, live highlighting, Word file. Free, no sign-up.", "s1": "Paste a YouTube link", "open": "▶ Open video", "s2": "Get the video text", "s2h": "These services don't allow being shown inside other sites, so they open in a new tab. The link is copied automatically — paste it there, copy the text and come back here.", "s3": "Paste the text here", "make": "Organize", "clr": "Clear", "s3h": "If the text has times ([0:12] or 0:12), time buttons play the video from that moment. Text with headings (#, 1., -) is split into sections.", "s4": "Translate with AI (optional)", "s4h": "Press a button: the task and the text are copied and the AI opens (short text is pasted automatically). Paste the answer back into step 3 — it will be split into sections.", "toLang": "Into which language", "oSense": "Meaning-based translation", "oSenseH": "On: natural, by meaning. Off: word for word, precise.", "oStruct": "Split into sections", "oStructH": "On: title, summary, sections. Off: only the full translation with times.", "follow": "Follow the video", "copyAll": "Copy all text", "toc": "Contents", "back": "↑ Contents", "top": "↑ Top", "sum": "Summary", "full": "Full text", "open2": "Expand all", "close": "Collapse all", "word": "Word (.docx)", "copy": "Copy", "tg": "Telegram", "find": "Search in text…", "hide": "▴ Hide", "show": "▾ Show video", "copied": "Copied ✓", "linkCopied": "Link copied — paste it there", "promptCopied": "Task and text copied — paste them there", "badLink": "Paste a YouTube link", "noText": "Paste the text first", "part": "Part", "text": "Text", "auto": "⚡ Get text automatically", "tl": "Translate into: {lang}", "autoWait": "Getting the text…", "autoFail": "Couldn't get the text for this video. Use the services below.", "autoTr": "Done — Google translation", "autoTrWait": "Translating…", "autoNoTr": "Translation failed — showing the original text", "autoOrig": "Done — original language", "siteLang": "Site language", "uiWait": "Translating the site…", "types": {"other": "Video text"}, "svc": [["DownSub", "Text + auto-translation into 100+ languages"], ["vidIQ Transcript", "Full text with times"], ["YouTube", "«…more» → «Show transcript»"]], "aiName": [["ChatGPT", "OpenAI, free"], ["Claude", "Anthropic, free"], ["Gemini", "Google, free"]]},
+uz:{ocrT:"Ekrandagi yozuv",ocrH:"Videoda ko'rsatilgan, lekin aytilmagan yozuvlar uchun. Video to'xtatildi. Skrinshot oling (iPhone: yon tugma + ovoz baland; Android: quvvat + ovoz past) va pastdan tanlang — yozuv shu yerda o'qiladi va tarjima qilinadi.",ocrPick:"📷 Skrinshotni tanlash",ocrPaste:"Kompyuterda Ctrl+V bilan ham qo'yish mumkin.",ocrTr:"Tarjima",ocrOrig:"Asl yozuv",ocrAdd:"Matnga shu vaqtga qo'shish",ocrRead:"Yozuv o'qilmoqda… (birinchi marta ~20 soniya)",ocrNone:"Rasmda yozuv topilmadi.",ocrFail:"Rasmni o'qib bo'lmadi.",top:"↑ Boshiga",sum:"Qisqacha",full:"To'liq matn",siteLang:"Sayt tili",uiWait:"Sayt tarjima qilinmoqda…",lead:"YouTube video va uning matni bir sahifada: mundarija, ochiladigan bo'limlar, vaqt tugmalari, Word fayl. Bepul, ro'yxatdan o'tishsiz.",
  s1:"YouTube havolasini qo'ying",open:"▶ Videoni ochish",
  s2:"Video matnini oling (bepul servislar)",s2h:"Bu servislar o'z sahifasini boshqa saytlar ichida ko'rsatishga ruxsat bermaydi, shuning uchun yangi oynada ochiladi. Havola avtomatik nusxalanadi — u yerga qo'ying, matnni nusxalab, shu sahifaga qayting.",
  s3:"Matnni shu yerga qo'ying",make:"Tartibga solish",clr:"Tozalash",s3h:"Vaqtli matn ([0:12] yoki 0:12) bo'lsa — vaqt tugmalari videoni aynan shu joydan qo'yadi. Sarlavhali matn (#, 1., -) bo'limlarga ajratiladi.",
@@ -161,7 +178,7 @@ uz:{top:"↑ Boshiga",sum:"Qisqacha",full:"To'liq matn",siteLang:"Sayt tili",uiW
  svc:[["DownSub","Matn + o'zbekchaga avto-tarjima"],["vidIQ Transcript","To'liq matn, vaqtlar bilan"],["YouTube","«…ещё» → «Показать текст видео»"]],
  aiName:[["ChatGPT","OpenAI, bepul"],["Claude","Anthropic, bepul"],["Gemini","Google, bepul"]],
  prompt:"Quyidagi YouTube video matnini o'zbek tilida (lotin) to'liq, tushunarli matnga aylantiring. So'zma-so'z emas, MA'NOSI bo'yicha tarjima qiling. Hech narsa o'ylab topmang. Tuzilishi: # Sarlavha, keyin ## Qisqacha (3-5 gap), ## bo'limlar (retsept bo'lsa: ## Masalliqlar — ro'yxat '- nomi — miqdori', ## Tayyorlash — '1. qadam'; yo'riqnoma bo'lsa: ## Kerakli narsalar, ## Qadamlar; boshqa bo'lsa: ## Asosiy fikrlar, ## Videoda nima bo'ladi, ## Xulosa). Agar matnda vaqtlar bo'lsa, har qadam boshida [m:ss] qoldiring.\n\nVIDEO: "},
-ru:{top:"↑ В начало",sum:"Кратко",full:"Полный текст",siteLang:"Язык сайта",uiWait:"Перевожу сайт…",lead:"Видео YouTube и его текст на одной странице: содержание, раскрывающиеся разделы, кнопки времени, файл Word. Бесплатно, без регистрации.",
+ru:{ocrT:"Надпись на экране",ocrH:"Для надписей, которые показаны в видео, но не озвучены. Видео на паузе. Сделайте скриншот (iPhone: боковая + громкость вверх; Android: питание + громкость вниз) и выберите его ниже — надпись прочитается и переведётся прямо здесь.",ocrPick:"📷 Выбрать скриншот",ocrPaste:"На компьютере можно вставить скриншот через Ctrl+V.",ocrTr:"Перевод",ocrOrig:"Оригинал надписи",ocrAdd:"Добавить в текст на это время",ocrRead:"Читаю надпись… (первый раз ~20 секунд)",ocrNone:"На картинке не найден текст.",ocrFail:"Не удалось прочитать картинку.",top:"↑ В начало",sum:"Кратко",full:"Полный текст",siteLang:"Язык сайта",uiWait:"Перевожу сайт…",lead:"Видео YouTube и его текст на одной странице: содержание, раскрывающиеся разделы, кнопки времени, файл Word. Бесплатно, без регистрации.",
  s1:"Вставьте ссылку YouTube",open:"▶ Открыть видео",
  s2:"Получите текст видео (бесплатные сервисы)",s2h:"Эти сервисы не разрешают показывать себя внутри других сайтов, поэтому открываются в новой вкладке. Ссылка копируется автоматически — вставьте её там, скопируйте текст и вернитесь сюда.",
  s3:"Вставьте текст сюда",make:"Разложить по полочкам",clr:"Очистить",s3h:"Если в тексте есть время ([0:12] или 0:12) — кнопки времени включают видео с этого места. Текст с заголовками (#, 1., -) делится на разделы.",
@@ -477,12 +494,41 @@ $("autoBtn").onclick=autoText;
 /* ---------- player controls: speed, pause, ±5s ---------- */
 let rate=1,playing=false,curT=0;
 const ytCmd=(f,a)=>{const w=$("yt").contentWindow;if(w)w.postMessage(JSON.stringify({event:"command",func:f,args:a||[]}),"*")};
-$("sp").innerHTML=[0.5,0.75,1,1.25,1.5].map(r=>`<button type="button" data-r="${r}" aria-pressed="${r===1}">${String(r).replace(/^0/,"")}×</button>`).join("");
-$("sp").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;rate=+b.dataset.r;ytCmd("setPlaybackRate",[rate]);
-  $("sp").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
+$("spd").innerHTML=[0.25,0.5,0.75,1,1.25,1.5,1.75,2].map(r=>`<option value="${r}"${r===1?" selected":""}>${r}×</option>`).join("");
+$("spd").addEventListener("change",e=>{rate=+e.target.value;ytCmd("setPlaybackRate",[rate]);clk={t:nowT(),at:performance.now()}});
 $("ctl").addEventListener("click",e=>{const b=e.target.closest("button[data-c]");if(!b)return;const c=b.dataset.c;
   if(c==="toggle"){ytCmd(playing?"pauseVideo":"playVideo")}
   else{ytCmd("seekTo",[Math.max(0,curT+(c==="back"?-5:5)),true]);ytCmd("playVideo")}});
+/* ---------- text on screen (OCR in the browser, free) ---------- */
+let tess=null,ocrAt=0,ocrText="";
+const TL={en:"eng",ru:"rus",uz:"uzb",tr:"tur",kk:"kaz",ky:"kir",tg:"tgk",az:"aze",uk:"ukr",ar:"ara",fa:"fas",de:"deu",fr:"fra",es:"spa",pt:"por",it:"ita",zh:"chi_sim",ja:"jpn",ko:"kor",hi:"hin"};
+function loadTess(){return tess||(tess=new Promise((res,rej)=>{if(window.Tesseract)return res(window.Tesseract);const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";s.onload=()=>res(window.Tesseract);s.onerror=()=>{tess=null;rej(new Error("load"))};document.head.appendChild(s)}))}
+function openOcr(){ocrAt=curT;ytCmd("pauseVideo");$("ocr").hidden=false;$("ocrOut").hidden=true;$("ocrSt").textContent="";$("ocrFile").value=""}
+$("ocrBtn").onclick=openOcr;$("ocrX").onclick=()=>$("ocr").hidden=true;
+$("ocr").addEventListener("click",e=>{if(e.target===$("ocr"))$("ocr").hidden=true});
+async function runOcr(file){
+  const t=T[L];$("ocrSt").textContent=t.ocrRead;$("ocrOut").hidden=true;
+  try{
+    const Ts=await loadTess();
+    const langs=[...new Set(["eng","rus",TL[(L||"en").split("-")[0]]].filter(Boolean))].join("+");
+    const r=await Ts.recognize(file,langs);
+    ocrText=(r.data.text||"").replace(/[ \t]+/g," ").replace(/\n{2,}/g,"\n").trim();
+    if(!ocrText){$("ocrSt").textContent=t.ocrNone;return}
+    let tr=ocrText;
+    try{const q=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&dt=t&tl="+L+"&q="+encodeURIComponent(ocrText.slice(0,4000)));const d=await q.json();tr=(d[0]||[]).map(p=>p[0]||"").join("").trim()||ocrText}catch(e){}
+    $("ocrTrT").textContent=tr;$("ocrOrT").textContent=ocrText;$("ocrSt").textContent="";$("ocrOut").hidden=false;
+    $("ocrAdd").textContent=t.ocrAdd+" ("+fmt(ocrAt)+")";$("ocrCopy").textContent=t.copy;
+    $("ocrCopy").onclick=async()=>{if(await copy(tr))toast(t.copied)};
+    $("ocrAdd").onclick=()=>{
+      const line="["+fmt(ocrAt)+"] 🖼 "+tr.replace(/\n/g," ");
+      const ls=$("txt").value.split("\n");let k=ls.length;
+      for(let i=0;i<ls.length;i++){const m=ls[i].match(TS);if(m&&toSec(m[1])>ocrAt){k=i;break}}
+      ls.splice(k,0,line);$("txt").value=ls.join("\n");$("ocr").hidden=true;$("make").click();toast(t.copied.replace(/.*/,"✓"));
+    };
+  }catch(e){$("ocrSt").textContent=t.ocrFail}
+}
+$("ocrFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)runOcr(f)});
+addEventListener("paste",e=>{if($("ocr").hidden)return;const it=[...(e.clipboardData||{}).items||[]].find(x=>x.type.startsWith("image/"));if(it){e.preventDefault();runOcr(it.getAsFile())}});
 /* ---------- follow the video (karaoke) ---------- */
 let lastNow=null,lastLn=null,lastW=null,clk={t:0,at:0},lines=[];
 function indexLines(){
@@ -523,7 +569,7 @@ addEventListener("message",e=>{
   if(!/youtube(-nocookie)?\.com$/.test(new URL(e.origin).hostname))return;
   let d;try{d=typeof e.data==="string"?JSON.parse(e.data):e.data}catch(_){return}
   if(d&&d.info&&typeof d.info.playerState==="number"){playing=d.info.playerState===1;$("pp").textContent=playing?"⏸":"▶"}
-  if(d&&d.info&&typeof d.info.playbackRate==="number"&&d.info.playbackRate!==rate){rate=d.info.playbackRate;$("sp").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(+x.dataset.r===rate)))}
+  if(d&&d.info&&typeof d.info.playbackRate==="number"&&d.info.playbackRate!==rate){rate=d.info.playbackRate;$("spd").value=String(rate)}
   const ct=d&&d.info&&typeof d.info.currentTime==="number"?d.info.currentTime:null;
   if(ct!=null){curT=ct;clk={t:ct,at:performance.now()}}
 });
