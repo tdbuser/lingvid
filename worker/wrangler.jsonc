@@ -1,5 +1,7 @@
 {
   "name": "lingvid",
   "main": "worker.js",
+  "workers_dev": true,
+  "preview_urls": true,
   "compatibility_date": "2026-11-01"
 }

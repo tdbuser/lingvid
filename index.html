@@ -374,7 +374,7 @@ async function buildDocx(){
 
 
 /* ---------- auto text (Cloudflare helper) ---------- */
-const WORKER="";
+const WORKER="https://lingvid.3307999.workers.dev/";
 async function autoText(){
   const t=T[L];if(!curVid){toast(t.badLink);return}
   const b=$("autoBtn");b.disabled=true;$("autoSt").textContent=t.autoWait;
