@@ -135,7 +135,7 @@ uz:{lead:"YouTube video va uning matni bir sahifada: mundarija, ochiladigan bo'l
  s4:"Ma'noli tarjima va tahlil (ixtiyoriy)",s4h:"Topshiriq va matn nusxalanadi. Bepul sun'iy intellektni oching, qo'ying, javobini 3-qadamga qaytarib qo'ying — bo'limlarga ajratiladi.",
  toc:"Mundarija",back:"↑ Mundarijaga",open2:"Hammasini ochish",close:"Hammasini yopish",word:"Word (.docx)",copy:"Nusxa olish",tg:"Telegram",find:"Matndan qidirish…",
  hide:"▴ Yashirish",show:"▾ Videoni ko'rsatish",copied:"Nusxalandi ✓",linkCopied:"Havola nusxalandi — u yerga qo'ying",promptCopied:"Topshiriq va matn nusxalandi — u yerga qo'ying",badLink:"YouTube havolasini qo'ying",noText:"Avval matnni qo'ying",
- part:"Qism",text:"Matn",auto:"⚡ Matnni avtomatik olish",tl:"YouTube tarjimasi bilan (o'zbekcha)",autoWait:"Matn olinmoqda…",autoFail:"Bu video uchun matn olinmadi. Pastdagi servislardan foydalaning.",autoTr:"Tayyor — YouTube tarjimasi",autoOrig:"Tayyor — asl tilda",types:{other:"Video matni"},
+ part:"Qism",text:"Matn",auto:"⚡ Matnni avtomatik olish",tl:"O'zbekchaga tarjima bilan",autoWait:"Matn olinmoqda…",autoFail:"Bu video uchun matn olinmadi. Pastdagi servislardan foydalaning.",autoTr:"Tayyor — Google tarjimasi",autoTrWait:"Tarjima qilinmoqda…",autoNoTr:"Tarjima ishlamadi — asl tildagi matn ko'rsatildi",autoOrig:"Tayyor — asl tilda",types:{other:"Video matni"},
  svc:[["DownSub","Matn + o'zbekchaga avto-tarjima"],["vidIQ Transcript","To'liq matn, vaqtlar bilan"],["YouTube","«…ещё» → «Показать текст видео»"]],
  aiName:[["Gemini","Google, bepul"],["ChatGPT","OpenAI, bepul"],["Claude","Anthropic, bepul"]],
  prompt:"Quyidagi YouTube video matnini o'zbek tilida (lotin) to'liq, tushunarli matnga aylantiring. So'zma-so'z emas, MA'NOSI bo'yicha tarjima qiling. Hech narsa o'ylab topmang. Tuzilishi: # Sarlavha, keyin ## Qisqacha (3-5 gap), ## bo'limlar (retsept bo'lsa: ## Masalliqlar — ro'yxat '- nomi — miqdori', ## Tayyorlash — '1. qadam'; yo'riqnoma bo'lsa: ## Kerakli narsalar, ## Qadamlar; boshqa bo'lsa: ## Asosiy fikrlar, ## Videoda nima bo'ladi, ## Xulosa). Agar matnda vaqtlar bo'lsa, har qadam boshida [m:ss] qoldiring.\n\nVIDEO: "},
@@ -146,7 +146,7 @@ ru:{lead:"Видео YouTube и его текст на одной страниц
  s4:"Перевод по смыслу и анализ (по желанию)",s4h:"Задание и текст копируются. Откройте бесплатный ИИ, вставьте, а его ответ верните в шаг 3 — он разложится по разделам.",
  toc:"Содержание",back:"↑ К содержанию",open2:"Открыть все",close:"Свернуть все",word:"Word (.docx)",copy:"Копировать",tg:"Telegram",find:"Поиск по тексту…",
  hide:"▴ Скрыть",show:"▾ Показать видео",copied:"Скопировано ✓",linkCopied:"Ссылка скопирована — вставьте её там",promptCopied:"Задание и текст скопированы — вставьте там",badLink:"Вставьте ссылку YouTube",noText:"Сначала вставьте текст",
- part:"Часть",text:"Текст",auto:"⚡ Получить текст автоматически",tl:"С переводом YouTube (на русский)",autoWait:"Получаю текст…",autoFail:"Для этого видео текст получить не удалось. Используйте сервисы ниже.",autoTr:"Готово — перевод YouTube",autoOrig:"Готово — на языке оригинала",types:{other:"Текст видео"},
+ part:"Часть",text:"Текст",auto:"⚡ Получить текст автоматически",tl:"С переводом на русский",autoWait:"Получаю текст…",autoFail:"Для этого видео текст получить не удалось. Используйте сервисы ниже.",autoTr:"Готово — перевод Google",autoTrWait:"Перевожу…",autoNoTr:"Перевод не сработал — показан текст на языке оригинала",autoOrig:"Готово — на языке оригинала",types:{other:"Текст видео"},
  svc:[["DownSub","Текст + автоперевод на 100+ языков"],["vidIQ Transcript","Полный текст со временем"],["YouTube","«…ещё» → «Показать текст видео»"]],
  aiName:[["Gemini","Google, бесплатно"],["ChatGPT","OpenAI, бесплатно"],["Claude","Anthropic, бесплатно"]],
  prompt:"Преврати текст этого YouTube-видео в понятный полный текст на русском языке. Переводи по СМЫСЛУ, не дословно. Ничего не выдумывай. Структура: # Заголовок, затем ## Кратко (3-5 предложений), ## разделы (рецепт: ## Ингредиенты — список '- название — количество', ## Приготовление — '1. шаг'; инструкция: ## Что нужно, ## Шаги; другое: ## Главное, ## Что происходит в видео, ## Вывод). Если в тексте есть время, оставь [m:ss] в начале каждого шага.\n\nВИДЕО: "}
@@ -375,15 +375,35 @@ async function buildDocx(){
 
 /* ---------- auto text (Cloudflare helper) ---------- */
 const WORKER="https://lingvid.3307999.workers.dev/";
+async function gtrans(segs,tl){
+  const out=segs.map(x=>({...x}));let i=0;
+  while(i<out.length){
+    let j=i,len=0;while(j<out.length&&len+out[j].text.length+1<1800){len+=out[j].text.length+1;j++}
+    if(j===i)j=i+1;
+    const q=out.slice(i,j).map(x=>x.text.replace(/\n/g," ")).join("\n");
+    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&dt=t&tl="+tl+"&q="+encodeURIComponent(q));
+    if(!r.ok)throw new Error("translate "+r.status);
+    const d=await r.json();const lines=[];let c="";
+    for(const p of d[0]||[]){c+=p[0]||"";if(/\n\s*$/.test(p[1]||"")||/\n\s*$/.test(p[0]||"")){lines.push(c.trim());c=""}}
+    if(c.trim())lines.push(c.trim());
+    if(lines.length===j-i)lines.forEach((t,k)=>out[i+k].text=t);
+    else{out[i].text=lines.join(" ");for(let k=i+1;k<j;k++)out[k].text=""}
+    i=j;$("autoSt").textContent=T[L].autoTrWait+" "+Math.round(i/out.length*100)+"%";
+  }
+  return out.filter(x=>x.text);
+}
 async function autoText(){
   const t=T[L];if(!curVid){toast(t.badLink);return}
   const b=$("autoBtn");b.disabled=true;$("autoSt").textContent=t.autoWait;
   try{
-    const r=await fetch(WORKER+"?v="+curVid+($("tl").checked?"&lang="+L:""));const d=await r.json();
+    const r=await fetch(WORKER+"?v="+curVid);const d=await r.json();
     if(!d.segments||!d.segments.length){$("autoSt").textContent=t.autoFail;return}
-    const head=(d.title?"# "+d.title+"\n":"");
-    $("txt").value=d.segments.map(s=>`[${s.t}] ${s.text}`).join("\n")+(d.description?"\n\n"+d.description:"");
-    $("autoSt").textContent=(d.translated?t.autoTr:t.autoOrig)+" ("+d.lang+")";
+    let segs=d.segments,tr=false;
+    if($("tl").checked&&(d.original||"").split("-")[0]!==L){
+      try{segs=await gtrans(segs,L);tr=true}catch(e){$("autoSt").textContent=t.autoNoTr}
+    }
+    $("txt").value=segs.map(s=>`[${s.t}] ${s.text}`).join("\n");
+    if(!tr||$("autoSt").textContent!==t.autoNoTr)$("autoSt").textContent=(tr?t.autoTr:t.autoOrig)+" ("+(tr?L:d.original||"?")+")";
     cur=parse($("txt").value);cur.r.title=d.title||cur.r.title;render();$("c4").hidden=false;
     try{localStorage.setItem("lv_txt",$("txt").value)}catch(e){}
     $("out").scrollIntoView({block:"start"});
