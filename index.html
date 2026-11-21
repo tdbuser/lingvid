@@ -29,7 +29,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Nunito,system
 header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
 h1{font:700 clamp(34px,8vw,48px)/1 Rubik,sans-serif;margin:0;color:#2b1530;flex:1}
 @media (prefers-color-scheme:dark){h1{color:#f6eef7}}
-.lang{display:flex;border:2px solid rgba(43,21,48,.25);border-radius:12px;overflow:hidden;background:var(--card)}
+.lang{display:flex;align-items:center;gap:6px;border:2px solid rgba(43,21,48,.25);border-radius:12px;padding:0 8px;background:var(--card)}.lang select{border:0;background:transparent;color:var(--ink);font:700 15px Nunito,system-ui,sans-serif;min-height:42px;max-width:46vw}
 .lang button{border:0;background:transparent;color:var(--ink);font:700 14px Nunito,system-ui,sans-serif;min-height:40px;padding:0 12px;cursor:pointer}
 .lang button[aria-pressed=true]{background:var(--ink);color:var(--card)}
 .lead{margin:6px 0 16px;font-weight:600;opacity:.85}
@@ -81,6 +81,11 @@ ul.bl{margin:0;padding-left:20px}ul.bl li{margin:6px 0}
 .chk{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);border-radius:14px;margin-bottom:8px;cursor:pointer}
 .chk input{width:22px;height:22px;flex:none;margin-top:2px;accent-color:var(--acc)}.chk small{display:block;color:var(--soft);font-size:13px;line-height:1.35}
 .seg{border-radius:8px;transition:background .2s}.seg.now{background:light-dark(#ffe58a,#5a4520);box-shadow:0 0 0 4px light-dark(#ffe58a,#5a4520)}
+.wd{border-radius:4px;transition:background .12s,color .12s}
+.ln.cur .wd.pw{opacity:.55}
+.wd.cw{background:var(--acc);color:#fff;box-shadow:0 0 0 2px var(--acc);font-weight:700}
+.wd.nw{text-decoration:underline 2px var(--acc);text-underline-offset:4px}
+@media (prefers-reduced-motion:reduce){.wd{transition:none}}
 .follow{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700;color:var(--soft);margin:2px 0 8px;cursor:pointer}.follow input{width:20px;height:20px;accent-color:var(--acc)}
 mark{background:#ffe066;color:#2b1530;border-radius:3px}
 #up{position:fixed;right:16px;bottom:20px;width:52px;height:52px;border-radius:50%;border:0;background:var(--ink);color:var(--card);font:700 22px Rubik;box-shadow:0 6px 18px rgba(0,0,0,.3);cursor:pointer;z-index:20}
@@ -97,7 +102,7 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
 <div id="spacer"></div>
 <div class="wrap">
   <header><h1>Lingvid</h1>
-    <div class="lang" role="group" aria-label="Til / Язык"><button type="button" data-l="uz" aria-pressed="true">O'zbekcha</button><button type="button" data-l="ru" aria-pressed="false">Русский</button></div>
+    <label class="lang" title="Language"><span aria-hidden="true">🌐</span><select id="uiLang" aria-label="Language"></select></label>
   </header>
   <p class="lead" data-t="lead"></p>
 
@@ -144,25 +149,26 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
 <script>
 {
 const T={
-uz:{lead:"YouTube video va uning matni bir sahifada: mundarija, ochiladigan bo'limlar, vaqt tugmalari, Word fayl. Bepul, ro'yxatdan o'tishsiz.",
+en:{"lead": "A YouTube video and its text on one page: contents, folding sections, time buttons, live highlighting, Word file. Free, no sign-up.", "s1": "Paste a YouTube link", "open": "▶ Open video", "s2": "Get the video text", "s2h": "These services don't allow being shown inside other sites, so they open in a new tab. The link is copied automatically — paste it there, copy the text and come back here.", "s3": "Paste the text here", "make": "Organize", "clr": "Clear", "s3h": "If the text has times ([0:12] or 0:12), time buttons play the video from that moment. Text with headings (#, 1., -) is split into sections.", "s4": "Translate with AI (optional)", "s4h": "Press a button: the task and the text are copied and the AI opens (short text is pasted automatically). Paste the answer back into step 3 — it will be split into sections.", "toLang": "Into which language", "oSense": "Meaning-based translation", "oSenseH": "On: natural, by meaning. Off: word for word, precise.", "oStruct": "Split into sections", "oStructH": "On: title, summary, sections. Off: only the full translation with times.", "follow": "Follow the video", "copyAll": "Copy all text", "toc": "Contents", "back": "↑ Contents", "top": "↑ Top", "sum": "Summary", "full": "Full text", "open2": "Expand all", "close": "Collapse all", "word": "Word (.docx)", "copy": "Copy", "tg": "Telegram", "find": "Search in text…", "hide": "▴ Hide", "show": "▾ Show video", "copied": "Copied ✓", "linkCopied": "Link copied — paste it there", "promptCopied": "Task and text copied — paste them there", "badLink": "Paste a YouTube link", "noText": "Paste the text first", "part": "Part", "text": "Text", "auto": "⚡ Get text automatically", "tl": "Translate into: {lang}", "autoWait": "Getting the text…", "autoFail": "Couldn't get the text for this video. Use the services below.", "autoTr": "Done — Google translation", "autoTrWait": "Translating…", "autoNoTr": "Translation failed — showing the original text", "autoOrig": "Done — original language", "siteLang": "Site language", "uiWait": "Translating the site…", "types": {"other": "Video text"}, "svc": [["DownSub", "Text + auto-translation into 100+ languages"], ["vidIQ Transcript", "Full text with times"], ["YouTube", "«…more» → «Show transcript»"]], "aiName": [["ChatGPT", "OpenAI, free"], ["Claude", "Anthropic, free"], ["Gemini", "Google, free"]]},
+uz:{top:"↑ Boshiga",sum:"Qisqacha",full:"To'liq matn",siteLang:"Sayt tili",uiWait:"Sayt tarjima qilinmoqda…",lead:"YouTube video va uning matni bir sahifada: mundarija, ochiladigan bo'limlar, vaqt tugmalari, Word fayl. Bepul, ro'yxatdan o'tishsiz.",
  s1:"YouTube havolasini qo'ying",open:"▶ Videoni ochish",
  s2:"Video matnini oling (bepul servislar)",s2h:"Bu servislar o'z sahifasini boshqa saytlar ichida ko'rsatishga ruxsat bermaydi, shuning uchun yangi oynada ochiladi. Havola avtomatik nusxalanadi — u yerga qo'ying, matnni nusxalab, shu sahifaga qayting.",
  s3:"Matnni shu yerga qo'ying",make:"Tartibga solish",clr:"Tozalash",s3h:"Vaqtli matn ([0:12] yoki 0:12) bo'lsa — vaqt tugmalari videoni aynan shu joydan qo'yadi. Sarlavhali matn (#, 1., -) bo'limlarga ajratiladi.",
  s4:"Sun'iy intellekt orqali tarjima (ixtiyoriy)",s4h:"Tugmani bosing: topshiriq va matn nusxalanadi va sun'iy intellekt ochiladi (qisqa matn avtomatik qo'yiladi). Javobni 3-qadamga qaytarib qo'ysangiz — bo'limlarga ajratiladi.",toLang:"Qaysi tilga",oSense:"Ma'noli tarjima",oSenseH:"Yoqilgan: tabiiy, ma'nosi bo'yicha. O'chirilgan: so'zma-so'z, aniq.",oStruct:"Bo'limlarga ajratish",oStructH:"Yoqilgan: sarlavha, qisqacha, bo'limlar. O'chirilgan: faqat to'liq tarjima, vaqtlar bilan.",follow:"Video bilan birga kuzatish",copyAll:"Butun matnni nusxalash",
  toc:"Mundarija",back:"↑ Mundarijaga",open2:"Hammasini ochish",close:"Hammasini yopish",word:"Word (.docx)",copy:"Nusxa olish",tg:"Telegram",find:"Matndan qidirish…",
  hide:"▴ Yashirish",show:"▾ Videoni ko'rsatish",copied:"Nusxalandi ✓",linkCopied:"Havola nusxalandi — u yerga qo'ying",promptCopied:"Topshiriq va matn nusxalandi — u yerga qo'ying",badLink:"YouTube havolasini qo'ying",noText:"Avval matnni qo'ying",
- part:"Qism",text:"Matn",auto:"⚡ Matnni avtomatik olish",tl:"O'zbekchaga tarjima bilan",autoWait:"Matn olinmoqda…",autoFail:"Bu video uchun matn olinmadi. Pastdagi servislardan foydalaning.",autoTr:"Tayyor — Google tarjimasi",autoTrWait:"Tarjima qilinmoqda…",autoNoTr:"Tarjima ishlamadi — asl tildagi matn ko'rsatildi",autoOrig:"Tayyor — asl tilda",types:{other:"Video matni"},
+ part:"Qism",text:"Matn",auto:"⚡ Matnni avtomatik olish",tl:"Tarjima: {lang}",autoWait:"Matn olinmoqda…",autoFail:"Bu video uchun matn olinmadi. Pastdagi servislardan foydalaning.",autoTr:"Tayyor — Google tarjimasi",autoTrWait:"Tarjima qilinmoqda…",autoNoTr:"Tarjima ishlamadi — asl tildagi matn ko'rsatildi",autoOrig:"Tayyor — asl tilda",types:{other:"Video matni"},
  svc:[["DownSub","Matn + o'zbekchaga avto-tarjima"],["vidIQ Transcript","To'liq matn, vaqtlar bilan"],["YouTube","«…ещё» → «Показать текст видео»"]],
  aiName:[["ChatGPT","OpenAI, bepul"],["Claude","Anthropic, bepul"],["Gemini","Google, bepul"]],
  prompt:"Quyidagi YouTube video matnini o'zbek tilida (lotin) to'liq, tushunarli matnga aylantiring. So'zma-so'z emas, MA'NOSI bo'yicha tarjima qiling. Hech narsa o'ylab topmang. Tuzilishi: # Sarlavha, keyin ## Qisqacha (3-5 gap), ## bo'limlar (retsept bo'lsa: ## Masalliqlar — ro'yxat '- nomi — miqdori', ## Tayyorlash — '1. qadam'; yo'riqnoma bo'lsa: ## Kerakli narsalar, ## Qadamlar; boshqa bo'lsa: ## Asosiy fikrlar, ## Videoda nima bo'ladi, ## Xulosa). Agar matnda vaqtlar bo'lsa, har qadam boshida [m:ss] qoldiring.\n\nVIDEO: "},
-ru:{lead:"Видео YouTube и его текст на одной странице: содержание, раскрывающиеся разделы, кнопки времени, файл Word. Бесплатно, без регистрации.",
+ru:{top:"↑ В начало",sum:"Кратко",full:"Полный текст",siteLang:"Язык сайта",uiWait:"Перевожу сайт…",lead:"Видео YouTube и его текст на одной странице: содержание, раскрывающиеся разделы, кнопки времени, файл Word. Бесплатно, без регистрации.",
  s1:"Вставьте ссылку YouTube",open:"▶ Открыть видео",
  s2:"Получите текст видео (бесплатные сервисы)",s2h:"Эти сервисы не разрешают показывать себя внутри других сайтов, поэтому открываются в новой вкладке. Ссылка копируется автоматически — вставьте её там, скопируйте текст и вернитесь сюда.",
  s3:"Вставьте текст сюда",make:"Разложить по полочкам",clr:"Очистить",s3h:"Если в тексте есть время ([0:12] или 0:12) — кнопки времени включают видео с этого места. Текст с заголовками (#, 1., -) делится на разделы.",
  s4:"Перевод через ИИ (по желанию)",s4h:"Нажмите кнопку: задание и текст скопируются и откроется ИИ (короткий текст вставится сам). Ответ верните в шаг 3 — он разложится по разделам.",toLang:"На какой язык",oSense:"Смысловой перевод",oSenseH:"Включено: естественно, по смыслу. Выключено: дословно, точно.",oStruct:"Разложить по разделам",oStructH:"Включено: заголовок, кратко, разделы. Выключено: только полный перевод со временем.",follow:"Следить за видео",copyAll:"Скопировать весь текст",
  toc:"Содержание",back:"↑ К содержанию",open2:"Открыть все",close:"Свернуть все",word:"Word (.docx)",copy:"Копировать",tg:"Telegram",find:"Поиск по тексту…",
  hide:"▴ Скрыть",show:"▾ Показать видео",copied:"Скопировано ✓",linkCopied:"Ссылка скопирована — вставьте её там",promptCopied:"Задание и текст скопированы — вставьте там",badLink:"Вставьте ссылку YouTube",noText:"Сначала вставьте текст",
- part:"Часть",text:"Текст",auto:"⚡ Получить текст автоматически",tl:"С переводом на русский",autoWait:"Получаю текст…",autoFail:"Для этого видео текст получить не удалось. Используйте сервисы ниже.",autoTr:"Готово — перевод Google",autoTrWait:"Перевожу…",autoNoTr:"Перевод не сработал — показан текст на языке оригинала",autoOrig:"Готово — на языке оригинала",types:{other:"Текст видео"},
+ part:"Часть",text:"Текст",auto:"⚡ Получить текст автоматически",tl:"Перевод на: {lang}",autoWait:"Получаю текст…",autoFail:"Для этого видео текст получить не удалось. Используйте сервисы ниже.",autoTr:"Готово — перевод Google",autoTrWait:"Перевожу…",autoNoTr:"Перевод не сработал — показан текст на языке оригинала",autoOrig:"Готово — на языке оригинала",types:{other:"Текст видео"},
  svc:[["DownSub","Текст + автоперевод на 100+ языков"],["vidIQ Transcript","Полный текст со временем"],["YouTube","«…ещё» → «Показать текст видео»"]],
  aiName:[["ChatGPT","OpenAI, бесплатно"],["Claude","Anthropic, бесплатно"],["Gemini","Google, бесплатно"]],
  prompt:"Преврати текст этого YouTube-видео в понятный полный текст на русском языке. Переводи по СМЫСЛУ, не дословно. Ничего не выдумывай. Структура: # Заголовок, затем ## Кратко (3-5 предложений), ## разделы (рецепт: ## Ингредиенты — список '- название — количество', ## Приготовление — '1. шаг'; инструкция: ## Что нужно, ## Шаги; другое: ## Главное, ## Что происходит в видео, ## Вывод). Если в тексте есть время, оставь [m:ss] в начале каждого шага.\n\nВИДЕО: "}
@@ -191,7 +197,10 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const vidOf=u=>{const m=String(u).match(/(?:youtu\.be\/|v=|shorts\/|live\/|embed\/)([A-Za-z0-9_-]{11})/);return m?m[1]:null};
 const toSec=t=>{const m=String(t||"").match(/^(\d+):(\d{2})(?::(\d{2}))?$/);if(!m)return null;return m[3]!=null?+m[1]*3600+ +m[2]*60+ +m[3]:+m[1]*60+ +m[2]};
 const fmt=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,"0");return h?`${h}:${String(m).padStart(2,"0")}:${x}`:`${m}:${x}`};
-let L=(navigator.language||"").startsWith("ru")?"ru":"uz";try{L=localStorage.getItem("lv_lang")||L}catch(e){}
+const UIL=[["en","English"],["ru","Русский"],["uz","O'zbekcha"],["tr","Türkçe"],["kk","Қазақша"],["ky","Кыргызча"],["tg","Тоҷикӣ"],["tk","Türkmençe"],["az","Azərbaycanca"],["uk","Українська"],["ar","العربية"],["fa","فارسی"],["ur","اردو"],["hi","हिन्दी"],["bn","বাংলা"],["id","Bahasa Indonesia"],["ms","Bahasa Melayu"],["vi","Tiếng Việt"],["th","ไทย"],["zh-CN","中文 (简体)"],["zh-TW","中文 (繁體)"],["ja","日本語"],["ko","한국어"],["de","Deutsch"],["fr","Français"],["es","Español"],["pt","Português"],["it","Italiano"],["nl","Nederlands"],["pl","Polski"],["ro","Română"],["cs","Čeština"],["el","Ελληνικά"],["he","עברית"],["sv","Svenska"],["fi","Suomi"],["hu","Magyar"],["ka","ქართული"],["hy","Հայերեն"],["mn","Монгол"],["sw","Kiswahili"]];
+const pickLang=c=>{c=(c||"").toLowerCase();const f=UIL.find(x=>x[0].toLowerCase()===c)||UIL.find(x=>x[0].split("-")[0]===c.split("-")[0]);return f?f[0]:"en"};
+let L="en";try{L=pickLang(localStorage.getItem("lv_lang")||navigator.language||"en")}catch(e){L=pickLang(navigator.language)}
+const want=L;if(!T[L]){try{const c=JSON.parse(localStorage.getItem("lv_ui_"+L)||"null");if(c&&c.lead)T[L]=c}catch(e){}if(!T[L])L="en"}
 let curVid=null,cur=null;
 const toast=m=>{const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2600)};
 async function copy(s){try{await navigator.clipboard.writeText(s);return true}catch(e){const a=document.createElement("textarea");a.value=s;document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand("copy")}catch(_){}a.remove();return ok}}
@@ -199,7 +208,8 @@ async function copy(s){try{await navigator.clipboard.writeText(s);return true}ca
 function ui(){
   const t=T[L];document.documentElement.lang=L;
   document.querySelectorAll("[data-t]").forEach(e=>e.textContent=t[e.dataset.t]);
-  document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.l===L)));
+  const us=$("uiLang");if(!us.options.length)us.innerHTML=UIL.map(([c,n])=>`<option value="${c}">${esc(n)}</option>`).join("");us.value=L;
+  document.documentElement.dir=/^(ar|fa|ur|he)/.test(L)?"rtl":"ltr";
   $("open").textContent=t.open;$("make").textContent=t.make;$("clr").textContent=t.clr;
   const v=curVid,yurl=v?"https://www.youtube.com/watch?v="+v:"https://www.youtube.com/";
   const S=[["https://downsub.com/?url="+encodeURIComponent(yurl),"translate","#2b7a6f"],["https://vidiq.com/youtube-transcript-generator/","text","#3a5bbf"],[yurl,"play","#d8432b"]];
@@ -209,11 +219,29 @@ function ui(){
   $("ai").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{const pr=buildPrompt();copy(pr);toast(t.promptCopied);
     const i=+a.dataset.i;if(i<2&&pr.length<6000)a.href=A[i][0]+"?q="+encodeURIComponent(pr);else a.href=A[i][0]}));
   const sel=$("tlang"),keep=sel.value||L;sel.innerHTML=LANGS.map(([c,n])=>`<option value="${c}">${esc(n)}</option>`).join("");sel.value=keep;
-  $("auto").hidden=!WORKER;$("autoBtn").textContent=t.auto;$("tlT").textContent=t.tl;
+  $("auto").hidden=!WORKER;$("autoBtn").textContent=t.auto;$("tlT").textContent=t.tl.replace("{lang}",(UIL.find(x=>x[0]===L)||[0,L])[1]);
   if(cur)render();
   if(!$("top").hidden)$("mn").textContent=$("top").classList.contains("min")?t.show:t.hide;
 }
-document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{L=b.dataset.l;try{localStorage.setItem("lv_lang",L)}catch(e){}ui()}));
+async function translateUI(code){
+  // translate English strings into any language with Google (in the visitor's browser), cache it
+  const flat=[];const walk=(o,path)=>{for(const k in o){const v=o[k],pp=path.concat(k);if(typeof v==="string")flat.push([pp,v]);else walk(v,pp)}};walk(T.en,[]);
+  const src=flat.map(x=>x[1].replace(/\n/g," "));const outv=[];let i=0;
+  while(i<src.length){let j=i,len=0;while(j<src.length&&len+src[j].length+1<1500){len+=src[j].length+1;j++}if(j===i)j=i+1;
+    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&dt=t&tl="+code+"&q="+encodeURIComponent(src.slice(i,j).join("\n")));
+    if(!r.ok)throw new Error(r.status);const d=await r.json();const lines=[];let c="";
+    for(const p of d[0]||[]){c+=p[0]||"";if(/\n\s*$/.test(p[1]||"")){lines.push(c.trim());c=""}}if(c.trim())lines.push(c.trim());
+    if(lines.length!==j-i)throw new Error("align");outv.push(...lines);i=j}
+  const o=JSON.parse(JSON.stringify(T.en));flat.forEach(([pp],k)=>{let x=o;for(let q=0;q<pp.length-1;q++)x=x[pp[q]];x[pp[pp.length-1]]=outv[k].replace(/\{ ?lang ?\}/i,"{lang}")});
+  ["svc","aiName"].forEach(k=>o[k].forEach((r,n)=>r[0]=T.en[k][n][0]));o.word="Word (.docx)";o.tg="Telegram";
+  return o;
+}
+async function setLang(code){
+  try{localStorage.setItem("lv_lang",code)}catch(e){}
+  if(!T[code]){toast((T[L]||T.en).uiWait);try{T[code]=await translateUI(code);try{localStorage.setItem("lv_ui_"+code,JSON.stringify(T[code]))}catch(e){}}catch(e){toast("Translation unavailable — English");code="en"}}
+  L=code;ui();
+}
+$("uiLang").addEventListener("change",e=>setLang(e.target.value));
 
 function play(v){
   if(!v)return;curVid=v;$("top").hidden=false;$("top").classList.remove("min");
@@ -264,7 +292,8 @@ function parse(raw){
       const hasAmt=s.items.some(i=>i.amount);return{title:s.title,kind:hasAmt?"checklist":main,items:s.items}});
   }else{
     const segs=[];let buf="",bt=null;
-    const flush=()=>{if(buf.trim())segs.push({t:bt,text:buf.trim()});buf="";bt=null};
+    let parts=[];
+    const flush=()=>{if(buf.trim())segs.push({t:bt,text:buf.trim(),parts});buf="";bt=null;parts=[]};
     for(let i=0;i<lines.length;i++){
       let l=lines[i];if(!l)continue;
       let t=null;const tm=l.match(TS);
@@ -275,6 +304,7 @@ function parse(raw){
       if(t!=null&&bt!=null&&t-bt>=15)flush();
       if(t!=null&&bt===null)bt=t;
       buf+=(buf?" ":"")+l;
+      if(t!=null||!parts.length)parts.push({s:t,text:l});else parts[parts.length-1].text+=" "+l;
       if(buf.length>700||(bt===null&&/[.!?]$/.test(l)&&buf.length>350))flush();
     }
     flush();
@@ -282,23 +312,26 @@ function parse(raw){
     const per=timed?180:6;const groups=[];
     segs.forEach((s,i)=>{const key=timed?Math.floor((s.t??0)/per):Math.floor(i/per);(groups[key]=groups[key]||[]).push(s)});
     secs=groups.filter(Boolean).map((g,i)=>{const a=g[0].t,b=g[g.length-1].t;
-      return{title:timed?`${T[L].part} ${i+1} · ${fmt(a??0)}–${fmt(b??a??0)}`:`${T[L].part} ${i+1}`,kind:"text",items:g.map(s=>({text:s.text,t:s.t!=null?fmt(s.t):""}))}});
+      return{title:timed?`${T[L].part} ${i+1} · ${fmt(a??0)}–${fmt(b??a??0)}`:`${T[L].part} ${i+1}`,kind:"text",items:g.map(s=>({text:s.text,t:s.t!=null?fmt(s.t):"",parts:s.parts&&s.parts.some(x=>x.s!=null)?s.parts:null}))}});
   }
   const icon=s=>{const x=s.title.toLowerCase();
     return /qisqa|кратк|summary|xulosa|вывод/.test(x)?"info":/masalliq|ингред|состав|kerak|нужн|tools/.test(x)?"basket":/tayyor|приготов|qadam|шаг|step/.test(x)?"steps":/maslahat|совет|tip/.test(x)?"tip":/ehtiyot|diqqat|внимани|осторож|warn/.test(x)?"warn":/asosiy|главн|main/.test(x)?"star":/videoda|происход/.test(x)?"play":s.kind==="checklist"?"basket":s.kind==="steps"?"steps":"text"};
   secs.forEach(s=>s.icon=icon(s));
-  return{r:{title:title||(L==="ru"?"Текст видео":"Video matni"),type:"other",meta:[],sections:secs}};
+  return{r:{title:title||T[L].types.other,type:"other",meta:[],sections:secs}};
 }
 
+const words=s=>esc(s).split(/(\s+)/).map(w=>/^\s*$/.test(w)?w:`<span class="wd">${w}</span>`).join("");
+const lineHTML=(text,sec)=>sec!=null?`<span class="ln" data-a="${sec}">${words(text)}</span>`:esc(text);
+const itemText=i=>i.parts?i.parts.map(x=>lineHTML(x.text,x.s)).join(" "):lineHTML(i.text,toSec(i.t));
 const segAttr=t=>{const s=toSec(t);return s!=null?` class="seg" data-sec="${s}"`:""};
 function tsBtn(t){const s=toSec(t);return s!=null?`<button class="ts" type="button" data-s="${s}">▶ ${esc(t)}</button>`:""}
 function secBody(s){const it=s.items||[];
-  if(s.kind==="checklist")return`<ul class="ck">${it.map(i=>`<li${segAttr(i.t)}><span class="box">✓</span><span>${tsBtn(i.t)}${esc(i.text)}${i.amount?` — <b>${esc(i.amount)}</b>`:""}${i.note?` <i style="color:var(--soft)">(${esc(i.note)})</i>`:""}</span></li>`).join("")}</ul>`;
-  if(s.kind==="steps")return`<ol class="st">${it.map(i=>`<li${segAttr(i.t)}><span>${tsBtn(i.t)}${esc(i.text)}</span></li>`).join("")}</ol>`;
-  if(s.kind==="bullets")return`<ul class="bl">${it.map(i=>`<li${segAttr(i.t)}>${tsBtn(i.t)}${esc(i.text)}</li>`).join("")}</ul>`;
-  return it.map(i=>`<p${segAttr(i.t)}>${tsBtn(i.t)}${esc(i.text)}</p>`).join("");
+  if(s.kind==="checklist")return`<ul class="ck">${it.map(i=>`<li${segAttr(i.t)}><span class="box">✓</span><span>${tsBtn(i.t)}${itemText(i)}${i.amount?` — <b>${esc(i.amount)}</b>`:""}${i.note?` <i style="color:var(--soft)">(${esc(i.note)})</i>`:""}</span></li>`).join("")}</ul>`;
+  if(s.kind==="steps")return`<ol class="st">${it.map(i=>`<li${segAttr(i.t)}><span>${tsBtn(i.t)}${itemText(i)}</span></li>`).join("")}</ol>`;
+  if(s.kind==="bullets")return`<ul class="bl">${it.map(i=>`<li${segAttr(i.t)}>${tsBtn(i.t)}${itemText(i)}</li>`).join("")}</ul>`;
+  return it.map(i=>`<p${segAttr(i.t)}>${tsBtn(i.t)}${itemText(i)}</p>`).join("");
 }
-function sectionsFlat(){const s=(cur.r.sections||[]).slice();if(cur.r.summary)s.unshift({icon:"info",title:L==="ru"?"Кратко":"Qisqacha",kind:"text",items:[{text:cur.r.summary}]});if(cur.full)s.push({icon:"translate",title:L==="ru"?"Полный текст":"To'liq matn",kind:"text",items:cur.full});return s}
+function sectionsFlat(){const s=(cur.r.sections||[]).slice();if(cur.r.summary)s.unshift({icon:"info",title:T[L].sum,kind:"text",items:[{text:cur.r.summary}]});if(cur.full)s.push({icon:"translate",title:T[L].full,kind:"text",items:cur.full});return s}
 function render(){
   const t=T[L],S=sectionsFlat();
   $("out").innerHTML=`<h2 class="tt">${esc(cur.r.title)}</h2>
@@ -312,7 +345,7 @@ function render(){
      <button class="go" type="button" id="cp" style="flex:1 1 100%;background:var(--ink);color:var(--card)">${t.copyAll}</button>
      <a class="ghost" id="tgl" target="_blank" rel="noopener" href="#">${t.tg} ↗</a>
    </div>`;
-  $("out").hidden=false;
+  $("out").hidden=false;indexLines();
   if(!$("top").hidden)$("nm").textContent=cur.r.title;
   const plain=asText();
   $("tgl").href="https://t.me/share/url?url="+encodeURIComponent(curVid?"https://youtu.be/"+curVid:location.href)+"&text="+encodeURIComponent(plain.slice(0,3000));
@@ -388,11 +421,11 @@ async function buildDocx(){
       else if(s.kind==="text")b+=para((it.t&&s.icon==="translate"?ext(`https://www.youtube.com/watch?v=${curVid}&t=${toSec(it.t)||0}s`,`[${it.t}] `):"")+run(it.text)+(s.icon==="translate"?"":extra),{sp:160});
       else b+=para(run("• ",{c:"D8432B"})+run(it.text)+extra,{ind:440,hang:300,sp:60});
     });
-    b+=para(anc("toc",t.back,{c:"6D5A70"})+run("    ")+anc("top",L==="ru"?"↑ В начало":"↑ Boshiga",{c:"6D5A70"}),{sp:200});
+    b+=para(anc("toc",t.back,{c:"6D5A70"})+run("    ")+anc("top",T[L].top||"↑",{c:"6D5A70"}),{sp:200});
   });
   const NS='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
   const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${b}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>`;
-  const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri" w:eastAsia="Calibri"/><w:sz w:val="24"/><w:lang w:val="${L==="ru"?"ru-RU":"uz-Latn-UZ"}"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="300" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="200"/></w:pPr><w:rPr><w:b/><w:color w:val="2B1530"/><w:sz w:val="44"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="360" w:after="160"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:color w:val="2B1530"/><w:sz w:val="32"/></w:rPr></w:style></w:styles>`;
+  const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri" w:eastAsia="Calibri"/><w:sz w:val="24"/><w:lang w:val="${L}"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="300" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="200"/></w:pPr><w:rPr><w:b/><w:color w:val="2B1530"/><w:sz w:val="44"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="360" w:after="160"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:color w:val="2B1530"/><w:sz w:val="32"/></w:rPr></w:style></w:styles>`;
   const files=[
     {name:"[Content_Types].xml",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`},
     {name:"_rels/.rels",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`},
@@ -450,8 +483,40 @@ $("sp").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)re
 $("ctl").addEventListener("click",e=>{const b=e.target.closest("button[data-c]");if(!b)return;const c=b.dataset.c;
   if(c==="toggle"){ytCmd(playing?"pauseVideo":"playVideo")}
   else{ytCmd("seekTo",[Math.max(0,curT+(c==="back"?-5:5)),true]);ytCmd("playVideo")}});
-/* ---------- follow the video ---------- */
-let lastNow=null;
+/* ---------- follow the video (karaoke) ---------- */
+let lastNow=null,lastLn=null,lastW=null,clk={t:0,at:0},lines=[];
+function indexLines(){
+  lines=[...$("out").querySelectorAll(".ln")].map(el=>({el,a:+el.dataset.a,w:[...el.querySelectorAll(".wd")]}));
+  lines.forEach((x,i)=>{const n=lines[i+1];x.b=n&&n.a>x.a?n.a:x.a+Math.max(2,x.w.length*0.45)});
+  lines.forEach(x=>{const total=x.w.reduce((s,w)=>s+w.textContent.length+1,0)||1;let acc=0;x.ws=x.w.map(w=>{const s=x.a+(x.b-x.a)*acc/total;acc+=w.textContent.length+1;return s})});
+  lastNow=lastLn=lastW=null;
+}
+const nowT=()=>clk.t+(playing?(performance.now()-clk.at)/1000*rate:0);
+function scrollUnder(el){const topH=$("top").hidden?0:$("top").offsetHeight;const y=el.getBoundingClientRect().top+scrollY-topH-10;scrollTo({top:Math.max(0,y),behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"})}
+function tick(){
+  requestAnimationFrame(tick);
+  if($("out").hidden||!clk.at)return;
+  const ct=nowT();
+  // paragraph highlight (yellow)
+  const segs=$("out").querySelectorAll(".seg");let best=null,bs=-1;
+  for(const s of segs){const v=+s.dataset.sec;if(v<=ct+0.3&&v>=bs){bs=v;best=s}}
+  if(best!==lastNow){if(lastNow)lastNow.classList.remove("now");lastNow=best;if(best){best.classList.add("now");const d2=best.closest("details");if($("fol")&&$("fol").checked&&d2&&!d2.open)d2.open=true}}
+  // line + word highlight
+  if(!lines.length)return;
+  let ln=null;for(const x of lines){if(x.a<=ct+0.15)ln=x;else break}
+  if(ln&&ct>ln.b+1.5)ln=null;
+  if(ln!==lastLn){
+    if(lastLn){lastLn.el.classList.remove("cur");lastLn.w.forEach(w=>w.classList.remove("cw","nw","pw"))}
+    lastLn=ln;lastW=null;
+    if(ln){ln.el.classList.add("cur");if($("fol")&&$("fol").checked){const d2=ln.el.closest("details");if(d2&&!d2.open)d2.open=true;scrollUnder(ln.el)}}
+  }
+  if(!ln)return;
+  let k=0;for(let i=0;i<ln.ws.length;i++){if(ln.ws[i]<=ct)k=i;else break}
+  if(k===lastW)return;lastW=k;
+  ln.w.forEach((w,i)=>{w.classList.toggle("pw",i<k);w.classList.toggle("cw",i===k);w.classList.toggle("nw",i===k+1)});
+  if(k+1>=ln.w.length){const nx=lines[lines.indexOf(ln)+1];if(nx&&nx.w[0])nx.w[0].classList.add("nw")}
+}
+requestAnimationFrame(tick);
 function listen(){const w=$("yt").contentWindow;if(w)w.postMessage(JSON.stringify({event:"listening",id:1,channel:"widget"}),"*")}
 $("yt").addEventListener("load",()=>{listen();setTimeout(listen,1000);setTimeout(listen,3000)});
 addEventListener("message",e=>{
@@ -459,11 +524,8 @@ addEventListener("message",e=>{
   let d;try{d=typeof e.data==="string"?JSON.parse(e.data):e.data}catch(_){return}
   if(d&&d.info&&typeof d.info.playerState==="number"){playing=d.info.playerState===1;$("pp").textContent=playing?"⏸":"▶"}
   if(d&&d.info&&typeof d.info.playbackRate==="number"&&d.info.playbackRate!==rate){rate=d.info.playbackRate;$("sp").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(+x.dataset.r===rate)))}
-  const ct=d&&d.info&&typeof d.info.currentTime==="number"?d.info.currentTime:null;if(ct!=null)curT=ct;if(ct==null||$("out").hidden)return;
-  const segs=[...$("out").querySelectorAll(".seg")];if(!segs.length)return;
-  let best=null,bs=-1;for(const s of segs){const v=+s.dataset.sec;if(v<=ct+0.3&&v>=bs){bs=v;best=s}}
-  if(best===lastNow)return;if(lastNow)lastNow.classList.remove("now");lastNow=best;if(!best)return;best.classList.add("now");
-  if($("fol")&&$("fol").checked){const d2=best.closest("details");if(d2&&!d2.open)d2.open=true;best.scrollIntoView({block:"center",behavior:"smooth"})}
+  const ct=d&&d.info&&typeof d.info.currentTime==="number"?d.info.currentTime:null;
+  if(ct!=null){curT=ct;clk={t:ct,at:performance.now()}}
 });
 /* ---------- fixed player spacer ---------- */
 const fitTop=()=>{const h=$("top").hidden?0:$("top").offsetHeight;$("spacer").style.height=h+"px";document.documentElement.style.scrollPaddingTop=(h+10)+"px"};
@@ -475,13 +537,14 @@ function decode(h){const m=h.match(/[#&]d=([^&]+)/);if(!m)return null;
   try{let b=m[1].replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b),c=>c.charCodeAt(0))))}catch(e){return null}}
 const qs=new URLSearchParams(location.search);
 const d=decode(location.hash);
-if(d&&d.r){L=d.L==="ru"?"ru":"uz";cur={r:d.r,full:d.full||null};play(d.v);ui();$("out").scrollIntoView({block:"start"})}
+if(d&&d.r){if(T[d.L])L=d.L;cur={r:d.r,full:d.full||null};play(d.v);ui();$("out").scrollIntoView({block:"start"})}
 else{
   const v=vidOf(qs.get("v")||qs.get("url")||"")||(()=>{try{return localStorage.getItem("lv_vid")}catch(e){return null}})();
   if(v){$("link").value="https://youtu.be/"+v;play(v)}
   try{const x=localStorage.getItem("lv_txt");if(x){$("txt").value=x;$("c4").hidden=false}}catch(e){}
   ui();
 }
+if(want!==L)setLang(want);
 const up=$("up");addEventListener("scroll",()=>{up.hidden=scrollY<500},{passive:true});up.onclick=()=>scrollTo({top:0});
 }
 </script>
