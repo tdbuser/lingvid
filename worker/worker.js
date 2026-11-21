@@ -172,6 +172,27 @@ export default {
     const lang = (url.searchParams.get("lang") || "").toLowerCase();
     if (!/^[A-Za-z0-9_-]{11}$/.test(v)) return json({ error: "bad_video_id" }, 400);
 
+    // Cache: each video's captions are fetched from YouTube once, then served from Cloudflare's cache for 7 days.
+    const cacheKey = new Request("https://lingvid-cache.local/v/" + v + "/" + (lang || "orig"));
+    const cache = caches.default;
+    if (!url.searchParams.has("fresh")) {
+      const hit = await cache.match(cacheKey);
+      if (hit) { const r = new Response(hit.body, hit); r.headers.set("X-Lingvid-Cache", "HIT"); return r; }
+    }
+    const res = await handleVideo(v, lang);
+    try {
+      const body = await res.clone().json();
+      if (body && body.segments && body.segments.length) {
+        const toStore = new Response(JSON.stringify(body), { headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=604800", ...CORS } });
+        await cache.put(cacheKey, toStore);
+      }
+    } catch (e) {}
+    return res;
+  },
+};
+
+async function handleVideo(v, lang) {
+  {
     const p = await player(v);
     if (!p) return json({ error: "youtube_unavailable" }, 502);
     const det = p.d.videoDetails || {};
@@ -193,5 +214,6 @@ export default {
       try { segments = (await gtranslate(segments, lang)).filter(x => x.text); translated = true; via = "google"; } catch (e) { via = "error: " + (e && e.message || e); }
     }
     return json({ ...base, lang: translated ? lang : own, original: own, translated, via, segments });
-  },
-};
+  }
+}
+

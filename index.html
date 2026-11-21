@@ -500,18 +500,33 @@ async function gtrans(segs,tl){
   }
   return out.filter(x=>x.text);
 }
+/* local cache: up to 30 videos, 7 days — the same video is never downloaded or translated twice */
+const CK="lv_cache_v1",CTTL=7*864e5;
+function cacheGet(k){try{const c=JSON.parse(localStorage.getItem(CK)||"{}");const e=c[k];if(e&&Date.now()-e.at<CTTL)return e.v}catch(e){}return null}
+function cachePut(k,v){try{const c=JSON.parse(localStorage.getItem(CK)||"{}");c[k]={at:Date.now(),v};
+  const keys=Object.keys(c).sort((a,b)=>c[b].at-c[a].at);keys.forEach((x,i)=>{if(i>=60||Date.now()-c[x].at>CTTL)delete c[x]});
+  try{localStorage.setItem(CK,JSON.stringify(c))}catch(e){const ks=Object.keys(c).sort((a,b)=>c[a].at-c[b].at);ks.slice(0,Math.ceil(ks.length/2)).forEach(x=>delete c[x]);localStorage.setItem(CK,JSON.stringify(c))}}catch(e){}}
+async function fetchVideo(v){
+  const hit=cacheGet("v:"+v);if(hit)return hit;
+  let last=null;
+  for(let a=0;a<2;a++){
+    try{const r=await fetch(WORKER+"?v="+v);const d=await r.json();if(d.segments&&d.segments.length){cachePut("v:"+v,d);return d}last=d}catch(e){last={error:e.message||"network"}}
+    await new Promise(r=>setTimeout(r,1500));
+  }
+  return last||{error:"unknown"};
+}
 async function autoText(){
   const t=T[L];if(!curVid){toast(t.badLink);return}
   const b=$("autoBtn");b.disabled=true;$("autoSt").textContent=t.autoWait;
   try{
-    const r=await fetch(WORKER+"?v="+curVid);const d=await r.json();
+    const d=await fetchVideo(curVid);
     if(!d.segments||!d.segments.length){$("autoSt").textContent=t.autoFail+(d.error?" ("+d.error+")":"");return}
     let segs=d.segments,tr=false;
     if($("tl").checked&&(d.original||"").split("-")[0]!==L){
-      try{segs=await gtrans(segs,L);tr=true}catch(e){$("autoSt").textContent=t.autoNoTr}
+      const tk="t:"+curVid+":"+L,th=cacheGet(tk);if(th){segs=th;tr=true}else{try{segs=await gtrans(segs,L);tr=true;cachePut(tk,segs)}catch(e){$("autoSt").textContent=t.autoNoTr+" ("+(e&&e.message||e)+")"}}
     }
     $("txt").value=segs.map(s=>`[${s.t}] ${s.text}`).join("\n");
-    if(!tr||$("autoSt").textContent!==t.autoNoTr)$("autoSt").textContent=(tr?t.autoTr:t.autoOrig)+" ("+(tr?L:d.original||"?")+")";
+    if(!$("autoSt").textContent.startsWith(t.autoNoTr))$("autoSt").textContent=(tr?t.autoTr:t.autoOrig)+" ("+(tr?L:d.original||"?")+")";
     cur=parse($("txt").value);cur.r.title=d.title||cur.r.title;cur.lang=tr?L:(d.original||L);render();$("c4").hidden=false;
     try{localStorage.setItem("lv_txt",$("txt").value)}catch(e){}
     $("out").scrollIntoView({block:"start"});
