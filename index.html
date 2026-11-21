@@ -19,6 +19,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Nunito,system
 .bar{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:6px 14px;background:#120a14;color:#fff}
 .bar .nm{flex:1;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bar button{flex:none;min-height:38px;padding:0 12px;border:2px solid rgba(255,255,255,.35);border-radius:10px;background:transparent;color:#fff;font:700 14px Rubik,sans-serif;cursor:pointer}
+.ctl{max-width:720px;margin:0 auto;display:flex;gap:4px;align-items:center;padding:0 8px 8px;background:#120a14}
+.top.min .ctl{display:none}
+.ctl button{min-height:36px;min-width:36px;padding:0 6px;flex:none;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:transparent;color:#fff;font:700 13px Rubik,system-ui,sans-serif;cursor:pointer}
+.ctl .sp{display:flex;gap:3px;margin-left:auto}
+.ctl .sp button{min-width:0;padding:0 5px}
+.ctl .sp button[aria-pressed=true]{background:#ff7a5c;border-color:#ff7a5c}
 .wrap{max-width:720px;margin:0 auto;padding:18px 14px 90px}
 header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
 h1{font:700 clamp(34px,8vw,48px)/1 Rubik,sans-serif;margin:0;color:#2b1530;flex:1}
@@ -71,6 +77,11 @@ ol.st li.done::before{content:"✓";background:var(--acc)}ol.st li.done>span{opa
 ul.bl{margin:0;padding-left:20px}ul.bl li{margin:6px 0}
 .ts{display:inline-flex;align-items:center;margin:0 6px 0 0;padding:1px 10px;border-radius:999px;background:var(--acc);color:#fff;font-weight:700;font-size:13px;border:0;cursor:pointer;min-height:26px;vertical-align:1px;white-space:nowrap}
 .back{display:inline-block;margin-top:8px;font-size:14px;font-weight:700;color:var(--soft);text-decoration:none}
+.fl{display:block;font-weight:700;margin-bottom:10px}.fl select{display:block;width:100%;margin-top:6px;font:16px Nunito,system-ui,sans-serif;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink)}
+.chk{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);border-radius:14px;margin-bottom:8px;cursor:pointer}
+.chk input{width:22px;height:22px;flex:none;margin-top:2px;accent-color:var(--acc)}.chk small{display:block;color:var(--soft);font-size:13px;line-height:1.35}
+.seg{border-radius:8px;transition:background .2s}.seg.now{background:light-dark(#ffe58a,#5a4520);box-shadow:0 0 0 4px light-dark(#ffe58a,#5a4520)}
+.follow{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700;color:var(--soft);margin:2px 0 8px;cursor:pointer}.follow input{width:20px;height:20px;accent-color:var(--acc)}
 mark{background:#ffe066;color:#2b1530;border-radius:3px}
 #up{position:fixed;right:16px;bottom:20px;width:52px;height:52px;border-radius:50%;border:0;background:var(--ink);color:var(--card);font:700 22px Rubik;box-shadow:0 6px 18px rgba(0,0,0,.3);cursor:pointer;z-index:20}
 footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px}
@@ -81,6 +92,7 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
 <div class="top" id="top" hidden>
   <div class="frame"><iframe id="yt" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
   <div class="bar"><div class="nm" id="nm"></div><button id="mn" type="button"></button></div>
+  <div class="ctl" id="ctl"><button type="button" data-c="back" aria-label="-5s">−5</button><button type="button" data-c="toggle" id="pp" aria-label="Play/Pause">▶</button><button type="button" data-c="fwd" aria-label="+5s">+5</button><span class="sp" id="sp"></span></div>
 </div>
 <div id="spacer"></div>
 <div class="wrap">
@@ -115,7 +127,11 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
 
   <section class="card" id="c4" hidden>
     <div class="step"><span class="num">4</span><h2 data-t="s4"></h2></div>
-    <p class="hint" style="margin:0 0 10px" data-t="s4h"></p>
+    <label class="fl"><span data-t="toLang"></span>
+      <select id="tlang"></select></label>
+    <label class="chk"><input type="checkbox" id="optSense" checked><span><b data-t="oSense"></b><small data-t="oSenseH"></small></span></label>
+    <label class="chk"><input type="checkbox" id="optStruct" checked><span><b data-t="oStruct"></b><small data-t="oStructH"></small></span></label>
+    <p class="hint" style="margin:6px 0 10px" data-t="s4h"></p>
     <div class="svc" id="ai"></div>
   </section>
 
@@ -132,23 +148,23 @@ uz:{lead:"YouTube video va uning matni bir sahifada: mundarija, ochiladigan bo'l
  s1:"YouTube havolasini qo'ying",open:"▶ Videoni ochish",
  s2:"Video matnini oling (bepul servislar)",s2h:"Bu servislar o'z sahifasini boshqa saytlar ichida ko'rsatishga ruxsat bermaydi, shuning uchun yangi oynada ochiladi. Havola avtomatik nusxalanadi — u yerga qo'ying, matnni nusxalab, shu sahifaga qayting.",
  s3:"Matnni shu yerga qo'ying",make:"Tartibga solish",clr:"Tozalash",s3h:"Vaqtli matn ([0:12] yoki 0:12) bo'lsa — vaqt tugmalari videoni aynan shu joydan qo'yadi. Sarlavhali matn (#, 1., -) bo'limlarga ajratiladi.",
- s4:"Ma'noli tarjima va tahlil (ixtiyoriy)",s4h:"Topshiriq va matn nusxalanadi. Bepul sun'iy intellektni oching, qo'ying, javobini 3-qadamga qaytarib qo'ying — bo'limlarga ajratiladi.",
+ s4:"Sun'iy intellekt orqali tarjima (ixtiyoriy)",s4h:"Tugmani bosing: topshiriq va matn nusxalanadi va sun'iy intellekt ochiladi (qisqa matn avtomatik qo'yiladi). Javobni 3-qadamga qaytarib qo'ysangiz — bo'limlarga ajratiladi.",toLang:"Qaysi tilga",oSense:"Ma'noli tarjima",oSenseH:"Yoqilgan: tabiiy, ma'nosi bo'yicha. O'chirilgan: so'zma-so'z, aniq.",oStruct:"Bo'limlarga ajratish",oStructH:"Yoqilgan: sarlavha, qisqacha, bo'limlar. O'chirilgan: faqat to'liq tarjima, vaqtlar bilan.",follow:"Video bilan birga kuzatish",copyAll:"Butun matnni nusxalash",
  toc:"Mundarija",back:"↑ Mundarijaga",open2:"Hammasini ochish",close:"Hammasini yopish",word:"Word (.docx)",copy:"Nusxa olish",tg:"Telegram",find:"Matndan qidirish…",
  hide:"▴ Yashirish",show:"▾ Videoni ko'rsatish",copied:"Nusxalandi ✓",linkCopied:"Havola nusxalandi — u yerga qo'ying",promptCopied:"Topshiriq va matn nusxalandi — u yerga qo'ying",badLink:"YouTube havolasini qo'ying",noText:"Avval matnni qo'ying",
  part:"Qism",text:"Matn",auto:"⚡ Matnni avtomatik olish",tl:"O'zbekchaga tarjima bilan",autoWait:"Matn olinmoqda…",autoFail:"Bu video uchun matn olinmadi. Pastdagi servislardan foydalaning.",autoTr:"Tayyor — Google tarjimasi",autoTrWait:"Tarjima qilinmoqda…",autoNoTr:"Tarjima ishlamadi — asl tildagi matn ko'rsatildi",autoOrig:"Tayyor — asl tilda",types:{other:"Video matni"},
  svc:[["DownSub","Matn + o'zbekchaga avto-tarjima"],["vidIQ Transcript","To'liq matn, vaqtlar bilan"],["YouTube","«…ещё» → «Показать текст видео»"]],
- aiName:[["Gemini","Google, bepul"],["ChatGPT","OpenAI, bepul"],["Claude","Anthropic, bepul"]],
+ aiName:[["ChatGPT","OpenAI, bepul"],["Claude","Anthropic, bepul"],["Gemini","Google, bepul"]],
  prompt:"Quyidagi YouTube video matnini o'zbek tilida (lotin) to'liq, tushunarli matnga aylantiring. So'zma-so'z emas, MA'NOSI bo'yicha tarjima qiling. Hech narsa o'ylab topmang. Tuzilishi: # Sarlavha, keyin ## Qisqacha (3-5 gap), ## bo'limlar (retsept bo'lsa: ## Masalliqlar — ro'yxat '- nomi — miqdori', ## Tayyorlash — '1. qadam'; yo'riqnoma bo'lsa: ## Kerakli narsalar, ## Qadamlar; boshqa bo'lsa: ## Asosiy fikrlar, ## Videoda nima bo'ladi, ## Xulosa). Agar matnda vaqtlar bo'lsa, har qadam boshida [m:ss] qoldiring.\n\nVIDEO: "},
 ru:{lead:"Видео YouTube и его текст на одной странице: содержание, раскрывающиеся разделы, кнопки времени, файл Word. Бесплатно, без регистрации.",
  s1:"Вставьте ссылку YouTube",open:"▶ Открыть видео",
  s2:"Получите текст видео (бесплатные сервисы)",s2h:"Эти сервисы не разрешают показывать себя внутри других сайтов, поэтому открываются в новой вкладке. Ссылка копируется автоматически — вставьте её там, скопируйте текст и вернитесь сюда.",
  s3:"Вставьте текст сюда",make:"Разложить по полочкам",clr:"Очистить",s3h:"Если в тексте есть время ([0:12] или 0:12) — кнопки времени включают видео с этого места. Текст с заголовками (#, 1., -) делится на разделы.",
- s4:"Перевод по смыслу и анализ (по желанию)",s4h:"Задание и текст копируются. Откройте бесплатный ИИ, вставьте, а его ответ верните в шаг 3 — он разложится по разделам.",
+ s4:"Перевод через ИИ (по желанию)",s4h:"Нажмите кнопку: задание и текст скопируются и откроется ИИ (короткий текст вставится сам). Ответ верните в шаг 3 — он разложится по разделам.",toLang:"На какой язык",oSense:"Смысловой перевод",oSenseH:"Включено: естественно, по смыслу. Выключено: дословно, точно.",oStruct:"Разложить по разделам",oStructH:"Включено: заголовок, кратко, разделы. Выключено: только полный перевод со временем.",follow:"Следить за видео",copyAll:"Скопировать весь текст",
  toc:"Содержание",back:"↑ К содержанию",open2:"Открыть все",close:"Свернуть все",word:"Word (.docx)",copy:"Копировать",tg:"Telegram",find:"Поиск по тексту…",
  hide:"▴ Скрыть",show:"▾ Показать видео",copied:"Скопировано ✓",linkCopied:"Ссылка скопирована — вставьте её там",promptCopied:"Задание и текст скопированы — вставьте там",badLink:"Вставьте ссылку YouTube",noText:"Сначала вставьте текст",
  part:"Часть",text:"Текст",auto:"⚡ Получить текст автоматически",tl:"С переводом на русский",autoWait:"Получаю текст…",autoFail:"Для этого видео текст получить не удалось. Используйте сервисы ниже.",autoTr:"Готово — перевод Google",autoTrWait:"Перевожу…",autoNoTr:"Перевод не сработал — показан текст на языке оригинала",autoOrig:"Готово — на языке оригинала",types:{other:"Текст видео"},
  svc:[["DownSub","Текст + автоперевод на 100+ языков"],["vidIQ Transcript","Полный текст со временем"],["YouTube","«…ещё» → «Показать текст видео»"]],
- aiName:[["Gemini","Google, бесплатно"],["ChatGPT","OpenAI, бесплатно"],["Claude","Anthropic, бесплатно"]],
+ aiName:[["ChatGPT","OpenAI, бесплатно"],["Claude","Anthropic, бесплатно"],["Gemini","Google, бесплатно"]],
  prompt:"Преврати текст этого YouTube-видео в понятный полный текст на русском языке. Переводи по СМЫСЛУ, не дословно. Ничего не выдумывай. Структура: # Заголовок, затем ## Кратко (3-5 предложений), ## разделы (рецепт: ## Ингредиенты — список '- название — количество', ## Приготовление — '1. шаг'; инструкция: ## Что нужно, ## Шаги; другое: ## Главное, ## Что происходит в видео, ## Вывод). Если в тексте есть время, оставь [m:ss] в начале каждого шага.\n\nВИДЕО: "}
 };
 const IC={
@@ -188,10 +204,11 @@ function ui(){
   const v=curVid,yurl=v?"https://www.youtube.com/watch?v="+v:"https://www.youtube.com/";
   const S=[["https://downsub.com/?url="+encodeURIComponent(yurl),"translate","#2b7a6f"],["https://vidiq.com/youtube-transcript-generator/","text","#3a5bbf"],[yurl,"play","#d8432b"]];
   $("svc").innerHTML=S.map((s,i)=>`<a href="${esc(s[0])}" target="_blank" rel="noopener" data-copy="1">${ico(s[1],s[2])}<span><b>${esc(t.svc[i][0])} ↗</b><small>${esc(t.svc[i][1])}</small></span></a>`).join("");
-  const A=[["https://gemini.google.com/app","#3a5bbf"],["https://chatgpt.com/","#2b7a6f"],["https://claude.ai/new","#c96442"]];
-  $("ai").innerHTML=A.map((a,i)=>`<a href="${a[0]}" target="_blank" rel="noopener" data-ai="1">${ico("translate",a[1])}<span><b>${esc(t.aiName[i][0])} ↗</b><small>${esc(t.aiName[i][1])}</small></span></a>`).join("");
-  $("svc").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{if(curVid){copy("https://www.youtube.com/watch?v="+curVid);toast(t.linkCopied)}}));
-  $("ai").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{const x=$("txt").value.trim();copy(t.prompt+(curVid?"https://youtu.be/"+curVid:"")+"\n\n"+x);toast(t.promptCopied)}));
+  const A=[["https://chatgpt.com/","#2b7a6f"],["https://claude.ai/new","#c96442"],["https://gemini.google.com/app","#3a5bbf"]];
+  $("ai").innerHTML=A.map((a,i)=>`<a href="${a[0]}" target="_blank" rel="noopener" data-i="${i}">${ico("translate",a[1])}<span><b>${esc(t.aiName[i][0])} ↗</b><small>${esc(t.aiName[i][1])}</small></span></a>`).join("");
+  $("ai").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{const pr=buildPrompt();copy(pr);toast(t.promptCopied);
+    const i=+a.dataset.i;if(i<2&&pr.length<6000)a.href=A[i][0]+"?q="+encodeURIComponent(pr);else a.href=A[i][0]}));
+  const sel=$("tlang"),keep=sel.value||L;sel.innerHTML=LANGS.map(([c,n])=>`<option value="${c}">${esc(n)}</option>`).join("");sel.value=keep;
   $("auto").hidden=!WORKER;$("autoBtn").textContent=t.auto;$("tlT").textContent=t.tl;
   if(cur)render();
   if(!$("top").hidden)$("mn").textContent=$("top").classList.contains("min")?t.show:t.hide;
@@ -210,6 +227,17 @@ $("link").addEventListener("keydown",e=>{if(e.key==="Enter")$("open").click()});
 function seek(s){const w=$("yt").contentWindow;if(!w||$("top").hidden)return;$("top").classList.remove("min");$("mn").textContent=T[L].hide;
   const send=(f,a)=>w.postMessage(JSON.stringify({event:"command",func:f,args:a||[]}),"*");send("seekTo",[s,true]);send("playVideo")}
 
+const LANGS=[["uz","O'zbekcha (lotin)"],["uz-Cyrl","Ўзбекча (кирилл)"],["ru","Русский"],["en","English"],["tr","Türkçe"],["kk","Қазақша"],["ky","Кыргызча"],["tg","Тоҷикӣ"],["tk","Türkmençe"],["az","Azərbaycanca"],["ar","العربية"],["fa","فارسی"],["de","Deutsch"],["fr","Français"],["es","Español"],["it","Italiano"],["pt","Português"],["zh","中文"],["ja","日本語"],["ko","한국어"],["hi","हिन्दी"],["uk","Українська"]];
+function buildPrompt(){
+  const code=$("tlang").value,name=(LANGS.find(x=>x[0]===code)||[0,code])[1];
+  const sense=$("optSense").checked,struct=$("optStruct").checked;
+  let p=`Translate the YouTube video transcript below into ${name}.\n`;
+  p+=sense?"Translate by MEANING: natural, idiomatic sentences a native speaker would write. Fix obvious subtitle errors. Do not translate word by word.\n":"Translate LITERALLY and precisely, sentence by sentence, keeping the original wording as close as possible.\n";
+  p+="Do not invent anything and do not drop information.\n";
+  p+=struct?"Format: '# Title', then '## Summary' (3-5 sentences), then sections with '## ' headings that fit the video (recipe: ingredients as '- name — amount' and steps as '1. step'; instruction: what you need, steps; other: main points, what happens in the video, conclusion). Keep [m:ss] times at the start of steps when the transcript has them. All headings in "+name+".\n":"Format: the full translation as paragraphs of about 30-60 seconds; start every paragraph with its [m:ss] time.\n";
+  p+="\nVIDEO: "+(curVid?"https://youtu.be/"+curVid:"")+"\nTRANSCRIPT:\n"+$("txt").value.trim();
+  return p;
+}
 /* ---------- text -> sections ---------- */
 const TS=/^\s*\[?((?:\d{1,2}:)?\d{1,2}:\d{2})\]?\s*[-–—]?\s*/;
 function parse(raw){
@@ -244,7 +272,7 @@ function parse(raw){
       else if(/^\d+$/.test(l)&&lines[i+1]&&/-->/.test(lines[i+1]))continue;
       else if(/-->/.test(l)){const m2=l.match(/(\d+):(\d{2}):(\d{2})/);if(m2){bt=bt??(+m2[1]*3600+ +m2[2]*60+ +m2[3])}continue}
       if(!l)continue;
-      if(t!=null&&bt!=null&&t-bt>=40)flush();
+      if(t!=null&&bt!=null&&t-bt>=15)flush();
       if(t!=null&&bt===null)bt=t;
       buf+=(buf?" ":"")+l;
       if(buf.length>700||(bt===null&&/[.!?]$/.test(l)&&buf.length>350))flush();
@@ -262,24 +290,26 @@ function parse(raw){
   return{r:{title:title||(L==="ru"?"Текст видео":"Video matni"),type:"other",meta:[],sections:secs}};
 }
 
+const segAttr=t=>{const s=toSec(t);return s!=null?` class="seg" data-sec="${s}"`:""};
 function tsBtn(t){const s=toSec(t);return s!=null?`<button class="ts" type="button" data-s="${s}">▶ ${esc(t)}</button>`:""}
 function secBody(s){const it=s.items||[];
-  if(s.kind==="checklist")return`<ul class="ck">${it.map(i=>`<li><span class="box">✓</span><span>${tsBtn(i.t)}${esc(i.text)}${i.amount?` — <b>${esc(i.amount)}</b>`:""}${i.note?` <i style="color:var(--soft)">(${esc(i.note)})</i>`:""}</span></li>`).join("")}</ul>`;
-  if(s.kind==="steps")return`<ol class="st">${it.map(i=>`<li><span>${tsBtn(i.t)}${esc(i.text)}</span></li>`).join("")}</ol>`;
-  if(s.kind==="bullets")return`<ul class="bl">${it.map(i=>`<li>${tsBtn(i.t)}${esc(i.text)}</li>`).join("")}</ul>`;
-  return it.map(i=>`<p>${tsBtn(i.t)}${esc(i.text)}</p>`).join("");
+  if(s.kind==="checklist")return`<ul class="ck">${it.map(i=>`<li${segAttr(i.t)}><span class="box">✓</span><span>${tsBtn(i.t)}${esc(i.text)}${i.amount?` — <b>${esc(i.amount)}</b>`:""}${i.note?` <i style="color:var(--soft)">(${esc(i.note)})</i>`:""}</span></li>`).join("")}</ul>`;
+  if(s.kind==="steps")return`<ol class="st">${it.map(i=>`<li${segAttr(i.t)}><span>${tsBtn(i.t)}${esc(i.text)}</span></li>`).join("")}</ol>`;
+  if(s.kind==="bullets")return`<ul class="bl">${it.map(i=>`<li${segAttr(i.t)}>${tsBtn(i.t)}${esc(i.text)}</li>`).join("")}</ul>`;
+  return it.map(i=>`<p${segAttr(i.t)}>${tsBtn(i.t)}${esc(i.text)}</p>`).join("");
 }
 function sectionsFlat(){const s=(cur.r.sections||[]).slice();if(cur.r.summary)s.unshift({icon:"info",title:L==="ru"?"Кратко":"Qisqacha",kind:"text",items:[{text:cur.r.summary}]});if(cur.full)s.push({icon:"translate",title:L==="ru"?"Полный текст":"To'liq matn",kind:"text",items:cur.full});return s}
 function render(){
   const t=T[L],S=sectionsFlat();
   $("out").innerHTML=`<h2 class="tt">${esc(cur.r.title)}</h2>
    <input type="text" id="q" placeholder="${esc(t.find)}" style="margin-bottom:4px">
+   <label class="follow"><input type="checkbox" id="fol" checked><span>${t.follow}</span></label>
    <nav class="toc" id="toc"><b>${t.toc}</b><ol>${S.map((s,i)=>`<li><a href="#s${i}" data-i="${i}">${ico(s.icon)}<span>${i+1}. ${esc(s.title)}</span></a></li>`).join("")}</ol></nav>
    <div class="row" style="margin:0 0 4px"><button class="ghost" type="button" id="tog">${t.open2}</button></div>
    ${S.map((s,i)=>`<details class="sec" id="s${i}"${i===0?" open":""}><summary>${ico(s.icon)}<span>${i+1}. ${esc(s.title)}</span></summary><div class="body">${secBody(s)}<a class="back" href="#toc">${t.back}</a></div></details>`).join("")}
    <div class="row">
      <button class="go" type="button" id="dlw" style="flex:1 1 100%">${svg("text","#fff")} ${t.word}</button>
-     <button class="ghost" type="button" id="cp">${t.copy}</button>
+     <button class="go" type="button" id="cp" style="flex:1 1 100%;background:var(--ink);color:var(--card)">${t.copyAll}</button>
      <a class="ghost" id="tgl" target="_blank" rel="noopener" href="#">${t.tg} ↗</a>
    </div>`;
   $("out").hidden=false;
@@ -411,6 +441,30 @@ async function autoText(){
   finally{b.disabled=false}
 }
 $("autoBtn").onclick=autoText;
+/* ---------- player controls: speed, pause, ±5s ---------- */
+let rate=1,playing=false,curT=0;
+const ytCmd=(f,a)=>{const w=$("yt").contentWindow;if(w)w.postMessage(JSON.stringify({event:"command",func:f,args:a||[]}),"*")};
+$("sp").innerHTML=[0.5,0.75,1,1.25,1.5].map(r=>`<button type="button" data-r="${r}" aria-pressed="${r===1}">${String(r).replace(/^0/,"")}×</button>`).join("");
+$("sp").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;rate=+b.dataset.r;ytCmd("setPlaybackRate",[rate]);
+  $("sp").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
+$("ctl").addEventListener("click",e=>{const b=e.target.closest("button[data-c]");if(!b)return;const c=b.dataset.c;
+  if(c==="toggle"){ytCmd(playing?"pauseVideo":"playVideo")}
+  else{ytCmd("seekTo",[Math.max(0,curT+(c==="back"?-5:5)),true]);ytCmd("playVideo")}});
+/* ---------- follow the video ---------- */
+let lastNow=null;
+function listen(){const w=$("yt").contentWindow;if(w)w.postMessage(JSON.stringify({event:"listening",id:1,channel:"widget"}),"*")}
+$("yt").addEventListener("load",()=>{listen();setTimeout(listen,1000);setTimeout(listen,3000)});
+addEventListener("message",e=>{
+  if(!/youtube(-nocookie)?\.com$/.test(new URL(e.origin).hostname))return;
+  let d;try{d=typeof e.data==="string"?JSON.parse(e.data):e.data}catch(_){return}
+  if(d&&d.info&&typeof d.info.playerState==="number"){playing=d.info.playerState===1;$("pp").textContent=playing?"⏸":"▶"}
+  if(d&&d.info&&typeof d.info.playbackRate==="number"&&d.info.playbackRate!==rate){rate=d.info.playbackRate;$("sp").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(+x.dataset.r===rate)))}
+  const ct=d&&d.info&&typeof d.info.currentTime==="number"?d.info.currentTime:null;if(ct!=null)curT=ct;if(ct==null||$("out").hidden)return;
+  const segs=[...$("out").querySelectorAll(".seg")];if(!segs.length)return;
+  let best=null,bs=-1;for(const s of segs){const v=+s.dataset.sec;if(v<=ct+0.3&&v>=bs){bs=v;best=s}}
+  if(best===lastNow)return;if(lastNow)lastNow.classList.remove("now");lastNow=best;if(!best)return;best.classList.add("now");
+  if($("fol")&&$("fol").checked){const d2=best.closest("details");if(d2&&!d2.open)d2.open=true;best.scrollIntoView({block:"center",behavior:"smooth"})}
+});
 /* ---------- fixed player spacer ---------- */
 const fitTop=()=>{const h=$("top").hidden?0:$("top").offsetHeight;$("spacer").style.height=h+"px";document.documentElement.style.scrollPaddingTop=(h+10)+"px"};
 const roTop=new ResizeObserver(fitTop);roTop.observe($("top"));
