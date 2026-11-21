@@ -97,6 +97,11 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
 
   <section class="card" id="c2">
     <div class="step"><span class="num">2</span><h2 data-t="s2"></h2></div>
+    <div id="auto" hidden style="margin-bottom:12px">
+      <button class="go" id="autoBtn" type="button" style="width:100%"></button>
+      <label style="display:flex;gap:10px;align-items:center;margin-top:10px;font-weight:600;font-size:15px;cursor:pointer"><input type="checkbox" id="tl" checked style="width:22px;height:22px"><span id="tlT"></span></label>
+      <p class="hint" id="autoSt"></p>
+    </div>
     <div class="svc" id="svc"></div>
     <p class="hint" data-t="s2h"></p>
   </section>
@@ -130,7 +135,7 @@ uz:{lead:"YouTube video va uning matni bir sahifada: mundarija, ochiladigan bo'l
  s4:"Ma'noli tarjima va tahlil (ixtiyoriy)",s4h:"Topshiriq va matn nusxalanadi. Bepul sun'iy intellektni oching, qo'ying, javobini 3-qadamga qaytarib qo'ying — bo'limlarga ajratiladi.",
  toc:"Mundarija",back:"↑ Mundarijaga",open2:"Hammasini ochish",close:"Hammasini yopish",word:"Word (.docx)",copy:"Nusxa olish",tg:"Telegram",find:"Matndan qidirish…",
  hide:"▴ Yashirish",show:"▾ Videoni ko'rsatish",copied:"Nusxalandi ✓",linkCopied:"Havola nusxalandi — u yerga qo'ying",promptCopied:"Topshiriq va matn nusxalandi — u yerga qo'ying",badLink:"YouTube havolasini qo'ying",noText:"Avval matnni qo'ying",
- part:"Qism",text:"Matn",types:{other:"Video matni"},
+ part:"Qism",text:"Matn",auto:"⚡ Matnni avtomatik olish",tl:"YouTube tarjimasi bilan (o'zbekcha)",autoWait:"Matn olinmoqda…",autoFail:"Bu video uchun matn olinmadi. Pastdagi servislardan foydalaning.",autoTr:"Tayyor — YouTube tarjimasi",autoOrig:"Tayyor — asl tilda",types:{other:"Video matni"},
  svc:[["DownSub","Matn + o'zbekchaga avto-tarjima"],["vidIQ Transcript","To'liq matn, vaqtlar bilan"],["YouTube","«…ещё» → «Показать текст видео»"]],
  aiName:[["Gemini","Google, bepul"],["ChatGPT","OpenAI, bepul"],["Claude","Anthropic, bepul"]],
  prompt:"Quyidagi YouTube video matnini o'zbek tilida (lotin) to'liq, tushunarli matnga aylantiring. So'zma-so'z emas, MA'NOSI bo'yicha tarjima qiling. Hech narsa o'ylab topmang. Tuzilishi: # Sarlavha, keyin ## Qisqacha (3-5 gap), ## bo'limlar (retsept bo'lsa: ## Masalliqlar — ro'yxat '- nomi — miqdori', ## Tayyorlash — '1. qadam'; yo'riqnoma bo'lsa: ## Kerakli narsalar, ## Qadamlar; boshqa bo'lsa: ## Asosiy fikrlar, ## Videoda nima bo'ladi, ## Xulosa). Agar matnda vaqtlar bo'lsa, har qadam boshida [m:ss] qoldiring.\n\nVIDEO: "},
@@ -141,7 +146,7 @@ ru:{lead:"Видео YouTube и его текст на одной страниц
  s4:"Перевод по смыслу и анализ (по желанию)",s4h:"Задание и текст копируются. Откройте бесплатный ИИ, вставьте, а его ответ верните в шаг 3 — он разложится по разделам.",
  toc:"Содержание",back:"↑ К содержанию",open2:"Открыть все",close:"Свернуть все",word:"Word (.docx)",copy:"Копировать",tg:"Telegram",find:"Поиск по тексту…",
  hide:"▴ Скрыть",show:"▾ Показать видео",copied:"Скопировано ✓",linkCopied:"Ссылка скопирована — вставьте её там",promptCopied:"Задание и текст скопированы — вставьте там",badLink:"Вставьте ссылку YouTube",noText:"Сначала вставьте текст",
- part:"Часть",text:"Текст",types:{other:"Текст видео"},
+ part:"Часть",text:"Текст",auto:"⚡ Получить текст автоматически",tl:"С переводом YouTube (на русский)",autoWait:"Получаю текст…",autoFail:"Для этого видео текст получить не удалось. Используйте сервисы ниже.",autoTr:"Готово — перевод YouTube",autoOrig:"Готово — на языке оригинала",types:{other:"Текст видео"},
  svc:[["DownSub","Текст + автоперевод на 100+ языков"],["vidIQ Transcript","Полный текст со временем"],["YouTube","«…ещё» → «Показать текст видео»"]],
  aiName:[["Gemini","Google, бесплатно"],["ChatGPT","OpenAI, бесплатно"],["Claude","Anthropic, бесплатно"]],
  prompt:"Преврати текст этого YouTube-видео в понятный полный текст на русском языке. Переводи по СМЫСЛУ, не дословно. Ничего не выдумывай. Структура: # Заголовок, затем ## Кратко (3-5 предложений), ## разделы (рецепт: ## Ингредиенты — список '- название — количество', ## Приготовление — '1. шаг'; инструкция: ## Что нужно, ## Шаги; другое: ## Главное, ## Что происходит в видео, ## Вывод). Если в тексте есть время, оставь [m:ss] в начале каждого шага.\n\nВИДЕО: "}
@@ -187,6 +192,7 @@ function ui(){
   $("ai").innerHTML=A.map((a,i)=>`<a href="${a[0]}" target="_blank" rel="noopener" data-ai="1">${ico("translate",a[1])}<span><b>${esc(t.aiName[i][0])} ↗</b><small>${esc(t.aiName[i][1])}</small></span></a>`).join("");
   $("svc").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{if(curVid){copy("https://www.youtube.com/watch?v="+curVid);toast(t.linkCopied)}}));
   $("ai").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{const x=$("txt").value.trim();copy(t.prompt+(curVid?"https://youtu.be/"+curVid:"")+"\n\n"+x);toast(t.promptCopied)}));
+  $("auto").hidden=!WORKER;$("autoBtn").textContent=t.auto;$("tlT").textContent=t.tl;
   if(cur)render();
   if(!$("top").hidden)$("mn").textContent=$("top").classList.contains("min")?t.show:t.hide;
 }
@@ -194,7 +200,7 @@ document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",
 
 function play(v){
   if(!v)return;curVid=v;$("top").hidden=false;$("top").classList.remove("min");
-  $("yt").src="https://www.youtube.com/embed/"+v+"?enablejsapi=1&playsinline=1&rel=0&origin="+encodeURIComponent(location.origin);
+  $("yt").src="https://www.youtube.com/embed/"+v+"?enablejsapi=1&playsinline=1&rel=0&cc_load_policy=1&cc_lang_pref="+L+"&hl="+L+"&origin="+encodeURIComponent(location.origin);
   $("nm").textContent=(cur&&cur.r.title)||"YouTube";$("mn").textContent=T[L].hide;
   try{localStorage.setItem("lv_vid",v)}catch(e){}
 }
@@ -367,6 +373,24 @@ async function buildDocx(){
 
 
 
+/* ---------- auto text (Cloudflare helper) ---------- */
+const WORKER="";
+async function autoText(){
+  const t=T[L];if(!curVid){toast(t.badLink);return}
+  const b=$("autoBtn");b.disabled=true;$("autoSt").textContent=t.autoWait;
+  try{
+    const r=await fetch(WORKER+"?v="+curVid+($("tl").checked?"&lang="+L:""));const d=await r.json();
+    if(!d.segments||!d.segments.length){$("autoSt").textContent=t.autoFail;return}
+    const head=(d.title?"# "+d.title+"\n":"");
+    $("txt").value=d.segments.map(s=>`[${s.t}] ${s.text}`).join("\n")+(d.description?"\n\n"+d.description:"");
+    $("autoSt").textContent=(d.translated?t.autoTr:t.autoOrig)+" ("+d.lang+")";
+    cur=parse($("txt").value);cur.r.title=d.title||cur.r.title;render();$("c4").hidden=false;
+    try{localStorage.setItem("lv_txt",$("txt").value)}catch(e){}
+    $("out").scrollIntoView({block:"start"});
+  }catch(e){$("autoSt").textContent=t.autoFail}
+  finally{b.disabled=false}
+}
+$("autoBtn").onclick=autoText;
 /* ---------- fixed player spacer ---------- */
 const fitTop=()=>{const h=$("top").hidden?0:$("top").offsetHeight;$("spacer").style.height=h+"px";document.documentElement.style.scrollPaddingTop=(h+10)+"px"};
 const roTop=new ResizeObserver(fitTop);roTop.observe($("top"));
