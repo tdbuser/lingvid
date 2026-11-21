@@ -103,10 +103,59 @@ async function gtranslate(segments, tl) {
   return out;
 }
 
+// ---------- Full analysis with Google Gemini (official API, free tier; key stored as secret GEMINI_KEY) ----------
+const LANG_NAMES = { uz: "Uzbek (Latin script)", ru: "Russian", en: "English", tr: "Turkish", kk: "Kazakh", ky: "Kyrgyz", tg: "Tajik", az: "Azerbaijani", uk: "Ukrainian", ar: "Arabic", fa: "Persian", de: "German", fr: "French", es: "Spanish", it: "Italian", pt: "Portuguese", zh: "Chinese (Simplified)", ja: "Japanese", ko: "Korean", hi: "Hindi" };
+async function analyze(v, lang, env) {
+  const key = env && env.GEMINI_KEY;
+  if (!key) return json({ error: "no_gemini_key" }, 500);
+  const lname = LANG_NAMES[lang] || lang || "English";
+  const prompt = `Watch this whole YouTube video (audio AND picture). Return JSON only, no markdown fences.
+Write all translations by MEANING (natural ${lname}), not word by word. Never invent anything.
+{
+ "title": "video title translated into ${lname}",
+ "language": "ISO code of the spoken language",
+ "summary": "3-5 sentences in ${lname}",
+ "guide": "the content as a clear guide in ${lname}, markdown: '## ' headings; for a recipe: ingredients as '- name — amount' and steps as '1. [m:ss] step'; for instructions: what you need, steps; otherwise: main points, conclusions",
+ "speech": [ { "t": "m:ss", "orig": "exactly what is said, in the spoken language", "tr": "meaning translation into ${lname}" } ],
+ "onscreen": [ { "t": "m:ss", "orig": "text shown on screen that is NOT spoken", "tr": "translation into ${lname}" } ]
+}
+speech: cover the WHOLE video in order, one item per sentence or short phrase (about 2-8 seconds), accurate start times. If nobody speaks, use an empty array.
+onscreen: every caption, title, label or written amount that appears on screen; skip channel logos and watermarks.`;
+  const model = (env && env.GEMINI_MODEL) || "gemini-flash-latest";
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+    body: JSON.stringify({
+      contents: [{ parts: [{ file_data: { file_uri: "https://www.youtube.com/watch?v=" + v, mime_type: "video/*" } }, { text: prompt }] }],
+      generationConfig: { responseMimeType: "application/json", temperature: 0.2, maxOutputTokens: 60000 },
+    }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) return json({ error: "gemini_" + r.status, detail: (d.error && d.error.message || "").slice(0, 300) }, 502);
+  const txt = (((d.candidates || [])[0] || {}).content || {}).parts?.map(p => p.text || "").join("") || "";
+  let out;
+  try { out = JSON.parse(txt.replace(/^```(json)?|```$/g, "").trim()); } catch (e) { return json({ error: "gemini_bad_json", detail: txt.slice(0, 300) }, 502); }
+  return json({ ok: true, lang, ...out });
+}
+
 export default {
-  async fetch(req) {
+  async fetch(req, env) {
     if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
     const url = new URL(req.url);
+    if (url.pathname === "/analyze") {
+      const v = url.searchParams.get("v") || "";
+      const lang = (url.searchParams.get("lang") || "en").toLowerCase().replace(/[^a-z-]/g, "").slice(0, 8);
+      if (!/^[A-Za-z0-9_-]{11}$/.test(v)) return json({ error: "bad_video_id" }, 400);
+      const ck = new Request("https://lingvid-cache.local/a/" + v + "/" + lang);
+      const hit = await caches.default.match(ck);
+      if (hit) return new Response(hit.body, hit);
+      const res = await analyze(v, lang, env);
+      if (res.status === 200) {
+        const body = await res.clone().text();
+        await caches.default.put(ck, new Response(body, { headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=604800", ...CORS } }));
+      }
+      return res;
+    }
     const v = url.searchParams.get("v") || "";
     const lang = (url.searchParams.get("lang") || "").toLowerCase();
     if (!/^[A-Za-z0-9_-]{11}$/.test(v)) return json({ error: "bad_video_id" }, 400);
