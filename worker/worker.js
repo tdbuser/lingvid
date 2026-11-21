@@ -103,10 +103,71 @@ async function gtranslate(segments, tl) {
   return out;
 }
 
+// ---------- Neural voices (Microsoft Edge "Read aloud" service, free) ----------
+const EDGE_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
+const EDGE_VER = "1-130.0.2849.68";
+async function secMsGec() {
+  let ticks = Math.floor(Date.now() / 1000) + 11644473600;
+  ticks -= ticks % 300;
+  const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(BigInt(ticks) * 10000000n) + EDGE_TOKEN));
+  return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+}
+const xesc = s => s.replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" }[c]));
+const uuid = () => crypto.randomUUID().replace(/-/g, "");
+const ts = () => new Date().toUTCString().replace("GMT", "GMT+0000 (Coordinated Universal Time)");
+
+async function edgeTTS(text, voice, rate) {
+  const url = `https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${EDGE_TOKEN}&Sec-MS-GEC=${await secMsGec()}&Sec-MS-GEC-Version=${EDGE_VER}&ConnectionId=${uuid()}`;
+  const resp = await fetch(url, { headers: {
+    Upgrade: "websocket",
+    Origin: "chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0",
+    Pragma: "no-cache", "Cache-Control": "no-cache",
+  } });
+  const ws = resp.webSocket;
+  if (!ws) throw new Error("ws " + resp.status);
+  ws.accept();
+  const chunks = [];
+  const done = new Promise((res, rej) => {
+    const timer = setTimeout(() => rej(new Error("timeout")), 25000);
+    ws.addEventListener("message", ev => {
+      const d = ev.data;
+      if (typeof d === "string") { if (d.includes("Path:turn.end")) { clearTimeout(timer); res(); } return; }
+      const u8 = new Uint8Array(d);
+      const hl = (u8[0] << 8) | u8[1];
+      const head = new TextDecoder().decode(u8.slice(2, 2 + hl));
+      if (head.includes("Path:audio")) chunks.push(u8.slice(2 + hl));
+    });
+    ws.addEventListener("close", () => { clearTimeout(timer); res(); });
+    ws.addEventListener("error", e => { clearTimeout(timer); rej(new Error("ws error")); });
+  });
+  ws.send(`X-Timestamp:${ts()}\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n` +
+    '{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-48kbitrate-mono-mp3"}}}}');
+  const lang = voice.split("-").slice(0, 2).join("-");
+  ws.send(`X-RequestId:${uuid()}\r\nContent-Type:application/ssml+xml\r\nX-Timestamp:${ts()}Z\r\nPath:ssml\r\n\r\n` +
+    `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='${lang}'><voice name='${xesc(voice)}'><prosody pitch='+0Hz' rate='${rate}' volume='+0%'>${xesc(text)}</prosody></voice></speak>`);
+  await done;
+  try { ws.close(); } catch (e) {}
+  const len = chunks.reduce((a, c) => a + c.length, 0);
+  if (!len) throw new Error("no audio");
+  const out = new Uint8Array(len); let o = 0; for (const c of chunks) { out.set(c, o); o += c.length; }
+  return out;
+}
+
 export default {
   async fetch(req) {
     if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
     const url = new URL(req.url);
+    if (url.pathname === "/tts") {
+      const text = (url.searchParams.get("text") || "").slice(0, 2500).trim();
+      const voice = url.searchParams.get("voice") || "en-US-AriaNeural";
+      let r = parseInt(url.searchParams.get("rate") || "0", 10); if (!(r >= -50 && r <= 100)) r = 0;
+      if (!text || !/^[a-z]{2,3}-[A-Z]{2}(-[A-Za-z]+)?-[A-Za-z]+Neural$/.test(voice)) return json({ error: "bad_request" }, 400);
+      try {
+        const audio = await edgeTTS(text, voice, (r >= 0 ? "+" : "") + r + "%");
+        return new Response(audio, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "public, max-age=86400", ...CORS } });
+      } catch (e) { return json({ error: "tts_failed", detail: String(e && e.message || e) }, 502); }
+    }
     const v = url.searchParams.get("v") || "";
     const lang = (url.searchParams.get("lang") || "").toLowerCase();
     if (!/^[A-Za-z0-9_-]{11}$/.test(v)) return json({ error: "bad_video_id" }, 400);
