@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>[full 20:10] Lingvid — video va matn</title>
+<meta name="description" content="Lingvid: YouTube video and its text on one page — contents, folding sections, time links, Word export.">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#f6b81c,#1d1420);--card:light-dark(#ffffff,#2a1f2e);--ink:light-dark(#2b1530,#f6eef7);--soft:light-dark(#6d5a70,#bfaec2);--line:light-dark(#eadfe9,#40324a);--acc:light-dark(#d8432b,#ff7a5c);--chip:light-dark(#fff3d1,#3a2b40)}
+*{box-sizing:border-box;min-width:0}
+html,body{max-width:100%}body{overflow-x:clip}
+#spacer{height:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Nunito,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.top{position:fixed;top:0;left:0;right:0;z-index:10;background:#000;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+.frame{position:relative;width:100%;max-width:720px;margin:0 auto;aspect-ratio:16/9;max-height:42vh;background:#000}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.top.min .frame{height:0;aspect-ratio:auto;overflow:hidden}
+.bar{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:6px 14px;background:#120a14;color:#fff}
+.bar .nm{flex:1;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar button{flex:none;min-height:38px;padding:0 12px;border:2px solid rgba(255,255,255,.35);border-radius:10px;background:transparent;color:#fff;font:700 14px Rubik,sans-serif;cursor:pointer}
+.ctl{max-width:720px;margin:0 auto;display:flex;gap:4px;align-items:center;padding:0 8px 8px;background:#120a14}
+.top.min .ctl{display:none}
+.ctl button{min-height:36px;min-width:36px;padding:0 6px;flex:none;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:transparent;color:#fff;font:700 13px Rubik,system-ui,sans-serif;cursor:pointer}
+.ctl .sp{display:flex;align-items:center;gap:4px;margin-left:auto;color:#fff;font:700 14px Rubik,system-ui,sans-serif;border:2px solid rgba(255,255,255,.3);border-radius:10px;padding:0 6px;min-height:36px}
+.ctl .sp select{background:transparent;color:#fff;border:0;font:700 15px Rubik,system-ui,sans-serif;min-height:32px}
+.ctl .sp option{color:#000}
+.wrap{max-width:720px;margin:0 auto;padding:18px 14px 90px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+h1{font:700 clamp(34px,8vw,48px)/1 Rubik,sans-serif;margin:0;color:#2b1530;flex:1}
+@media (prefers-color-scheme:dark){h1{color:#f6eef7}}
+.lang{display:flex;align-items:center;gap:6px;border:2px solid rgba(43,21,48,.25);border-radius:12px;padding:0 8px;background:var(--card)}.lang select{border:0;background:transparent;color:var(--ink);font:700 15px Nunito,system-ui,sans-serif;min-height:42px;max-width:46vw}
+.lang button{border:0;background:transparent;color:var(--ink);font:700 14px Nunito,system-ui,sans-serif;min-height:40px;padding:0 12px;cursor:pointer}
+.lang button[aria-pressed=true]{background:var(--ink);color:var(--card)}
+.lead{margin:6px 0 16px;font-weight:600;opacity:.85}
+.card{background:var(--card);border-radius:22px;padding:clamp(16px,4vw,26px);box-shadow:0 10px 30px rgba(43,21,48,.16);margin-bottom:14px}
+.step{display:flex;gap:12px;align-items:center;margin:0 0 12px}
+.num{flex:none;width:36px;height:36px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center;font:700 18px Rubik}
+.step h2{font:700 20px Rubik,sans-serif;margin:0}
+input[type=text],textarea{width:100%;font:16px Nunito,sans-serif;padding:14px 16px;border:2px solid var(--line);border-radius:14px;background:transparent;color:var(--ink)}
+textarea{min-height:170px;resize:vertical}
+input:focus,textarea:focus,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.go{flex:1 1 160px;min-height:52px;border:0;border-radius:14px;background:var(--acc);color:#fff;font:700 17px Rubik,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.ghost{min-height:46px;border:2px solid var(--line);border-radius:12px;background:transparent;color:var(--ink);font:700 15px Nunito,system-ui,sans-serif;padding:0 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.ghost svg,.go svg{width:20px;height:20px}
+.hint{font-size:14px;color:var(--soft);margin:8px 0 0}
+.svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
+.svc a{display:flex;gap:12px;align-items:center;padding:12px;border:2px solid var(--line);border-radius:16px;color:var(--ink);text-decoration:none}
+.svc a:hover{border-color:var(--acc)}
+.svc b{display:block;font-size:16px}.svc small{display:block;color:var(--soft);font-size:13px;line-height:1.3}
+.ico{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff}
+.ico svg{width:22px;height:22px}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 16px;border-radius:12px;font-weight:700;z-index:30;max-width:90vw;text-align:center}
+#out h2.tt{font:700 clamp(26px,5.5vw,34px)/1.1 Rubik,sans-serif;margin:0 0 10px}
+#out,#out *{overflow-wrap:anywhere}
+.toc{background:var(--chip);border-radius:16px;padding:12px 14px;margin:12px 0}
+.toc b{display:block;margin-bottom:6px}.toc ol{margin:0;padding:0;list-style:none;display:grid;gap:2px}
+.toc a{display:flex;gap:10px;align-items:center;color:var(--ink);text-decoration:none;font-weight:700;min-height:42px;padding:2px 6px;border-radius:10px}
+.toc .ico{width:32px;height:32px;border-radius:9px}.toc .ico svg{width:18px;height:18px}
+details.sec{border:2px solid var(--line);border-radius:16px;margin:10px 0;overflow:hidden}
+details.sec>summary{list-style:none;display:flex;gap:12px;align-items:center;padding:10px 14px;cursor:pointer;font:700 18px Rubik,sans-serif;min-height:56px}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::after{content:"▾";margin-left:auto;color:var(--soft)}
+details.sec[open]>summary::after{content:"▴"}
+details.sec[open]>summary{border-bottom:2px dashed var(--line)}
+.sec .ico{width:34px;height:34px;border-radius:10px}.sec .ico svg{width:20px;height:20px}
+.body{padding:6px 16px 14px}.body p{margin:8px 0}
+ul.ck{list-style:none;margin:0;padding:0}
+ul.ck li{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;min-height:44px}
+.box{flex:none;width:24px;height:24px;border:2px solid var(--soft);border-radius:7px;display:grid;place-items:center;font-size:15px;color:#fff}
+li.done .box{background:var(--acc);border-color:var(--acc)}li.done>span:last-child{text-decoration:line-through;opacity:.5}
+ol.st{list-style:none;margin:0;padding:0;counter-reset:s}
+ol.st li{counter-increment:s;display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;padding:8px 0;cursor:pointer}
+ol.st li::before{content:counter(s);width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--card);display:grid;place-items:center;font:700 16px Rubik}
+ol.st li.done::before{content:"✓";background:var(--acc)}ol.st li.done>span{opacity:.5}
+ul.bl{margin:0;padding-left:20px}ul.bl li{margin:6px 0}
+.ts{display:inline-flex;align-items:center;margin:0 6px 0 0;padding:1px 10px;border-radius:999px;background:var(--acc);color:#fff;font-weight:700;font-size:13px;border:0;cursor:pointer;min-height:26px;vertical-align:1px;white-space:nowrap}
+.back{display:inline-block;margin-top:8px;font-size:14px;font-weight:700;color:var(--soft);text-decoration:none}
+.fl{display:block;font-weight:700;margin-bottom:10px}.fl select{display:block;width:100%;margin-top:6px;font:16px Nunito,system-ui,sans-serif;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink)}
+.chk{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);border-radius:14px;margin-bottom:8px;cursor:pointer}
+.chk input{width:22px;height:22px;flex:none;margin-top:2px;accent-color:var(--acc)}.chk small{display:block;color:var(--soft);font-size:13px;line-height:1.35}
+.seg{border-radius:8px;transition:background .2s}.seg.now{background:light-dark(#ffe58a,#5a4520);box-shadow:0 0 0 4px light-dark(#ffe58a,#5a4520)}
+.wd{border-radius:4px;transition:background .12s,color .12s}
+.ln.cur .wd.pw{opacity:.55}
+.wd.cw{background:var(--acc);color:#fff;box-shadow:0 0 0 2px var(--acc);font-weight:700}
+.wd.nw{text-decoration:underline 2px var(--acc);text-underline-offset:4px}
+@media (prefers-reduced-motion:reduce){.wd{transition:none}}
+.sheet{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+.sheetIn{background:var(--card);color:var(--ink);width:100%;max-width:720px;max-height:85vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px 26px}
+#ocrBtn{background:#ff7a5c;border-color:#ff7a5c}
+.tts{border:2px solid var(--line);border-radius:16px;padding:12px;margin:8px 0 12px}
+.tts select{font:15px Nunito,system-ui,sans-serif;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);min-height:44px;max-width:100%}
+.tts>select{width:100%;margin-top:8px}
+.ms{margin-top:10px;border-top:2px dashed var(--line);padding-top:8px}.ms summary{cursor:pointer;min-height:40px;display:flex;align-items:center}
+.reading{background:light-dark(#d9f2ea,#1f3d35);border-radius:8px;box-shadow:0 0 0 4px light-dark(#d9f2ea,#1f3d35)}
+.follow{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700;color:var(--soft);margin:2px 0 8px;cursor:pointer}.follow input{width:20px;height:20px;accent-color:var(--acc)}
+details.fold>summary{list-style:none;cursor:pointer;margin:0}details.fold>summary::-webkit-details-marker,details.more>summary::-webkit-details-marker,#setup>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"▾";margin-left:auto;color:var(--soft);font-size:20px}details.fold[open]>summary::after{content:"▴"}details.fold[open]>summary{margin-bottom:12px}
+details.more{margin-top:12px}details.more>summary{list-style:none;cursor:pointer;font-weight:700;color:var(--soft);min-height:40px;display:flex;align-items:center}details.more>summary::after{content:" ▾";margin-left:6px}
+#setup>summary{list-style:none;display:none}
+#setup.has>summary{display:flex;align-items:center;justify-content:center;text-align:center;gap:8px;min-height:54px;padding:8px 16px;margin:0 0 14px;border-radius:14px;background:var(--card);color:var(--ink);font:700 16px Rubik,system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(43,21,48,.12)}
+.st:empty{display:none}
+.bar2{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;margin:0 0 6px;scrollbar-width:none}.bar2::-webkit-scrollbar{display:none}
+.bar2 button,.bar2 a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:0 14px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:700 14px Nunito,system-ui,sans-serif;text-decoration:none;cursor:pointer;white-space:nowrap}
+.bar2 .pri{background:var(--acc);border-color:var(--acc);color:#fff}
+details.tts{padding:0}details.tts>summary{list-style:none;cursor:pointer;padding:12px;font-weight:700;display:flex;align-items:center}details.tts>summary::-webkit-details-marker{display:none}details.tts>summary::after{content:"▾";margin-left:auto;color:var(--soft)}details.tts[open]>summary::after{content:"▴"}details.tts>.in{padding:0 12px 12px}
+.find{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}.find .follow{margin:0;align-self:flex-start}.find .follow span{white-space:nowrap}
+mark{background:#ffe066;color:#2b1530;border-radius:3px}
+#up{position:fixed;right:16px;bottom:20px;width:52px;height:52px;border-radius:50%;border:0;background:var(--ink);color:var(--card);font:700 22px Rubik;box-shadow:0 6px 18px rgba(0,0,0,.3);cursor:pointer;z-index:20}
+footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="top" id="top" hidden>
+  <div class="frame"><iframe id="yt" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+  <div class="bar"><div class="nm" id="nm"></div><button id="mn" type="button"></button></div>
+  <div class="ctl" id="ctl"><button type="button" data-c="back" aria-label="-5s">−5</button><button type="button" data-c="toggle" id="pp" aria-label="Play/Pause">▶</button><button type="button" data-c="fwd" aria-label="+5s">+5</button><button type="button" id="ocrBtn" aria-label="Text on screen">📷 Aa</button><span id="dbg" style="color:#ffb3a3;font:700 12px Rubik,system-ui,sans-serif;white-space:nowrap"></span><label class="sp" aria-label="Speed">⏱<select id="spd"></select></label></div>
+</div>
+<div id="spacer"></div>
+<div class="wrap">
+  <header><h1>Lingvid</h1>
+    <label class="lang" title="Language"><span aria-hidden="true">🌐</span><select id="uiLang" aria-label="Language"></select></label>
+  </header>
+  <p class="lead" data-t="lead"></p>
+
+  <section class="card" id="out" hidden></section>
+  <details id="setup" open><summary class="setupSum" data-t="setup"></summary>
+  <section class="card">
+    <div class="step"><span class="num">1</span><h2 data-t="s1"></h2></div>
+    <div class="row" style="margin-top:0"><input type="text" id="link" autocomplete="off" placeholder="https://youtu.be/..." style="flex:1 1 200px"><button class="go" id="open" type="button" style="flex:0 1 auto;padding:0 18px"></button></div>
+  </section>
+
+  <section class="card" id="c2">
+    <div class="step"><span class="num">2</span><h2 data-t="s2"></h2></div>
+    <div id="auto" hidden>
+      <label class="chk" style="margin-bottom:10px"><input type="checkbox" id="tl" checked><span><b id="tlT"></b></span></label>
+      <button class="go" id="autoBtn" type="button" style="width:100%"></button>
+      <button class="go" id="aiBtn" type="button" style="width:100%;margin-top:10px;background:#2b1530"></button>
+      <p class="hint" id="aiHint"></p>
+      <p class="hint st" id="autoSt" role="status"></p>
+    </div>
+    <details class="more"><summary data-t="moreWays"></summary>
+      <div class="svc" id="svc" style="margin-top:10px"></div>
+      <p class="hint" data-t="s2h"></p>
+    </details>
+  </section>
+
+  <details class="card fold" id="c3">
+    <summary class="step"><span class="num">3</span><h2 data-t="s3"></h2></summary>
+    <textarea id="txt"></textarea>
+    <div class="row"><button class="go" id="make" type="button"></button><button class="ghost" id="clr" type="button"></button></div>
+    <p class="hint" data-t="s3h"></p>
+  </details>
+
+  <details class="card fold" id="c4" hidden>
+    <summary class="step"><span class="num">4</span><h2 data-t="s4"></h2></summary>
+    <label class="fl"><span data-t="toLang"></span>
+      <select id="tlang"></select></label>
+    <label class="chk"><input type="checkbox" id="optSense" checked><span><b data-t="oSense"></b><small data-t="oSenseH"></small></span></label>
+    <label class="chk"><input type="checkbox" id="optStruct" checked><span><b data-t="oStruct"></b><small data-t="oStructH"></small></span></label>
+    <p class="hint" style="margin:6px 0 10px" data-t="s4h"></p>
+    <div class="svc" id="ai"></div>
+  </details>
+  </details>
+
+  <footer>Lingvid · tdbuser.github.io/lingvid · v21.11-20:10</footer>
+</div>
+<button id="up" type="button" aria-label="Yuqoriga" hidden>↑</button>
+<div class="toast" id="toast" hidden></div>
+<div class="sheet" id="ocr" hidden role="dialog" aria-modal="true" aria-labelledby="ocrT">
+  <div class="sheetIn">
+    <div class="step" style="margin-bottom:6px"><span class="num">Aa</span><h2 id="ocrT" data-t="ocrT"></h2><button class="ghost" id="ocrX" type="button" style="margin-left:auto;min-height:40px" aria-label="Close">✕</button></div>
+    <p class="hint" style="margin:0 0 10px" data-t="ocrH"></p>
+    <label class="go" style="cursor:pointer"><input type="file" id="ocrFile" accept="image/*" hidden><span data-t="ocrPick"></span></label>
+    <p class="hint" data-t="ocrPaste"></p>
+    <div id="ocrSt" class="hint" role="status"></div>
+    <div id="ocrOut" hidden>
+      <h3 style="margin:12px 0 4px" data-t="ocrTr"></h3><p id="ocrTrT" style="margin:0 0 8px;font-weight:700"></p>
+      <details><summary class="hint" data-t="ocrOrig"></summary><p id="ocrOrT" style="white-space:pre-wrap"></p></details>
+      <div class="row"><button class="go" type="button" id="ocrAdd"></button><button class="ghost" type="button" id="ocrCopy"></button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+{
+const T={
+en:{"moreWays": "Other free ways (DownSub, vidIQ, YouTube) ▸", "setup": "＋ New video / other way to get text","aiBtn": "🧠 Full analysis (AI) — even without subtitles", "aiHint": "Gemini watches the whole video: speech by seconds (any language, incl. Uzbek), text on screen, meaning-based translation, a ready guide. Takes 30–90 s.", "aiWait": "AI is watching the video… 30–90 s", "aiFail": "AI analysis failed", "srt": "Subtitles .srt", "aiSpeech": "What is said", "aiScreen": "Text on screen", "aiGuide": "Guide","msBest": "🎧 Best voices (Microsoft, incl. Uzbek) — free & official", "msWhy": "Microsoft's natural voices are free inside Microsoft's own apps. Lingvid hands the text over to them:", "edgeBtn": "Open this text in Microsoft Edge", "edgeHow": "In Edge tap ··· → «Read aloud» (Ovoz chiqarib o'qish / Читать вслух), choose a voice, e.g. Madina (uz). Edge must be installed (free).", "wordBtn": "Word file to listen", "wordHow": "Open the file in the Word app → ✎ menu → Review → «Read aloud».","listen": "Listen", "engMs": "Neural voices (Microsoft) — best", "engPiper": "Piper — on this device (offline)", "engDev": "Device voice", "play": "▶ Read aloud", "stop": "■ Stop", "voice": "Voice", "ttsFail": "This voice didn't work — try another engine.", "piperLoad": "Downloading the voice (first time ~60 MB)…", "devHint": "Tip for iPhone: Settings → Accessibility → Spoken Content → Voices — download a free «Enhanced/Premium» voice, it sounds much better.", "noVoice": "No voice for this language in this engine.","ocrT": "Text on the screen", "ocrH": "For words shown in the video but not spoken. The video is paused. Take a screenshot (iPhone: side + volume up; Android: power + volume down), then choose it below — the text is read and translated right here.", "ocrPick": "📷 Choose screenshot", "ocrPaste": "On a computer you can also press Ctrl+V to paste a screenshot.", "ocrTr": "Translation", "ocrOrig": "Original text", "ocrAdd": "Add to the text at this moment", "ocrRead": "Reading the text… (first time takes ~20 s)", "ocrNone": "No text found in this picture.", "ocrFail": "Couldn't read the picture.","lead": "A YouTube video and its text on one page: contents, folding sections, time buttons, live highlighting, Word file. Free, no sign-up.", "s1": "Paste a YouTube link", "open": "▶ Open", "s2": "Get the text", "s2h": "These services don't allow being shown inside other sites, so they open in a new tab. The link is copied automatically — paste it there, copy the text and come back here.", "s3": "Paste your own text", "make": "Organize", "clr": "Clear", "s3h": "If the text has times ([0:12] or 0:12), time buttons play the video from that moment. Text with headings (#, 1., -) is split into sections.", "s4": "Translate with AI (optional)", "s4h": "Press a button: the task and the text are copied and the AI opens (short text is pasted automatically). Paste the answer back into step 3 — it will be split into sections.", "toLang": "Into which language", "oSense": "Meaning-based translation", "oSenseH": "On: natural, by meaning. Off: word for word, precise.", "oStruct": "Split into sections", "oStructH": "On: title, summary, sections. Off: only the full translation with times.", "follow": "Follow the video", "copyAll": "Copy all text", "toc": "Contents", "back": "↑ Contents", "top": "↑ Top", "sum": "Summary", "full": "Full text", "open2": "Expand all", "close": "Collapse all", "word": "Word (.docx)", "copy": "Copy", "tg": "Telegram", "find": "Search in text…", "hide": "▴ Hide", "show": "▾ Show video", "copied": "Copied ✓", "linkCopied": "Link copied — paste it there", "promptCopied": "Task and text copied — paste them there", "badLink": "Paste a YouTube link", "noText": "Paste the text first", "part": "Part", "text": "Text", "auto": "⚡ Get text automatically", "tl": "Translate into: {lang}", "autoWait": "Getting the text…", "autoFail": "Couldn't get the text for this video. Use the services below.", "autoTr": "Done — Google translation", "autoTrWait": "Translating…", "autoNoTr": "Translation failed — showing the original text", "autoOrig": "Done — original language", "siteLang": "Site language", "uiWait": "Translating the site…", "types": {"other": "Video text"}, "svc": [["DownSub", "Text + auto-translation into 100+ languages"], ["vidIQ Transcript", "Full text with times"], ["YouTube", "«…more» → «Show transcript»"]], "aiName": [["ChatGPT", "OpenAI, free"], ["Claude", "Anthropic, free"], ["Gemini", "Google, free"]]},
+uz:{"moreWays": "Boshqa bepul usullar (DownSub, vidIQ, YouTube) ▸", "setup": "＋ Yangi video / matnni boshqa usulda olish","aiBtn": "🧠 To'liq tahlil (AI) — subtitrsiz ham", "aiHint": "Gemini butun videoni ko'radi: soniyalar bo'yicha nutq (har qanday til, o'zbekcha ham), ekrandagi yozuvlar, ma'noli tarjima, tayyor yo'riqnoma. 30–90 soniya.", "aiWait": "AI videoni ko'rmoqda… 30–90 soniya", "aiFail": "AI tahlili ishlamadi", "srt": "Subtitr .srt", "aiSpeech": "Nima deyilgan", "aiScreen": "Ekrandagi yozuvlar", "aiGuide": "Yo'riqnoma","msBest": "🎧 Eng yaxshi ovozlar (Microsoft, o'zbekcha ham) — bepul va rasmiy", "msWhy": "Microsoft'ning tabiiy ovozlari Microsoft ilovalarida bepul. Lingvid matnni ularga uzatadi:", "edgeBtn": "Matnni Microsoft Edge'da ochish", "edgeHow": "Edge'da ··· → «Ovoz chiqarib o'qish» ni bosing, ovozni tanlang, masalan Madina (uz). Edge o'rnatilgan bo'lishi kerak (bepul).", "wordBtn": "Tinglash uchun Word fayl", "wordHow": "Faylni Word ilovasida oching → ✎ menyu → Taqriz → «Ovoz chiqarib o'qish».",listen:"Tinglash",engMs:"Neyron ovozlar (Microsoft) — eng yaxshisi",engPiper:"Piper — shu qurilmada (oflayn)",engDev:"Qurilma ovozi",play:"▶ Ovoz chiqarib o'qish",stop:"■ To'xtatish",voice:"Ovoz",ttsFail:"Bu ovoz ishlamadi — boshqa usulni tanlang.",piperLoad:"Ovoz yuklanmoqda (birinchi marta ~60 MB)…",devHint:"iPhone uchun: Sozlamalar → Universal kirish → Nutq tarkibi → Ovozlar — bepul «Yaxshilangan/Premium» ovozni yuklang.",noVoice:"Bu usulda shu til uchun ovoz yo'q.",ocrT:"Ekrandagi yozuv",ocrH:"Videoda ko'rsatilgan, lekin aytilmagan yozuvlar uchun. Video to'xtatildi. Skrinshot oling (iPhone: yon tugma + ovoz baland; Android: quvvat + ovoz past) va pastdan tanlang — yozuv shu yerda o'qiladi va tarjima qilinadi.",ocrPick:"📷 Skrinshotni tanlash",ocrPaste:"Kompyuterda Ctrl+V bilan ham qo'yish mumkin.",ocrTr:"Tarjima",ocrOrig:"Asl yozuv",ocrAdd:"Matnga shu vaqtga qo'shish",ocrRead:"Yozuv o'qilmoqda… (birinchi marta ~20 soniya)",ocrNone:"Rasmda yozuv topilmadi.",ocrFail:"Rasmni o'qib bo'lmadi.",top:"↑ Boshiga",sum:"Qisqacha",full:"To'liq matn",siteLang:"Sayt tili",uiWait:"Sayt tarjima qilinmoqda…",lead:"YouTube video va uning matni bir sahifada: mundarija, ochiladigan bo'limlar, vaqt tugmalari, Word fayl. Bepul, ro'yxatdan o'tishsiz.",
+ s1:"YouTube havolasini qo'ying",open:"▶ Ochish",
+ s2:"Matnni oling",s2h:"Bu servislar o'z sahifasini boshqa saytlar ichida ko'rsatishga ruxsat bermaydi, shuning uchun yangi oynada ochiladi. Havola avtomatik nusxalanadi — u yerga qo'ying, matnni nusxalab, shu sahifaga qayting.",
+ s3:"O'z matningizni qo'yish",make:"Tartibga solish",clr:"Tozalash",s3h:"Vaqtli matn ([0:12] yoki 0:12) bo'lsa — vaqt tugmalari videoni aynan shu joydan qo'yadi. Sarlavhali matn (#, 1., -) bo'limlarga ajratiladi.",
+ s4:"Sun'iy intellekt orqali tarjima (ixtiyoriy)",s4h:"Tugmani bosing: topshiriq va matn nusxalanadi va sun'iy intellekt ochiladi (qisqa matn avtomatik qo'yiladi). Javobni 3-qadamga qaytarib qo'ysangiz — bo'limlarga ajratiladi.",toLang:"Qaysi tilga",oSense:"Ma'noli tarjima",oSenseH:"Yoqilgan: tabiiy, ma'nosi bo'yicha. O'chirilgan: so'zma-so'z, aniq.",oStruct:"Bo'limlarga ajratish",oStructH:"Yoqilgan: sarlavha, qisqacha, bo'limlar. O'chirilgan: faqat to'liq tarjima, vaqtlar bilan.",follow:"Video bilan birga kuzatish",copyAll:"Butun matnni nusxalash",
+ toc:"Mundarija",back:"↑ Mundarijaga",open2:"Hammasini ochish",close:"Hammasini yopish",word:"Word (.docx)",copy:"Nusxa olish",tg:"Telegram",find:"Matndan qidirish…",
+ hide:"▴ Yashirish",show:"▾ Videoni ko'rsatish",copied:"Nusxalandi ✓",linkCopied:"Havola nusxalandi — u yerga qo'ying",promptCopied:"Topshiriq va matn nusxalandi — u yerga qo'ying",badLink:"YouTube havolasini qo'ying",noText:"Avval matnni qo'ying",
+ part:"Qism",text:"Matn",auto:"⚡ Matnni avtomatik olish",tl:"Tarjima: {lang}",autoWait:"Matn olinmoqda…",autoFail:"Bu video uchun matn olinmadi. Pastdagi servislardan foydalaning.",autoTr:"Tayyor — Google tarjimasi",autoTrWait:"Tarjima qilinmoqda…",autoNoTr:"Tarjima ishlamadi — asl tildagi matn ko'rsatildi",autoOrig:"Tayyor — asl tilda",types:{other:"Video matni"},
+ svc:[["DownSub","Matn + o'zbekchaga avto-tarjima"],["vidIQ Transcript","To'liq matn, vaqtlar bilan"],["YouTube","«…ещё» → «Показать текст видео»"]],
+ aiName:[["ChatGPT","OpenAI, bepul"],["Claude","Anthropic, bepul"],["Gemini","Google, bepul"]],
+ prompt:"Quyidagi YouTube video matnini o'zbek tilida (lotin) to'liq, tushunarli matnga aylantiring. So'zma-so'z emas, MA'NOSI bo'yicha tarjima qiling. Hech narsa o'ylab topmang. Tuzilishi: # Sarlavha, keyin ## Qisqacha (3-5 gap), ## bo'limlar (retsept bo'lsa: ## Masalliqlar — ro'yxat '- nomi — miqdori', ## Tayyorlash — '1. qadam'; yo'riqnoma bo'lsa: ## Kerakli narsalar, ## Qadamlar; boshqa bo'lsa: ## Asosiy fikrlar, ## Videoda nima bo'ladi, ## Xulosa). Agar matnda vaqtlar bo'lsa, har qadam boshida [m:ss] qoldiring.\n\nVIDEO: "},
+ru:{"moreWays": "Другие бесплатные способы (DownSub, vidIQ, YouTube) ▸", "setup": "＋ Новое видео / другой способ получить текст","aiBtn": "🧠 Полный разбор (ИИ) — даже без субтитров", "aiHint": "Gemini смотрит всё видео: речь по секундам (любой язык, включая узбекский), надписи на экране, перевод по смыслу, готовую инструкцию. 30–90 секунд.", "aiWait": "ИИ смотрит видео… 30–90 секунд", "aiFail": "ИИ-разбор не сработал", "srt": "Субтитры .srt", "aiSpeech": "Что говорят", "aiScreen": "Надписи на экране", "aiGuide": "Инструкция","msBest": "🎧 Лучшие голоса (Microsoft, есть узбекский) — бесплатно и официально", "msWhy": "Естественные голоса Microsoft бесплатны внутри приложений Microsoft. Lingvid передаёт им текст:", "edgeBtn": "Открыть этот текст в Microsoft Edge", "edgeHow": "В Edge нажмите ··· → «Читать вслух», выберите голос, например Madina (uz). Edge должен быть установлен (бесплатно).", "wordBtn": "Word-файл для прослушивания", "wordHow": "Откройте файл в приложении Word → меню ✎ → Рецензирование → «Прочесть вслух».",listen:"Слушать",engMs:"Нейроголоса (Microsoft) — лучшие",engPiper:"Piper — на этом устройстве (офлайн)",engDev:"Голос устройства",play:"▶ Читать вслух",stop:"■ Стоп",voice:"Голос",ttsFail:"Этот голос не сработал — выберите другой способ.",piperLoad:"Скачиваю голос (первый раз ~60 МБ)…",devHint:"Совет для iPhone: Настройки → Универсальный доступ → Устный контент → Голоса — скачайте бесплатный «Улучшенный/Premium» голос, он звучит намного лучше.",noVoice:"В этом способе нет голоса для этого языка.",ocrT:"Надпись на экране",ocrH:"Для надписей, которые показаны в видео, но не озвучены. Видео на паузе. Сделайте скриншот (iPhone: боковая + громкость вверх; Android: питание + громкость вниз) и выберите его ниже — надпись прочитается и переведётся прямо здесь.",ocrPick:"📷 Выбрать скриншот",ocrPaste:"На компьютере можно вставить скриншот через Ctrl+V.",ocrTr:"Перевод",ocrOrig:"Оригинал надписи",ocrAdd:"Добавить в текст на это время",ocrRead:"Читаю надпись… (первый раз ~20 секунд)",ocrNone:"На картинке не найден текст.",ocrFail:"Не удалось прочитать картинку.",top:"↑ В начало",sum:"Кратко",full:"Полный текст",siteLang:"Язык сайта",uiWait:"Перевожу сайт…",lead:"Видео YouTube и его текст на одной странице: содержание, раскрывающиеся разделы, кнопки времени, файл Word. Бесплатно, без регистрации.",
+ s1:"Вставьте ссылку YouTube",open:"▶ Открыть",
+ s2:"Получите текст",s2h:"Эти сервисы не разрешают показывать себя внутри других сайтов, поэтому открываются в новой вкладке. Ссылка копируется автоматически — вставьте её там, скопируйте текст и вернитесь сюда.",
+ s3:"Вставить свой текст",make:"Разложить по полочкам",clr:"Очистить",s3h:"Если в тексте есть время ([0:12] или 0:12) — кнопки времени включают видео с этого места. Текст с заголовками (#, 1., -) делится на разделы.",
+ s4:"Перевод через ИИ (по желанию)",s4h:"Нажмите кнопку: задание и текст скопируются и откроется ИИ (короткий текст вставится сам). Ответ верните в шаг 3 — он разложится по разделам.",toLang:"На какой язык",oSense:"Смысловой перевод",oSenseH:"Включено: естественно, по смыслу. Выключено: дословно, точно.",oStruct:"Разложить по разделам",oStructH:"Включено: заголовок, кратко, разделы. Выключено: только полный перевод со временем.",follow:"Следить за видео",copyAll:"Скопировать весь текст",
+ toc:"Содержание",back:"↑ К содержанию",open2:"Открыть все",close:"Свернуть все",word:"Word (.docx)",copy:"Копировать",tg:"Telegram",find:"Поиск по тексту…",
+ hide:"▴ Скрыть",show:"▾ Показать видео",copied:"Скопировано ✓",linkCopied:"Ссылка скопирована — вставьте её там",promptCopied:"Задание и текст скопированы — вставьте там",badLink:"Вставьте ссылку YouTube",noText:"Сначала вставьте текст",
+ part:"Часть",text:"Текст",auto:"⚡ Получить текст автоматически",tl:"Перевод на: {lang}",autoWait:"Получаю текст…",autoFail:"Для этого видео текст получить не удалось. Используйте сервисы ниже.",autoTr:"Готово — перевод Google",autoTrWait:"Перевожу…",autoNoTr:"Перевод не сработал — показан текст на языке оригинала",autoOrig:"Готово — на языке оригинала",types:{other:"Текст видео"},
+ svc:[["DownSub","Текст + автоперевод на 100+ языков"],["vidIQ Transcript","Полный текст со временем"],["YouTube","«…ещё» → «Показать текст видео»"]],
+ aiName:[["ChatGPT","OpenAI, бесплатно"],["Claude","Anthropic, бесплатно"],["Gemini","Google, бесплатно"]],
+ prompt:"Преврати текст этого YouTube-видео в понятный полный текст на русском языке. Переводи по СМЫСЛУ, не дословно. Ничего не выдумывай. Структура: # Заголовок, затем ## Кратко (3-5 предложений), ## разделы (рецепт: ## Ингредиенты — список '- название — количество', ## Приготовление — '1. шаг'; инструкция: ## Что нужно, ## Шаги; другое: ## Главное, ## Что происходит в видео, ## Вывод). Если в тексте есть время, оставь [m:ss] в начале каждого шага.\n\nВИДЕО: "}
+};
+const IC={
+ info:["#3a5bbf",'<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/>'],
+ basket:["#2b7a6f",'<path d="M4 10h16l-2 9H6z"/><path d="M8 10l4-6 4 6"/>'],
+ steps:["#d8432b",'<path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 5l1-1v4M3.5 12.5c0-1 2-1 2 0s-2 1.5-2 2.5h2M3.5 17h2l-1 1.2c1 0 1 1.8 0 1.8h-1"/>'],
+ tools:["#7a3b8f",'<path d="M14 7l3-3 3 3-3 3M14 7l-9 9 3 3 9-9"/>'],
+ tip:["#c98a00",'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c1 1 1 2 1 3h6c0-1 0-2 1-3A6 6 0 0 0 12 3z"/>'],
+ warn:["#b03a3a",'<path d="M12 3l10 18H2z"/><path d="M12 10v4M12 18h.01"/>'],
+ star:["#c98a00",'<path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4 6.5 20.3l1-6.2L3 9.7l6.2-.9z"/>'],
+ text:["#3a5bbf",'<path d="M5 5h14M5 10h14M5 15h10M5 20h7"/>'],
+ check:["#2b7a6f",'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>'],
+ time:["#7a3b8f",'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'],
+ translate:["#b03a6a",'<path d="M4 5h8M8 3v2c0 4-2 7-5 8M6 9c1 2 3 3.5 5 4"/><path d="M13 21l4-9 4 9M14.5 18h5"/>'],
+ play:["#d8432b",'<path d="M8 5v14l11-7z"/>'],
+ box:["#2b7a6f",'<path d="M3 7l9-4 9 4-9 4zM3 7v10l9 4 9-4V7M12 11v10"/>'],
+ heart:["#b03a6a",'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>']
+};
+
+const svg=(k,c)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c||"currentColor"}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(IC[k]||IC.info)[1]}</svg>`;
+const ico=(k,bg)=>`<span class="ico" style="background:${bg||(IC[k]||IC.info)[0]}">${svg(k,"#fff")}</span>`;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const vidOf=u=>{const m=String(u).match(/(?:youtu\.be\/|v=|shorts\/|live\/|embed\/)([A-Za-z0-9_-]{11})/);return m?m[1]:null};
+const toSec=t=>{const m=String(t||"").match(/^(\d+):(\d{2})(?::(\d{2}))?$/);if(!m)return null;return m[3]!=null?+m[1]*3600+ +m[2]*60+ +m[3]:+m[1]*60+ +m[2]};
+const fmt=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,"0");return h?`${h}:${String(m).padStart(2,"0")}:${x}`:`${m}:${x}`};
+const UIL=[["en","English"],["ru","Русский"],["uz","O'zbekcha"],["tr","Türkçe"],["kk","Қазақша"],["ky","Кыргызча"],["tg","Тоҷикӣ"],["tk","Türkmençe"],["az","Azərbaycanca"],["uk","Українська"],["ar","العربية"],["fa","فارسی"],["ur","اردو"],["hi","हिन्दी"],["bn","বাংলা"],["id","Bahasa Indonesia"],["ms","Bahasa Melayu"],["vi","Tiếng Việt"],["th","ไทย"],["zh-CN","中文 (简体)"],["zh-TW","中文 (繁體)"],["ja","日本語"],["ko","한국어"],["de","Deutsch"],["fr","Français"],["es","Español"],["pt","Português"],["it","Italiano"],["nl","Nederlands"],["pl","Polski"],["ro","Română"],["cs","Čeština"],["el","Ελληνικά"],["he","עברית"],["sv","Svenska"],["fi","Suomi"],["hu","Magyar"],["ka","ქართული"],["hy","Հայերեն"],["mn","Монгол"],["sw","Kiswahili"]];
+const pickLang=c=>{c=(c||"").toLowerCase();const f=UIL.find(x=>x[0].toLowerCase()===c)||UIL.find(x=>x[0].split("-")[0]===c.split("-")[0]);return f?f[0]:"en"};
+let L="en";try{L=pickLang(localStorage.getItem("lv_lang")||navigator.language||"en")}catch(e){L=pickLang(navigator.language)}
+const want=L;if(!T[L]){try{const c=JSON.parse(localStorage.getItem("lv_ui_"+L)||"null");if(c&&c.lead)T[L]=c}catch(e){}if(!T[L])L="en"}
+let curVid=null,cur=null;
+const toast=m=>{const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2600)};
+async function copy(s){try{await navigator.clipboard.writeText(s);return true}catch(e){const a=document.createElement("textarea");a.value=s;document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand("copy")}catch(_){}a.remove();return ok}}
+
+function ui(){
+  const t=T[L];document.documentElement.lang=L;
+  document.querySelectorAll("[data-t]").forEach(e=>e.textContent=t[e.dataset.t]);
+  const us=$("uiLang");if(!us.options.length)us.innerHTML=UIL.map(([c,n])=>`<option value="${c}">${esc(n)}</option>`).join("");us.value=L;
+  document.documentElement.dir=/^(ar|fa|ur|he)/.test(L)?"rtl":"ltr";
+  $("open").textContent=t.open;$("make").textContent=t.make;$("clr").textContent=t.clr;
+  const v=curVid,yurl=v?"https://www.youtube.com/watch?v="+v:"https://www.youtube.com/";
+  const S=[["https://downsub.com/?url="+encodeURIComponent(yurl),"translate","#2b7a6f"],["https://vidiq.com/youtube-transcript-generator/","text","#3a5bbf"],[yurl,"play","#d8432b"]];
+  $("svc").innerHTML=S.map((s,i)=>`<a href="${esc(s[0])}" target="_blank" rel="noopener" data-copy="1">${ico(s[1],s[2])}<span><b>${esc(t.svc[i][0])} ↗</b><small>${esc(t.svc[i][1])}</small></span></a>`).join("");
+  const A=[["https://chatgpt.com/","#2b7a6f"],["https://claude.ai/new","#c96442"],["https://gemini.google.com/app","#3a5bbf"]];
+  $("ai").innerHTML=A.map((a,i)=>`<a href="${a[0]}" target="_blank" rel="noopener" data-i="${i}">${ico("translate",a[1])}<span><b>${esc(t.aiName[i][0])} ↗</b><small>${esc(t.aiName[i][1])}</small></span></a>`).join("");
+  $("ai").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{const pr=buildPrompt();copy(pr);toast(t.promptCopied);
+    const i=+a.dataset.i;if(i<2&&pr.length<6000)a.href=A[i][0]+"?q="+encodeURIComponent(pr);else a.href=A[i][0]}));
+  const sel=$("tlang"),keep=sel.value||L;sel.innerHTML=LANGS.map(([c,n])=>`<option value="${c}">${esc(n)}</option>`).join("");sel.value=keep;
+  $("auto").hidden=!WORKER;$("autoBtn").textContent=t.auto;$("aiBtn").textContent=t.aiBtn;$("aiHint").textContent=t.aiHint;$("tlT").textContent=t.tl.replace("{lang}",(UIL.find(x=>x[0]===L)||[0,L])[1]);
+  if(cur)render();
+  if(!$("top").hidden)$("mn").textContent=$("top").classList.contains("min")?t.show:t.hide;
+}
+// Translate many short strings with Google (free, in the visitor's browser). Robust: several methods, never all-or-nothing.
+async function gtMany(list,tl,sl){
+  const out=new Array(list.length).fill(null);
+  const asText=x=>Array.isArray(x)?asText(x[0]):(typeof x==="string"?x:null);
+  // method 1: translate_a/t with many q= (one result per string)
+  for(let i=0;i<list.length;i+=25){
+    const part=list.slice(i,i+25);
+    try{
+      const body=part.map(s=>"q="+encodeURIComponent(s)).join("&");
+      const r=await fetch("https://translate.googleapis.com/translate_a/t?client=gtx&dt=t&sl="+(sl||"auto")+"&tl="+tl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body});
+      if(r.ok){const d=await r.json();const arr=Array.isArray(d)?d:[d];
+        if(arr.length===part.length)arr.forEach((x,k)=>{const s=asText(x);if(s)out[i+k]=s});
+        else if(part.length===1&&asText(arr))out[i]=asText(arr)}
+    }catch(e){}
+  }
+  // method 2: one string per request for anything still missing (small, sequential)
+  for(let i=0;i<list.length;i++){
+    if(out[i])continue;
+    try{const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl="+(sl||"auto")+"&tl="+tl+"&q="+encodeURIComponent(list[i]));
+      if(r.ok){const d=await r.json();const s=(d[0]||[]).map(p=>p[0]||"").join("").trim();if(s)out[i]=s}}catch(e){}
+  }
+  return out;
+}
+async function translateUI(code){
+  const flat=[];const walk=(o,path)=>{for(const k in o){const v=o[k],pp=path.concat(k);if(typeof v==="string")flat.push([pp,v]);else walk(v,pp)}};walk(T.en,[]);
+  const res=await gtMany(flat.map(x=>x[1]),code,"en");
+  const ok=res.filter(Boolean).length;if(ok<flat.length*0.6)throw new Error("too few "+ok);
+  const o=JSON.parse(JSON.stringify(T.en));
+  flat.forEach(([pp],k)=>{if(!res[k])return;let x=o;for(let q=0;q<pp.length-1;q++)x=x[pp[q]];x[pp[pp.length-1]]=T.en[pp[0]]&&String(T.en[pp[0]]).includes("{lang}")&&!/\{lang\}/.test(res[k])?res[k].replace(/\{[^}]*\}/,"{lang}")+(/\{/.test(res[k])?"":" {lang}"):res[k]});
+  ["svc","aiName"].forEach(k=>o[k].forEach((r,n)=>r[0]=T.en[k][n][0]));o.word="Word (.docx)";o.tg="Telegram";
+  return o;
+}
+async function setLang(code){
+  try{localStorage.setItem("lv_lang",code)}catch(e){}
+  if(!T[code]){toast((T[L]||T.en).uiWait);try{T[code]=await translateUI(code);try{localStorage.setItem("lv_ui_"+code,JSON.stringify(T[code]))}catch(e){}}catch(e){toast("Translation service unavailable right now — English");code="en";try{localStorage.setItem("lv_lang","en")}catch(_){}}}
+  L=code;ui();
+}
+$("uiLang").addEventListener("change",e=>setLang(e.target.value));
+
+/* Official YouTube IFrame Player API: exact current time and play/pause state */
+let ytP=null,ytReady=false;
+function ytApi(){return new Promise(res=>{if(window.YT&&YT.Player)return res();const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{if(prev)prev();res()};if(!document.getElementById("ytapi")){const s=document.createElement("script");s.id="ytapi";s.src="https://www.youtube.com/iframe_api";document.head.appendChild(s)}})}
+async function bindPlayer(){
+  await ytApi();ytReady=false;
+  try{if(ytP&&ytP.destroy){}}catch(e){}
+  ytP=new YT.Player("yt",{events:{onReady:()=>{ytReady=true},onStateChange:e=>{playing=e.data===1;$("pp").textContent=playing?"⏸":"▶";syncClock()},onPlaybackRateChange:e=>{rate=e.data;$("spd").value=String(rate);syncClock()}}});
+}
+function syncClock(){if(ytReady&&ytP.getCurrentTime){const t=ytP.getCurrentTime();curT=t;clk={t,at:performance.now()}}}
+setInterval(()=>{if(ytReady&&ytP&&ytP.getPlayerState){playing=ytP.getPlayerState()===1;syncClock()}},200);
+ytApi();
+function play(v){
+  if(!v)return;curVid=v;$("top").hidden=false;$("top").classList.remove("min");
+  $("yt").src="https://www.youtube.com/embed/"+v+"?enablejsapi=1&playsinline=1&rel=0&cc_load_policy=1&cc_lang_pref="+L+"&hl="+L+"&origin="+encodeURIComponent(location.origin);
+  $("nm").textContent=(cur&&cur.r.title)||"YouTube";$("mn").textContent=T[L].hide;
+  try{localStorage.setItem("lv_vid",v)}catch(e){}
+  bindPlayer().catch(()=>{});
+}
+$("mn").onclick=()=>{$("top").classList.toggle("min");$("mn").textContent=$("top").classList.contains("min")?T[L].show:T[L].hide};
+$("open").onclick=()=>{const v=vidOf($("link").value);if(!v){toast(T[L].badLink);return}play(v);ui();scrollTo({top:0})};
+$("link").addEventListener("keydown",e=>{if(e.key==="Enter")$("open").click()});
+function seek(s){if(ytReady&&ytP){$("top").classList.remove("min");ytP.seekTo(s,true);ytP.playVideo();setTimeout(syncClock,80);return}const w=$("yt").contentWindow;if(!w||$("top").hidden)return;$("top").classList.remove("min");$("mn").textContent=T[L].hide;
+  const send=(f,a)=>w.postMessage(JSON.stringify({event:"command",func:f,args:a||[]}),"*");send("seekTo",[s,true]);send("playVideo")}
+
+const LANGS=[["uz","O'zbekcha (lotin)"],["uz-Cyrl","Ўзбекча (кирилл)"],["ru","Русский"],["en","English"],["tr","Türkçe"],["kk","Қазақша"],["ky","Кыргызча"],["tg","Тоҷикӣ"],["tk","Türkmençe"],["az","Azərbaycanca"],["ar","العربية"],["fa","فارسی"],["de","Deutsch"],["fr","Français"],["es","Español"],["it","Italiano"],["pt","Português"],["zh","中文"],["ja","日本語"],["ko","한국어"],["hi","हिन्दी"],["uk","Українська"]];
+function buildPrompt(){
+  const code=$("tlang").value,name=(LANGS.find(x=>x[0]===code)||[0,code])[1];
+  const sense=$("optSense").checked,struct=$("optStruct").checked;
+  let p=`Translate the YouTube video transcript below into ${name}.\n`;
+  p+=sense?"Translate by MEANING: natural, idiomatic sentences a native speaker would write. Fix obvious subtitle errors. Do not translate word by word.\n":"Translate LITERALLY and precisely, sentence by sentence, keeping the original wording as close as possible.\n";
+  p+="Do not invent anything and do not drop information.\n";
+  p+=struct?"Format: '# Title', then '## Summary' (3-5 sentences), then sections with '## ' headings that fit the video (recipe: ingredients as '- name — amount' and steps as '1. step'; instruction: what you need, steps; other: main points, what happens in the video, conclusion). Keep [m:ss] times at the start of steps when the transcript has them. All headings in "+name+".\n":"Format: the full translation as paragraphs of about 30-60 seconds; start every paragraph with its [m:ss] time.\n";
+  p+="\nVIDEO: "+(curVid?"https://youtu.be/"+curVid:"")+"\nTRANSCRIPT:\n"+$("txt").value.trim();
+  return p;
+}
+/* ---------- text -> sections ---------- */
+const TS=/^\s*\[?((?:\d{1,2}:)?\d{1,2}:\d{2})\]?\s*[-–—]?\s*/;
+function parse(raw){
+  const lines=raw.replace(/\r/g,"").split("\n").map(s=>s.trim());
+  const hasHead=lines.some(l=>/^#{1,3}\s+\S/.test(l)||/^\*\*[^*]{2,80}\*\*:?$/.test(l));
+  let title="",secs=[];
+  if(hasHead){
+    let s=null;
+    for(let l of lines){
+      if(!l)continue;
+      let m;
+      if((m=l.match(/^#\s+(.+)/))&&!title&&!secs.length){title=m[1].replace(/\*\*/g,"");continue}
+      if((m=l.match(/^#{1,3}\s+(.+)/))||(m=l.match(/^\*\*([^*]{2,80})\*\*:?$/))){s={title:m[1].replace(/\*\*/g,"").replace(/:$/,""),items:[],kinds:[]};secs.push(s);continue}
+      if(!s){s={title:T[L].text,items:[],kinds:[]};secs.push(s)}
+      let kind="text";
+      if(/^\d+[.)]\s+/.test(l)){kind="steps";l=l.replace(/^\d+[.)]\s+/,"")}
+      else if(/^[-*•]\s+/.test(l)){kind="bullets";l=l.replace(/^[-*•]\s+/,"")}
+      l=l.replace(/\*\*(.+?)\*\*/g,"$1");
+      let t="";const tm=l.match(TS);if(tm&&toSec(tm[1])!=null){t=tm[1];l=l.slice(tm[0].length)}
+      const am=kind==="bullets"&&l.match(/^(.{2,60}?)\s+[—–-]\s+(.{1,40})$/);
+      s.items.push(am?{text:am[1],amount:am[2],t}:{text:l,t});s.kinds.push(kind);
+    }
+    secs=secs.filter(s=>s.items.length).map(s=>{const k=s.kinds.filter(x=>x!=="text");const main=k.length>=s.kinds.length/2?(k.filter(x=>x==="steps").length>k.length/2?"steps":"bullets"):"text";
+      const hasAmt=s.items.some(i=>i.amount);return{title:s.title,kind:hasAmt?"checklist":main,items:s.items}});
+  }else{
+    const segs=[];let buf="",bt=null;
+    let parts=[];
+    const flush=()=>{if(buf.trim())segs.push({t:bt,text:buf.trim(),parts});buf="";bt=null;parts=[]};
+    for(let i=0;i<lines.length;i++){
+      let l=lines[i];if(!l)continue;
+      let t=null;const tm=l.match(TS);
+      if(tm&&toSec(tm[1])!=null){t=toSec(tm[1]);l=l.slice(tm[0].length)}
+      else if(/^\d+$/.test(l)&&lines[i+1]&&/-->/.test(lines[i+1]))continue;
+      else if(/-->/.test(l)){const m2=l.match(/(\d+):(\d{2}):(\d{2})/);if(m2){bt=bt??(+m2[1]*3600+ +m2[2]*60+ +m2[3])}continue}
+      if(!l)continue;
+      if(t!=null&&bt!=null&&t-bt>=15)flush();
+      if(t!=null&&bt===null)bt=t;
+      buf+=(buf?" ":"")+l;
+      if(t!=null||!parts.length)parts.push({s:t,text:l});else parts[parts.length-1].text+=" "+l;
+      if(buf.length>700||(bt===null&&/[.!?]$/.test(l)&&buf.length>350))flush();
+    }
+    flush();
+    const timed=segs.some(s=>s.t!=null);
+    const per=timed?180:6;const groups=[];
+    segs.forEach((s,i)=>{const key=timed?Math.floor((s.t??0)/per):Math.floor(i/per);(groups[key]=groups[key]||[]).push(s)});
+    secs=groups.filter(Boolean).map((g,i)=>{const a=g[0].t,b=g[g.length-1].t;
+      return{title:timed?`${T[L].part} ${i+1} · ${fmt(a??0)}–${fmt(b??a??0)}`:`${T[L].part} ${i+1}`,kind:"text",items:g.map(s=>({text:s.text,t:s.t!=null?fmt(s.t):"",parts:s.parts&&s.parts.some(x=>x.s!=null)?s.parts:null}))}});
+  }
+  const icon=s=>{const x=s.title.toLowerCase();
+    return /qisqa|кратк|summary|xulosa|вывод/.test(x)?"info":/masalliq|ингред|состав|kerak|нужн|tools/.test(x)?"basket":/tayyor|приготов|qadam|шаг|step/.test(x)?"steps":/maslahat|совет|tip/.test(x)?"tip":/ehtiyot|diqqat|внимани|осторож|warn/.test(x)?"warn":/asosiy|главн|main/.test(x)?"star":/videoda|происход/.test(x)?"play":s.kind==="checklist"?"basket":s.kind==="steps"?"steps":"text"};
+  secs.forEach(s=>s.icon=icon(s));
+  return{r:{title:title||T[L].types.other,type:"other",meta:[],sections:secs}};
+}
+
+const words=s=>esc(s).split(/(\s+)/).map(w=>/^\s*$/.test(w)?w:`<span class="wd">${w}</span>`).join("");
+const lineHTML=(text,sec)=>sec!=null?`<span class="ln" data-a="${sec}">${words(text)}</span>`:esc(text);
+const itemText=i=>i.parts?i.parts.map(x=>lineHTML(x.text,x.s)).join(" "):lineHTML(i.text,toSec(i.t));
+const segAttr=t=>{const s=toSec(t);return s!=null?` class="seg" data-sec="${s}"`:""};
+function tsBtn(t){const s=toSec(t);return s!=null?`<button class="ts" type="button" data-s="${s}">▶ ${esc(t)}</button>`:""}
+function secBody(s){const it=s.items||[];
+  if(s.kind==="checklist")return`<ul class="ck">${it.map(i=>`<li${segAttr(i.t)}><span class="box">✓</span><span>${tsBtn(i.t)}${itemText(i)}${i.amount?` — <b>${esc(i.amount)}</b>`:""}${i.note?` <i style="color:var(--soft)">(${esc(i.note)})</i>`:""}</span></li>`).join("")}</ul>`;
+  if(s.kind==="steps")return`<ol class="st">${it.map(i=>`<li${segAttr(i.t)}><span>${tsBtn(i.t)}${itemText(i)}</span></li>`).join("")}</ol>`;
+  if(s.kind==="bullets")return`<ul class="bl">${it.map(i=>`<li${segAttr(i.t)}>${tsBtn(i.t)}${itemText(i)}</li>`).join("")}</ul>`;
+  return it.map(i=>`<p${segAttr(i.t)}>${tsBtn(i.t)}${itemText(i)}</p>`).join("");
+}
+function sectionsFlat(){const s=(cur.r.sections||[]).slice();if(cur.r.summary)s.unshift({icon:"info",title:T[L].sum,kind:"text",items:[{text:cur.r.summary}]});if(cur.full)s.push({icon:"translate",title:T[L].full,kind:"text",items:cur.full});return s}
+function render(){
+  const t=T[L],S=sectionsFlat();
+  $("out").innerHTML=`<h2 class="tt">${esc(cur.r.title)}</h2>
+   <div class="bar2" role="toolbar">
+     <button type="button" class="pri" id="dlw">📄 ${t.word}</button>
+     <button type="button" id="cp">📋 ${t.copyAll}</button>
+     <button type="button" id="srtB">🎬 ${t.srt}</button>
+     <a id="tgl" target="_blank" rel="noopener" href="#">✈️ ${t.tg}</a>
+     <button type="button" id="lsn">🔊 ${t.listen}</button>
+   </div>
+   <details class="tts" id="ttsBox"><summary>🔊 ${t.listen}</summary><div class="in">
+     <select id="ttsEng"><option value="piper">${t.engPiper}</option><option value="dev">${t.engDev}</option></select>
+     <div class="row" style="margin-top:8px"><select id="ttsVoice" aria-label="${t.voice}" style="flex:1 1 160px"></select><select id="ttsRate" aria-label="speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option></select></div>
+     <div class="row" style="margin-top:8px"><button class="go" type="button" id="ttsPlay">${t.play}</button><button class="ghost" type="button" id="ttsStop">${t.stop}</button></div>
+     <p class="hint" id="ttsSt"></p>
+     <details class="ms"><summary><b>${t.msBest}</b></summary>
+       <p class="hint">${t.msWhy}</p>
+       <div class="row"><a class="go" id="edgeOpen" href="#" style="flex:1 1 100%">${t.edgeBtn}</a></div>
+       <p class="hint">${t.edgeHow}</p>
+       <div class="row"><button class="ghost" type="button" id="wordListen">${t.wordBtn}</button></div>
+       <p class="hint">${t.wordHow}</p>
+     </details></div></details>
+   <div class="find"><input type="text" id="q" placeholder="🔍 ${esc(t.find)}"><label class="follow"><input type="checkbox" id="fol" checked><span>${t.follow}</span></label></div>
+   <nav class="toc" id="toc"><b>${t.toc}</b><ol>${S.map((s,i)=>`<li><a href="#s${i}" data-i="${i}">${ico(s.icon)}<span>${i+1}. ${esc(s.title)}</span></a></li>`).join("")}</ol></nav>
+   <div class="row" style="margin:0 0 4px"><button class="ghost" type="button" id="tog">${t.open2}</button></div>
+   ${S.map((s,i)=>`<details class="sec" id="s${i}"${i===0?" open":""}><summary>${ico(s.icon)}<span>${i+1}. ${esc(s.title)}</span></summary><div class="body">${secBody(s)}<a class="back" href="#toc">${t.back}</a></div></details>`).join("")}
+   <div class="row"><button class="go" type="button" id="cp2" style="flex:1 1 100%;background:var(--ink);color:var(--card)">📋 ${t.copyAll}</button></div>`;
+  $("out").hidden=false;indexLines();ttsSetup();
+  if(!$("top").hidden)$("nm").textContent=cur.r.title;
+  const plain=asText();
+  $("tgl").href="https://t.me/share/url?url="+encodeURIComponent(curVid?"https://youtu.be/"+curVid:location.href)+"&text="+encodeURIComponent(plain.slice(0,3000));
+  $("srtB").onclick=()=>{
+    const items=[];sectionsFlat().forEach(s=>(s.items||[]).forEach(i=>{if(i.parts)i.parts.forEach(p=>{if(p.s!=null)items.push({s:p.s,text:p.text})});else{const x=toSec(i.t);if(x!=null)items.push({s:x,text:i.text})}}));
+    if(cur.ai&&cur.ai.speech&&cur.ai.speech.length){items.length=0;cur.ai.speech.forEach(x=>{const s=toSec(x.t);if(s!=null)items.push({s,text:x.tr||x.orig})})}
+    items.sort((a,b)=>a.s-b.s);for(let i=items.length-1;i>0;i--)if(items[i].s===items[i-1].s)items.splice(i,1);if(!items.length){toast(T[L].noText);return}
+    const tc=x=>{const ms=Math.round(x*1000),h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3),r=ms%1e3;return`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")},${String(r).padStart(3,"0")}`};
+    const srt=items.map((x,i)=>{const e=Math.min(items[i+1]?items[i+1].s:x.s+4,x.s+8);return`${i+1}\n${tc(x.s)} --> ${tc(Math.max(e,x.s+1))}\n${x.text}\n`}).join("\n");
+    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([srt],{type:"text/plain"}));a.download=(cur.r.title||"Lingvid").replace(/[\\/:*?"<>|]+/g," ").slice(0,80)+"."+L+".srt";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)};
+  $("cp").onclick=async()=>{if(await copy(plain))toast(t.copied)};$("cp2").onclick=$("cp").onclick;
+  $("lsn").onclick=()=>{const d=$("ttsBox");d.open=true;scrollUnder(d)};
+  $("setup").classList.add("has");$("setup").open=false;document.querySelector('[data-t="lead"]').hidden=true;
+  $("dlw").onclick=async()=>{const b=await buildDocx();const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=(cur.r.title||"Lingvid").replace(/[\\/:*?"<>|]+/g," ").slice(0,80)+".docx";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)};
+  $("tog").onclick=()=>{const ds=[...$("out").querySelectorAll("details.sec")];const op=!ds.every(d=>d.open);ds.forEach(d=>d.open=op);$("tog").textContent=op?t.close:t.open2};
+  $("q").oninput=e=>{const q=e.target.value.trim().toLowerCase();
+    $("out").querySelectorAll("details.sec").forEach(d=>{const hit=q&&d.textContent.toLowerCase().includes(q);if(q)d.open=hit;
+      d.querySelectorAll(".body p,.body li").forEach(el=>{el.style.background=q&&el.textContent.toLowerCase().includes(q)?"light-dark(#fff3c4,#4a3a20)":""})})};
+}
+$("out").addEventListener("click",e=>{
+  const a=e.target.closest(".toc a");if(a){e.preventDefault();const d=$("s"+a.dataset.i);d.open=true;d.scrollIntoView({block:"start"});return}
+  const bk=e.target.closest("a.back");if(bk){e.preventDefault();$("toc").scrollIntoView({block:"start"});return}
+  const b=e.target.closest(".ts");if(b){seek(+b.dataset.s);return}
+  const li=e.target.closest("ul.ck li, ol.st li");if(li)li.classList.toggle("done");
+});
+function asText(){const S=sectionsFlat();let o=cur.r.title+"\n"+(curVid?"https://youtu.be/"+curVid+"\n":"")+"\n";
+  S.forEach((s,i)=>{o+=`\n${i+1}. ${s.title}\n`;(s.items||[]).forEach((it,j)=>{o+=(s.kind==="steps"?`${j+1}. `:s.kind==="text"?"":"• ")+(it.t?`[${it.t}] `:"")+it.text+(it.amount?` — ${it.amount}`:"")+"\n"})});return o}
+
+$("make").onclick=()=>{const x=$("txt").value.trim();if(!x){toast(T[L].noText);return}
+  cur=parse(x);render();$("c4").hidden=false;try{localStorage.setItem("lv_txt",x)}catch(e){}$("out").scrollIntoView({block:"start"})};
+$("clr").onclick=()=>{$("txt").value="";$("out").hidden=true;cur=null;try{localStorage.removeItem("lv_txt")}catch(e){}};
+$("txt").addEventListener("input",()=>{$("c4").hidden=!$("txt").value.trim()});
+
+/* ---------- Word ---------- */
+/* ---------- DOCX (zip, store) ---------- */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+function zip(files){
+  const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+  for(const f of files){
+    const name=enc.encode(f.name),data=typeof f.data==="string"?enc.encode(f.data):f.data,crc=crc32(data);
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,name.length,true);
+    parts.push(new Uint8Array(h.buffer),name,data);
+    const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint32(16,crc,true);c.setUint32(20,data.length,true);c.setUint32(24,data.length,true);c.setUint16(28,name.length,true);c.setUint32(42,off,true);
+    cen.push(new Uint8Array(c.buffer),name);off+=30+name.length+data.length;
+  }
+  const cs=cen.reduce((a,b)=>a+b.length,0),e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(e.buffer)]);
+}
+function iconPng(k){return new Promise(res=>{
+  const [col,p]=IC[k]||IC.info;
+  const s=`<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="${col}"/><g transform="translate(4 4) scale(.667)" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${p}</g></svg>`;
+  const img=new Image();img.onload=()=>{const c=document.createElement("canvas");c.width=c.height=96;c.getContext("2d").drawImage(img,0,0,96,96);c.toBlob(b=>b?b.arrayBuffer().then(a=>res(new Uint8Array(a))):res(null),"image/png")};
+  img.onerror=()=>res(null);img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(s);
+})}
+const X=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,"");
+
+async function buildDocx(){
+  const t=T[L],r=cur.r,S=sectionsFlat(),rels=[],media=[];let rid=10,bm=1;
+  const run=(txt,o={})=>`<w:r><w:rPr>${o.b?"<w:b/>":""}${o.c?`<w:color w:val="${o.c}"/>`:""}${o.sz?`<w:sz w:val="${o.sz}"/>`:""}${o.u?'<w:u w:val="single"/>':""}</w:rPr><w:t xml:space="preserve">${X(txt)}</w:t></w:r>`;
+  const para=(inner,o={})=>`<w:p><w:pPr>${o.style?`<w:pStyle w:val="${o.style}"/>`:""}${o.sp?`<w:spacing w:after="${o.sp}"/>`:""}${o.ind?`<w:ind w:left="${o.ind}" w:hanging="${o.hang||0}"/>`:""}</w:pPr>${inner}</w:p>`;
+  const ext=(url,txt)=>{const id="rId"+(rid++);rels.push(`<Relationship Id="${id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="${X(url)}" TargetMode="External"/>`);return`<w:hyperlink r:id="${id}">${run(txt,{c:"D8432B",u:1})}</w:hyperlink>`};
+  const anc=(a,txt,o={})=>`<w:hyperlink w:anchor="${a}">${run(txt,{c:o.c||"2B5BBF",u:1,b:o.b})}</w:hyperlink>`;
+  const mark=(name,inner)=>{const id=bm++;return`<w:bookmarkStart w:id="${id}" w:name="${name}"/>${inner}<w:bookmarkEnd w:id="${id}"/>`};
+  const pics={};let dp=1;
+  for(const s of S){if(!(s.icon in pics)){const png=await iconPng(s.icon);if(png){const n=media.length+1,id="rId"+(rid++);media.push({name:`word/media/i${n}.png`,data:png});rels.push(`<Relationship Id="${id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/i${n}.png"/>`);pics[s.icon]={id,n}}else pics[s.icon]=null}}
+  const pic=k=>{const p=pics[k];if(!p)return"";const e=320040;return`<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${e}" cy="${e}"/><wp:docPr id="${dp++}" name="i${p.n}"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="i${p.n}.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${p.id}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${e}" cy="${e}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>${run("  ")}`};
+  const tlink=tm=>{const s=toSec(tm);return curVid&&s!=null?run("  ")+ext(`https://www.youtube.com/watch?v=${curVid}&t=${s}s`,"▶ "+tm):""};
+  let b=para(mark("top",run(r.title)),{style:"Title"});
+  b+=para(run(t.types[r.type]||t.types.other,{b:1,c:"D8432B"}));
+  (r.meta||[]).forEach(m=>m&&m.value&&(b+=para(run(m.label+": ",{b:1})+run(m.value),{sp:40})));
+  if(curVid)b+=para(run("Video: ",{b:1})+ext("https://youtu.be/"+curVid,"https://youtu.be/"+curVid));
+  b+=para(mark("toc",run(t.toc)),{style:"Heading1"});
+  S.forEach((s,i)=>b+=para(pic(s.icon)+anc("sec"+i,`${i+1}. ${s.title}`),{sp:60}));
+  S.forEach((s,i)=>{
+    b+=para(mark("sec"+i,pic(s.icon)+run(`${i+1}. ${s.title}`)),{style:"Heading1"});
+    (s.items||[]).forEach((it,j)=>{
+      const extra=(it.amount?run(" — ")+run(it.amount,{b:1}):"")+(it.note?run(` (${it.note})`,{c:"6D5A70"}):"")+tlink(it.t);
+      if(s.kind==="steps")b+=para(run(`${j+1}. `,{b:1,c:"D8432B"})+run(it.text)+extra,{ind:440,hang:440,sp:100});
+      else if(s.kind==="checklist")b+=para(run("☐ ",{c:"D8432B"})+run(it.text)+extra,{ind:440,hang:440,sp:60});
+      else if(s.kind==="text")b+=para((it.t&&s.icon==="translate"?ext(`https://www.youtube.com/watch?v=${curVid}&t=${toSec(it.t)||0}s`,`[${it.t}] `):"")+run(it.text)+(s.icon==="translate"?"":extra),{sp:160});
+      else b+=para(run("• ",{c:"D8432B"})+run(it.text)+extra,{ind:440,hang:300,sp:60});
+    });
+    b+=para(anc("toc",t.back,{c:"6D5A70"})+run("    ")+anc("top",T[L].top||"↑",{c:"6D5A70"}),{sp:200});
+  });
+  const NS='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
+  const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${b}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri" w:eastAsia="Calibri"/><w:sz w:val="24"/><w:lang w:val="${L}"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="300" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="200"/></w:pPr><w:rPr><w:b/><w:color w:val="2B1530"/><w:sz w:val="44"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="360" w:after="160"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:color w:val="2B1530"/><w:sz w:val="32"/></w:rPr></w:style></w:styles>`;
+  const files=[
+    {name:"[Content_Types].xml",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`},
+    {name:"_rels/.rels",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`},
+    {name:"word/_rels/document.xml.rels",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>${rels.join("")}</Relationships>`},
+    {name:"word/document.xml",data:doc},{name:"word/styles.xml",data:styles},...media];
+  return zip(files);
+}
+
+
+
+/* ---------- auto text (Cloudflare helper) ---------- */
+const WORKER="https://lingvid.3307999.workers.dev/";
+async function gtrans(segs,tl){
+  const out=segs.map(x=>({...x}));
+  for(let i=0;i<out.length;i+=100){
+    const part=out.slice(i,i+100);const res=await gtMany(part.map(x=>x.text),tl,"auto");
+    if(res.filter(Boolean).length<part.length*0.5)throw new Error("translate");
+    res.forEach((t,k)=>{if(t)out[i+k].text=t});
+    $("autoSt").textContent=T[L].autoTrWait+" "+Math.round(Math.min(1,(i+100)/out.length)*100)+"%";
+  }
+  return out;
+}
+/* local cache: up to 30 videos, 7 days — the same video is never downloaded or translated twice */
+const CK="lv_cache_v1",CTTL=7*864e5;
+function cacheGet(k){try{const c=JSON.parse(localStorage.getItem(CK)||"{}");const e=c[k];if(e&&Date.now()-e.at<CTTL)return e.v}catch(e){}return null}
+function cachePut(k,v){try{const c=JSON.parse(localStorage.getItem(CK)||"{}");c[k]={at:Date.now(),v};
+  const keys=Object.keys(c).sort((a,b)=>c[b].at-c[a].at);keys.forEach((x,i)=>{if(i>=60||Date.now()-c[x].at>CTTL)delete c[x]});
+  try{localStorage.setItem(CK,JSON.stringify(c))}catch(e){const ks=Object.keys(c).sort((a,b)=>c[a].at-c[b].at);ks.slice(0,Math.ceil(ks.length/2)).forEach(x=>delete c[x]);localStorage.setItem(CK,JSON.stringify(c))}}catch(e){}}
+async function fetchVideo(v){
+  const hit=cacheGet("v:"+v);if(hit)return hit;
+  let last=null;
+  for(let a=0;a<2;a++){
+    try{const r=await fetch(WORKER+"?v="+v);const d=await r.json();if(d.segments&&d.segments.length){cachePut("v:"+v,d);return d}last=d}catch(e){last={error:e.message||"network"}}
+    await new Promise(r=>setTimeout(r,1500));
+  }
+  return last||{error:"unknown"};
+}
+async function autoText(){
+  const t=T[L];if(!curVid){toast(t.badLink);return}
+  const b=$("autoBtn");b.disabled=true;$("autoSt").textContent=t.autoWait;
+  try{
+    const d=await fetchVideo(curVid);
+    if(!d.segments||!d.segments.length){$("autoSt").textContent=t.autoFail+(d.error?" ("+d.error+")":"");return}
+    let segs=d.segments,tr=false;
+    if($("tl").checked&&(d.original||"").split("-")[0]!==L){
+      const tk="t2:"+curVid+":"+L,th=cacheGet(tk);if(th){segs=th;tr=true}else{try{segs=await gtrans(segs,L);tr=true;cachePut(tk,segs)}catch(e){$("autoSt").textContent=t.autoNoTr+" ("+(e&&e.message||e)+")"}}
+    }
+    $("txt").value=segs.map(s=>`[${s.t}] ${s.text}`).join("\n");
+    if(!$("autoSt").textContent.startsWith(t.autoNoTr))$("autoSt").textContent=(tr?t.autoTr:t.autoOrig)+" ("+(tr?L:d.original||"?")+")";
+    cur=parse($("txt").value);cur.r.title=d.title||cur.r.title;cur.lang=tr?L:(d.original||L);render();$("c4").hidden=false;
+    try{localStorage.setItem("lv_txt",$("txt").value)}catch(e){}
+    $("out").scrollIntoView({block:"start"});
+  }catch(e){$("autoSt").textContent=t.autoFail+" ("+(e&&e.message||e)+")"}
+  finally{b.disabled=false}
+}
+$("autoBtn").onclick=autoText;
+async function aiAnalyze(){
+  const t=T[L];if(!curVid){toast(t.badLink);return}
+  const b=$("aiBtn");b.disabled=true;$("autoSt").textContent=t.aiWait;
+  try{
+    const ck="a:"+curVid+":"+L;let d=cacheGet(ck);
+    if(!d){const r=await fetch(WORKER+"analyze?v="+curVid+"&lang="+L);d=await r.json();if(!d.ok)throw new Error((d.error||"")+(d.detail?": "+d.detail:""));cachePut(ck,d)}
+    const sp=(d.speech||[]).filter(x=>x&&(x.tr||x.orig));const os=(d.onscreen||[]).filter(x=>x&&(x.tr||x.orig));
+    let md="# "+(d.title||"")+"\n";
+    if(d.summary)md+="## "+t.sum+"\n"+d.summary+"\n";
+    if(d.guide)md+=d.guide.replace(/^#\s.*$/m,"")+"\n";
+    if(os.length)md+="## 🖼 "+t.aiScreen+"\n"+os.map(x=>"- ["+x.t+"] "+(x.tr||x.orig)+(x.orig&&x.tr&&x.orig!==x.tr?" ("+x.orig+")":"")).join("\n")+"\n";
+    if(sp.length)md+="## 🗣 "+t.aiSpeech+"\n"+sp.map(x=>"["+x.t+"] "+(x.tr||x.orig)).join("\n")+"\n";
+    $("txt").value=md;cur=parse(md);cur.lang=L;cur.ai=d;render();$("c4").hidden=false;
+    try{localStorage.setItem("lv_txt",md)}catch(e){}
+    $("autoSt").textContent="✓";$("out").scrollIntoView({block:"start"});
+  }catch(e){$("autoSt").textContent=t.aiFail+" ("+(e&&e.message||e)+")"}
+  finally{b.disabled=false}
+}
+$("aiBtn").onclick=aiAnalyze;
+/* ---------- player controls: speed, pause, ±5s ---------- */
+let rate=1,playing=false,curT=0;
+const ytCmd=(f,a)=>{if(ytReady&&ytP&&typeof ytP[f]==="function"){ytP[f](...(a||[]));setTimeout(syncClock,50);return}const w=$("yt").contentWindow;if(w)w.postMessage(JSON.stringify({event:"command",func:f,args:a||[]}),"*")};
+$("spd").innerHTML=[0.25,0.5,0.75,1,1.25,1.5,1.75,2].map(r=>`<option value="${r}"${r===1?" selected":""}>${r}×</option>`).join("");
+$("spd").addEventListener("change",e=>{rate=+e.target.value;ytCmd("setPlaybackRate",[rate]);clk={t:nowT(),at:performance.now()}});
+$("ctl").addEventListener("click",e=>{const b=e.target.closest("button[data-c]");if(!b)return;const c=b.dataset.c;
+  if(c==="toggle"){ytCmd(playing?"pauseVideo":"playVideo")}
+  else{ytCmd("seekTo",[Math.max(0,curT+(c==="back"?-5:5)),true]);ytCmd("playVideo")}});
+function b64u(s){const b=new TextEncoder().encode(s);let x="";b.forEach(c=>x+=String.fromCharCode(c));return btoa(x).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+/* ---------- read aloud: Microsoft neural (via helper), Piper (in browser), device ---------- */
+const MSV={uz:[["uz-UZ-MadinaNeural","Madina ♀"],["uz-UZ-SardorNeural","Sardor ♂"]],ru:[["ru-RU-SvetlanaNeural","Svetlana ♀"],["ru-RU-DmitryNeural","Dmitry ♂"],["ru-RU-DariyaNeural","Dariya ♀"]],en:[["en-US-AriaNeural","Aria ♀"],["en-US-GuyNeural","Guy ♂"],["en-US-JennyNeural","Jenny ♀"],["en-GB-SoniaNeural","Sonia ♀ UK"]],tr:[["tr-TR-EmelNeural","Emel ♀"],["tr-TR-AhmetNeural","Ahmet ♂"]],kk:[["kk-KZ-AigulNeural","Aigul ♀"],["kk-KZ-DauletNeural","Daulet ♂"]],az:[["az-AZ-BanuNeural","Banu ♀"],["az-AZ-BabekNeural","Babek ♂"]],uk:[["uk-UA-PolinaNeural","Polina ♀"],["uk-UA-OstapNeural","Ostap ♂"]],ar:[["ar-SA-ZariyahNeural","Zariyah ♀"],["ar-SA-HamedNeural","Hamed ♂"]],fa:[["fa-IR-DilaraNeural","Dilara ♀"],["fa-IR-FaridNeural","Farid ♂"]],de:[["de-DE-KatjaNeural","Katja ♀"],["de-DE-ConradNeural","Conrad ♂"]],fr:[["fr-FR-DeniseNeural","Denise ♀"],["fr-FR-HenriNeural","Henri ♂"]],es:[["es-ES-ElviraNeural","Elvira ♀"],["es-ES-AlvaroNeural","Álvaro ♂"]],it:[["it-IT-ElsaNeural","Elsa ♀"],["it-IT-DiegoNeural","Diego ♂"]],pt:[["pt-BR-FranciscaNeural","Francisca ♀"],["pt-BR-AntonioNeural","Antonio ♂"]],zh:[["zh-CN-XiaoxiaoNeural","Xiaoxiao ♀"],["zh-CN-YunxiNeural","Yunxi ♂"]],ja:[["ja-JP-NanamiNeural","Nanami ♀"],["ja-JP-KeitaNeural","Keita ♂"]],ko:[["ko-KR-SunHiNeural","SunHi ♀"],["ko-KR-InJoonNeural","InJoon ♂"]],hi:[["hi-IN-SwaraNeural","Swara ♀"],["hi-IN-MadhurNeural","Madhur ♂"]],id:[["id-ID-GadisNeural","Gadis ♀"],["id-ID-ArdiNeural","Ardi ♂"]],ka:[["ka-GE-EkaNeural","Eka ♀"],["ka-GE-GiorgiNeural","Giorgi ♂"]],vi:[["vi-VN-HoaiMyNeural","HoaiMy ♀"],["vi-VN-NamMinhNeural","NamMinh ♂"]],pl:[["pl-PL-ZofiaNeural","Zofia ♀"],["pl-PL-MarekNeural","Marek ♂"]],nl:[["nl-NL-ColetteNeural","Colette ♀"],["nl-NL-MaartenNeural","Maarten ♂"]],he:[["he-IL-HilaNeural","Hila ♀"],["he-IL-AvriNeural","Avri ♂"]],th:[["th-TH-PremwadeeNeural","Premwadee ♀"],["th-TH-NiwatNeural","Niwat ♂"]],bn:[["bn-BD-NabanitaNeural","Nabanita ♀"],["bn-BD-PradeepNeural","Pradeep ♂"]],ur:[["ur-PK-UzmaNeural","Uzma ♀"],["ur-PK-AsadNeural","Asad ♂"]],ms:[["ms-MY-YasminNeural","Yasmin ♀"],["ms-MY-OsmanNeural","Osman ♂"]],sw:[["sw-KE-ZuriNeural","Zuri ♀"],["sw-KE-RafikiNeural","Rafiki ♂"]],mn:[["mn-MN-YesuiNeural","Yesui ♀"],["mn-MN-BataaNeural","Bataa ♂"]],ro:[["ro-RO-AlinaNeural","Alina ♀"],["ro-RO-EmilNeural","Emil ♂"]],cs:[["cs-CZ-VlastaNeural","Vlasta ♀"],["cs-CZ-AntoninNeural","Antonin ♂"]],el:[["el-GR-AthinaNeural","Athina ♀"],["el-GR-NestorasNeural","Nestoras ♂"]],sv:[["sv-SE-SofieNeural","Sofie ♀"],["sv-SE-MattiasNeural","Mattias ♂"]],fi:[["fi-FI-NooraNeural","Noora ♀"],["fi-FI-HarriNeural","Harri ♂"]],hu:[["hu-HU-NoemiNeural","Noemi ♀"],["hu-HU-TamasNeural","Tamas ♂"]],hy:[["hy-AM-AnahitNeural","Anahit ♀"],["hy-AM-HaykNeural","Hayk ♂"]]};
+const PIV={en:[["en_US-hfc_female-medium","HFC ♀"],["en_US-lessac-medium","Lessac"]],ru:[["ru_RU-irina-medium","Irina ♀"],["ru_RU-denis-medium","Denis ♂"],["ru_RU-dmitri-medium","Dmitri ♂"]],kk:[["kk_KZ-issai-high","Issai"]],de:[["de_DE-thorsten-medium","Thorsten ♂"]],fr:[["fr_FR-siwis-medium","Siwis ♀"]],es:[["es_ES-davefx-medium","Davefx ♂"]],tr:[["tr_TR-dfki-medium","DFKI"]],uk:[["uk_UA-ukrainian_tts-medium","Ukrainian TTS"]],ka:[["ka_GE-natia-medium","Natia ♀"]],ar:[["ar_JO-kareem-medium","Kareem ♂"]],zh:[["zh_CN-huayan-medium","Huayan ♀"]],pl:[["pl_PL-gosia-medium","Gosia ♀"]],fa:[["fa_IR-amir-medium","Amir ♂"]],vi:[["vi_VN-vais1000-medium","Vais ♀"]],it:[["it_IT-riccardo-x_low","Riccardo ♂"]],pt:[["pt_BR-faber-medium","Faber ♂"]],nl:[["nl_NL-mls-medium","MLS"]]};
+let ttsRun=0,audioEl=null,piperMod=null;
+const tlang=()=>((cur&&cur.lang)||L||"en").split("-")[0].toLowerCase();
+function ttsVoices(){
+  const t=T[L],eng=$("ttsEng").value,lg=tlang(),sel=$("ttsVoice");let list=[];
+  if(eng==="ms")list=MSV[lg]||[];
+  else if(eng==="piper")list=PIV[lg]||[];
+  else{const vs=speechSynthesis.getVoices().filter(v=>v.lang.toLowerCase().startsWith(lg));
+    vs.sort((a,b)=>(/premium|enhanced|natural|neural|google/i.test(b.name)?1:0)-(/premium|enhanced|natural|neural|google/i.test(a.name)?1:0));
+    list=vs.map(v=>[v.name,v.name])}
+  sel.innerHTML=list.map(([v,n])=>`<option value="${esc(v)}">${esc(n)}</option>`).join("");
+  $("ttsSt").textContent=!list.length?t.noVoice:(eng==="dev"?t.devHint:"");
+  const md=document.querySelector(".tts .ms");if(md&&!list.length)md.open=true;
+  try{const k=localStorage.getItem("lv_v_"+eng+"_"+lg);if(k&&list.some(x=>x[0]===k))sel.value=k}catch(e){}
+}
+function ttsSetup(){
+  if(!$("ttsEng"))return;
+  try{const e=localStorage.getItem("lv_eng");if(e)$("ttsEng").value=e}catch(_){}
+  if(!$("ttsEng").value||$("ttsEng").value==="ms")$("ttsEng").value=PIV[tlang()]?"piper":"dev";
+  ttsVoices();
+  $("ttsEng").onchange=()=>{try{localStorage.setItem("lv_eng",$("ttsEng").value)}catch(_){}ttsVoices()};
+  $("ttsVoice").onchange=()=>{try{localStorage.setItem("lv_v_"+$("ttsEng").value+"_"+tlang(),$("ttsVoice").value)}catch(_){}};
+  if("speechSynthesis" in window)speechSynthesis.onvoiceschanged=()=>{if($("ttsEng")&&$("ttsEng").value==="dev")ttsVoices()};
+  $("ttsPlay").onclick=readAll;$("ttsStop").onclick=stopTTS;
+  const pageUrl=location.origin+location.pathname+"#d="+b64u(JSON.stringify({v:curVid,L,r:cur.r,full:cur.full||null}));
+  $("edgeOpen").href=(/iPhone|iPad|Android/i.test(navigator.userAgent)?"microsoft-edge-":"")+pageUrl;
+  $("wordListen").onclick=()=>$("dlw").click();
+}
+function stopTTS(){ttsRun++;if(audioEl){audioEl.pause();audioEl=null}try{speechSynthesis.cancel()}catch(e){}document.querySelectorAll(".reading").forEach(e=>e.classList.remove("reading"))}
+const plain=el=>{const c=el.cloneNode(true);c.querySelectorAll(".ts").forEach(x=>x.remove());return c.textContent.replace(/\s+/g," ").trim()};
+function chunks(s){const out=[];while(s.length>1800){let k=s.lastIndexOf(". ",1800);if(k<600)k=s.lastIndexOf(" ",1800);out.push(s.slice(0,k+1));s=s.slice(k+1)}if(s.trim())out.push(s);return out}
+async function synth(text,eng,voice,rate){
+  if(eng==="ms"){const r=await fetch(WORKER+"tts?voice="+encodeURIComponent(voice)+"&rate="+Math.round((rate-1)*100)+"&text="+encodeURIComponent(text));if(!r.ok)throw new Error("ms "+r.status);return {blob:await r.blob(),rate:1}}
+  if(eng==="piper"){if(!piperMod){$("ttsSt").textContent=T[L].piperLoad;piperMod=await import("https://cdn.jsdelivr.net/npm/@diffusionstudio/vits-web@1.0.3/+esm")}
+    const wav=await piperMod.predict({text,voiceId:voice});$("ttsSt").textContent="";return {blob:wav,rate}}
+  return null;
+}
+function playBlob(b,rate,run){return new Promise((res,rej)=>{if(run!==ttsRun)return res();const a=new Audio(URL.createObjectURL(b.blob));a.playbackRate=b.rate===1?1:rate;audioEl=a;a.onended=()=>{URL.revokeObjectURL(a.src);res()};a.onerror=()=>rej(new Error("audio"));a.play().catch(rej)})}
+function speakDev(text,voice,rate,run){return new Promise(res=>{if(run!==ttsRun)return res();const u=new SpeechSynthesisUtterance(text);const v=speechSynthesis.getVoices().find(x=>x.name===voice);if(v){u.voice=v;u.lang=v.lang}u.rate=rate;u.onend=res;u.onerror=res;speechSynthesis.speak(u)})}
+async function readAll(){
+  stopTTS();const run=++ttsRun,t=T[L];
+  const eng=$("ttsEng").value,voice=$("ttsVoice").value,rate=+$("ttsRate").value;if(!voice){$("ttsSt").textContent=t.noVoice;return}
+  const els=[...$("out").querySelectorAll(".body p,.body li")].filter(e=>plain(e));
+  const jobs=[];els.forEach(el=>chunks(plain(el)).forEach(c=>jobs.push({el,c})));
+  let next=jobs.length&&eng!=="dev"?synth(jobs[0].c,eng,voice,rate):null;
+  for(let i=0;i<jobs.length&&run===ttsRun;i++){
+    const j=jobs[i];document.querySelectorAll(".reading").forEach(e=>e.classList.remove("reading"));j.el.classList.add("reading");
+    const d2=j.el.closest("details");if(d2&&!d2.open)d2.open=true;scrollUnder(j.el);
+    try{
+      if(eng==="dev"){await speakDev(j.c,voice,rate,run);continue}
+      const b=await next;next=i+1<jobs.length?synth(jobs[i+1].c,eng,voice,rate):null;if(next)next.catch(()=>{});
+      await playBlob(b,rate,run);
+    }catch(e){if(run===ttsRun){$("ttsSt").textContent=t.ttsFail;stopTTS()}return}
+  }
+  if(run===ttsRun)document.querySelectorAll(".reading").forEach(e=>e.classList.remove("reading"));
+}
+/* ---------- text on screen (OCR in the browser, free) ---------- */
+let tess=null,ocrAt=0,ocrText="";
+const TL={en:"eng",ru:"rus",uz:"uzb",tr:"tur",kk:"kaz",ky:"kir",tg:"tgk",az:"aze",uk:"ukr",ar:"ara",fa:"fas",de:"deu",fr:"fra",es:"spa",pt:"por",it:"ita",zh:"chi_sim",ja:"jpn",ko:"kor",hi:"hin"};
+function loadTess(){return tess||(tess=new Promise((res,rej)=>{if(window.Tesseract)return res(window.Tesseract);const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";s.onload=()=>res(window.Tesseract);s.onerror=()=>{tess=null;rej(new Error("load"))};document.head.appendChild(s)}))}
+function openOcr(){ocrAt=curT;ytCmd("pauseVideo");$("ocr").hidden=false;$("ocrOut").hidden=true;$("ocrSt").textContent="";$("ocrFile").value=""}
+$("ocrBtn").onclick=openOcr;$("ocrX").onclick=()=>$("ocr").hidden=true;
+$("ocr").addEventListener("click",e=>{if(e.target===$("ocr"))$("ocr").hidden=true});
+async function runOcr(file){
+  const t=T[L];$("ocrSt").textContent=t.ocrRead;$("ocrOut").hidden=true;
+  try{
+    const Ts=await loadTess();
+    const langs=[...new Set(["eng","rus",TL[(L||"en").split("-")[0]]].filter(Boolean))].join("+");
+    const r=await Ts.recognize(file,langs);
+    ocrText=(r.data.text||"").replace(/[ \t]+/g," ").replace(/\n{2,}/g,"\n").trim();
+    if(!ocrText){$("ocrSt").textContent=t.ocrNone;return}
+    let tr=ocrText;
+    try{const q=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&dt=t&tl="+L+"&q="+encodeURIComponent(ocrText.slice(0,4000)));const d=await q.json();tr=(d[0]||[]).map(p=>p[0]||"").join("").trim()||ocrText}catch(e){}
+    $("ocrTrT").textContent=tr;$("ocrOrT").textContent=ocrText;$("ocrSt").textContent="";$("ocrOut").hidden=false;
+    $("ocrAdd").textContent=t.ocrAdd+" ("+fmt(ocrAt)+")";$("ocrCopy").textContent=t.copy;
+    $("ocrCopy").onclick=async()=>{if(await copy(tr))toast(t.copied)};
+    $("ocrAdd").onclick=()=>{
+      const line="["+fmt(ocrAt)+"] 🖼 "+tr.replace(/\n/g," ");
+      const ls=$("txt").value.split("\n");let k=ls.length;
+      for(let i=0;i<ls.length;i++){const m=ls[i].match(TS);if(m&&toSec(m[1])>ocrAt){k=i;break}}
+      ls.splice(k,0,line);$("txt").value=ls.join("\n");$("ocr").hidden=true;$("make").click();toast(t.copied.replace(/.*/,"✓"));
+    };
+  }catch(e){$("ocrSt").textContent=t.ocrFail}
+}
+$("ocrFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)runOcr(f)});
+addEventListener("paste",e=>{if($("ocr").hidden)return;const it=[...(e.clipboardData||{}).items||[]].find(x=>x.type.startsWith("image/"));if(it){e.preventDefault();runOcr(it.getAsFile())}});
+/* ---------- follow the video (karaoke) ---------- */
+let lastNow=null,lastLn=null,lastW=null,clk={t:0,at:0},lines=[],segList=[];
+function indexLines(){
+  lines=[...$("out").querySelectorAll(".ln")].map(el=>({el,a:+el.dataset.a,w:[...el.querySelectorAll(".wd")]}));
+  lines.forEach((x,i)=>{const n=lines[i+1];const need=Math.max(1.2,x.w.reduce((s,w)=>s+w.textContent.length,0)*0.075+x.w.length*0.12);x.b=n&&n.a>x.a?Math.min(n.a,x.a+need):x.a+need});
+  lines.forEach(x=>{const total=x.w.reduce((s,w)=>s+w.textContent.length+1,0)||1;let acc=0;x.ws=x.w.map(w=>{const s=x.a+(x.b-x.a)*acc/total;acc+=w.textContent.length+1;return s})});
+  segList=[...$("out").querySelectorAll(".seg")];lastNow=lastLn=lastW=null;
+}
+const nowT=()=>clk.t+(playing?Math.min(0.6,(performance.now()-clk.at)/1000)*rate:0);
+function scrollUnder(el){const topH=$("top").hidden?0:$("top").offsetHeight;const y=el.getBoundingClientRect().top+scrollY-topH-10;scrollTo({top:Math.max(0,y),behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"})}
+let userScrollUntil=0;
+["touchstart","wheel"].forEach(ev=>addEventListener(ev,()=>{userScrollUntil=performance.now()+4000},{passive:true}));
+const followOn=()=>$("fol")&&$("fol").checked&&performance.now()>userScrollUntil;
+function keepVisible(el){const topH=$("top").hidden?0:$("top").offsetHeight;const r=el.getBoundingClientRect();if(r.top<topH+4||r.bottom>innerHeight-70)scrollUnder(el)}
+let dbgAt=0;
+function tick(){
+  requestAnimationFrame(tick);
+  if(performance.now()-dbgAt>250){dbgAt=performance.now();const d=$("dbg");if(d)d.textContent=(clk.at?fmt(nowT()):"--:--")+(playing?" ▶":" ⏸")+(ytReady?" ✓":(clk.at?" ~":" ✗"))}
+  if($("out").hidden||!clk.at)return;
+  const ct=nowT();
+  // paragraph highlight (yellow)
+  const segs=segList;let best=null,bs=-1;
+  for(const s of segs){const v=+s.dataset.sec;if(v<=ct+0.3&&v>=bs){bs=v;best=s}}
+  if(best!==lastNow){if(lastNow)lastNow.classList.remove("now");lastNow=best;if(best){best.classList.add("now");const d2=best.closest("details");if(followOn()){if(d2&&!d2.open)d2.open=true;scrollUnder(best)}}}
+  // line + word highlight
+  if(!lines.length)return;
+  let ln=null;for(const x of lines){if(x.a<=ct+0.15)ln=x;else break}
+  if(ln&&ct>ln.b+1.5)ln=null;
+  if(ln!==lastLn){
+    if(lastLn){lastLn.el.classList.remove("cur");lastLn.w.forEach(w=>w.classList.remove("cw","nw","pw"))}
+    lastLn=ln;lastW=null;
+    if(ln){ln.el.classList.add("cur");if(followOn()){const par=lastNow&&lastNow.contains(ln.el)?lastNow:null;const room=innerHeight-($("top").hidden?0:$("top").offsetHeight)-80;if(!par||par.offsetHeight>room)setTimeout(()=>keepVisible(ln.el),700)}}
+  }
+  if(!ln)return;
+  let k=0;for(let i=0;i<ln.ws.length;i++){if(ln.ws[i]<=ct)k=i;else break}
+  if(k===lastW)return;lastW=k;
+  ln.w.forEach((w,i)=>{w.classList.toggle("pw",i<k);w.classList.toggle("cw",i===k);w.classList.toggle("nw",i===k+1)});
+  if(k+1>=ln.w.length){const nx=lines[lines.indexOf(ln)+1];if(nx&&nx.w[0])nx.w[0].classList.add("nw")}
+}
+requestAnimationFrame(tick);
+function listen(){const w=$("yt").contentWindow;if(w)w.postMessage(JSON.stringify({event:"listening",id:1,channel:"widget"}),"*")}
+$("yt").addEventListener("load",()=>{listen();setTimeout(listen,1000);setTimeout(listen,3000)});
+addEventListener("message",e=>{
+  if(!/youtube(-nocookie)?\.com$/.test(new URL(e.origin).hostname))return;
+  let d;try{d=typeof e.data==="string"?JSON.parse(e.data):e.data}catch(_){return}
+  if(!ytReady&&d&&d.info&&typeof d.info.playerState==="number"){playing=d.info.playerState===1;$("pp").textContent=playing?"⏸":"▶"}
+  if(d&&d.info&&typeof d.info.playbackRate==="number"&&d.info.playbackRate!==rate){rate=d.info.playbackRate;$("spd").value=String(rate)}
+  const ct=d&&d.info&&typeof d.info.currentTime==="number"?d.info.currentTime:null;
+  if(ct!=null&&!ytReady){if(Math.abs(ct-clk.t)>0.01||!clk.at){curT=ct;clk={t:ct,at:performance.now()}}}
+});
+/* ---------- fixed player spacer ---------- */
+const fitTop=()=>{const h=$("top").hidden?0:$("top").offsetHeight;$("spacer").style.height=h+"px";document.documentElement.style.scrollPaddingTop=(h+10)+"px"};
+const roTop=new ResizeObserver(fitTop);roTop.observe($("top"));
+new MutationObserver(fitTop).observe($("top"),{attributes:true,attributeFilter:["hidden","class"]});
+addEventListener("resize",fitTop);
+/* ---------- start ---------- */
+function decode(h){const m=h.match(/[#&]d=([^&]+)/);if(!m)return null;
+  try{let b=m[1].replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b),c=>c.charCodeAt(0))))}catch(e){return null}}
+const qs=new URLSearchParams(location.search);
+const d=decode(location.hash);
+if(d&&d.r){if(T[d.L])L=d.L;cur={r:d.r,full:d.full||null};play(d.v);ui();$("out").scrollIntoView({block:"start"})}
+else{
+  const v=vidOf(qs.get("v")||qs.get("url")||"")||(()=>{try{return localStorage.getItem("lv_vid")}catch(e){return null}})();
+  if(v){$("link").value="https://youtu.be/"+v;play(v)}
+  try{const x=localStorage.getItem("lv_txt");if(x){$("txt").value=x;$("c4").hidden=false}}catch(e){}
+  ui();
+}
+if(want!==L)setLang(want);
+const up=$("up");addEventListener("scroll",()=>{up.hidden=scrollY<500},{passive:true});up.onclick=()=>scrollTo({top:0});
+}
+</script>
+</body>
+</html>

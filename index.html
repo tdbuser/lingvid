@@ -22,9 +22,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Nunito,system
 .ctl{max-width:720px;margin:0 auto;display:flex;gap:4px;align-items:center;padding:0 8px 8px;background:#120a14}
 .top.min .ctl{display:none}
 .ctl button{min-height:36px;min-width:36px;padding:0 6px;flex:none;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:transparent;color:#fff;font:700 13px Rubik,system-ui,sans-serif;cursor:pointer}
-.ctl .sp{display:flex;align-items:center;gap:4px;margin-left:auto;color:#fff;font:700 14px Rubik,system-ui,sans-serif;border:2px solid rgba(255,255,255,.3);border-radius:10px;padding:0 6px;min-height:36px}
-.ctl .sp select{background:transparent;color:#fff;border:0;font:700 15px Rubik,system-ui,sans-serif;min-height:32px}
-.ctl .sp option{color:#000}
+.ctl .sp{display:flex;gap:3px;margin-left:auto}
+.ctl .sp button{min-width:0;padding:0 5px}
+.ctl .sp button[aria-pressed=true]{background:#ff7a5c;border-color:#ff7a5c}
 .wrap{max-width:720px;margin:0 auto;padding:18px 14px 90px}
 header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
 h1{font:700 clamp(34px,8vw,48px)/1 Rubik,sans-serif;margin:0;color:#2b1530;flex:1}
@@ -86,26 +86,7 @@ ul.bl{margin:0;padding-left:20px}ul.bl li{margin:6px 0}
 .wd.cw{background:var(--acc);color:#fff;box-shadow:0 0 0 2px var(--acc);font-weight:700}
 .wd.nw{text-decoration:underline 2px var(--acc);text-underline-offset:4px}
 @media (prefers-reduced-motion:reduce){.wd{transition:none}}
-.sheet{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
-.sheetIn{background:var(--card);color:var(--ink);width:100%;max-width:720px;max-height:85vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px 26px}
-#ocrBtn{background:#ff7a5c;border-color:#ff7a5c}
-.tts{border:2px solid var(--line);border-radius:16px;padding:12px;margin:8px 0 12px}
-.tts select{font:15px Nunito,system-ui,sans-serif;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);min-height:44px;max-width:100%}
-.tts>select{width:100%;margin-top:8px}
-.ms{margin-top:10px;border-top:2px dashed var(--line);padding-top:8px}.ms summary{cursor:pointer;min-height:40px;display:flex;align-items:center}
-.reading{background:light-dark(#d9f2ea,#1f3d35);border-radius:8px;box-shadow:0 0 0 4px light-dark(#d9f2ea,#1f3d35)}
 .follow{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700;color:var(--soft);margin:2px 0 8px;cursor:pointer}.follow input{width:20px;height:20px;accent-color:var(--acc)}
-details.fold>summary{list-style:none;cursor:pointer;margin:0}details.fold>summary::-webkit-details-marker,details.more>summary::-webkit-details-marker,#setup>summary::-webkit-details-marker{display:none}
-details.fold>summary::after{content:"▾";margin-left:auto;color:var(--soft);font-size:20px}details.fold[open]>summary::after{content:"▴"}details.fold[open]>summary{margin-bottom:12px}
-details.more{margin-top:12px}details.more>summary{list-style:none;cursor:pointer;font-weight:700;color:var(--soft);min-height:40px;display:flex;align-items:center}details.more>summary::after{content:" ▾";margin-left:6px}
-#setup>summary{list-style:none;display:none}
-#setup.has>summary{display:flex;align-items:center;justify-content:center;text-align:center;gap:8px;min-height:54px;padding:8px 16px;margin:0 0 14px;border-radius:14px;background:var(--card);color:var(--ink);font:700 16px Rubik,system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(43,21,48,.12)}
-.st:empty{display:none}
-.bar2{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;margin:0 0 6px;scrollbar-width:none}.bar2::-webkit-scrollbar{display:none}
-.bar2 button,.bar2 a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:0 14px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:700 14px Nunito,system-ui,sans-serif;text-decoration:none;cursor:pointer;white-space:nowrap}
-.bar2 .pri{background:var(--acc);border-color:var(--acc);color:#fff}
-details.tts{padding:0}details.tts>summary{list-style:none;cursor:pointer;padding:12px;font-weight:700;display:flex;align-items:center}details.tts>summary::-webkit-details-marker{display:none}details.tts>summary::after{content:"▾";margin-left:auto;color:var(--soft)}details.tts[open]>summary::after{content:"▴"}details.tts>.in{padding:0 12px 12px}
-.find{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}.find .follow{margin:0;align-self:flex-start}.find .follow span{white-space:nowrap}
 mark{background:#ffe066;color:#2b1530;border-radius:3px}
 #up{position:fixed;right:16px;bottom:20px;width:52px;height:52px;border-radius:50%;border:0;background:var(--ink);color:var(--card);font:700 22px Rubik;box-shadow:0 6px 18px rgba(0,0,0,.3);cursor:pointer;z-index:20}
 footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px}
@@ -116,7 +97,7 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
 <div class="top" id="top" hidden>
   <div class="frame"><iframe id="yt" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
   <div class="bar"><div class="nm" id="nm"></div><button id="mn" type="button"></button></div>
-  <div class="ctl" id="ctl"><button type="button" data-c="back" aria-label="-5s">−5</button><button type="button" data-c="toggle" id="pp" aria-label="Play/Pause">▶</button><button type="button" data-c="fwd" aria-label="+5s">+5</button><button type="button" id="ocrBtn" aria-label="Text on screen">📷 Aa</button><span id="dbg" style="color:#ffb3a3;font:700 12px Rubik,system-ui,sans-serif;white-space:nowrap"></span><label class="sp" aria-label="Speed">⏱<select id="spd"></select></label></div>
+  <div class="ctl" id="ctl"><button type="button" data-c="back" aria-label="-5s">−5</button><button type="button" data-c="toggle" id="pp" aria-label="Play/Pause">▶</button><button type="button" data-c="fwd" aria-label="+5s">+5</button><span class="sp" id="sp"></span></div>
 </div>
 <div id="spacer"></div>
 <div class="wrap">
@@ -125,73 +106,54 @@ footer{text-align:center;font-size:13px;color:#2b1530;opacity:.8;margin-top:20px
   </header>
   <p class="lead" data-t="lead"></p>
 
-  <section class="card" id="out" hidden></section>
-  <details id="setup" open><summary class="setupSum" data-t="setup"></summary>
   <section class="card">
     <div class="step"><span class="num">1</span><h2 data-t="s1"></h2></div>
-    <div class="row" style="margin-top:0"><input type="text" id="link" autocomplete="off" placeholder="https://youtu.be/..." style="flex:1 1 200px"><button class="go" id="open" type="button" style="flex:0 1 auto;padding:0 18px"></button></div>
+    <input type="text" id="link" autocomplete="off" placeholder="https://youtu.be/...">
+    <div class="row"><button class="go" id="open" type="button"></button></div>
   </section>
 
   <section class="card" id="c2">
     <div class="step"><span class="num">2</span><h2 data-t="s2"></h2></div>
-    <div id="auto" hidden>
-      <label class="chk" style="margin-bottom:10px"><input type="checkbox" id="tl" checked><span><b id="tlT"></b></span></label>
+    <div id="auto" hidden style="margin-bottom:12px">
       <button class="go" id="autoBtn" type="button" style="width:100%"></button>
-      <button class="go" id="aiBtn" type="button" style="width:100%;margin-top:10px;background:#2b1530"></button>
-      <p class="hint" id="aiHint"></p>
-      <p class="hint st" id="autoSt" role="status"></p>
+      <label style="display:flex;gap:10px;align-items:center;margin-top:10px;font-weight:600;font-size:15px;cursor:pointer"><input type="checkbox" id="tl" checked style="width:22px;height:22px"><span id="tlT"></span></label>
+      <p class="hint" id="autoSt"></p>
     </div>
-    <details class="more"><summary data-t="moreWays"></summary>
-      <div class="svc" id="svc" style="margin-top:10px"></div>
-      <p class="hint" data-t="s2h"></p>
-    </details>
+    <div class="svc" id="svc"></div>
+    <p class="hint" data-t="s2h"></p>
   </section>
 
-  <details class="card fold" id="c3">
-    <summary class="step"><span class="num">3</span><h2 data-t="s3"></h2></summary>
+  <section class="card">
+    <div class="step"><span class="num">3</span><h2 data-t="s3"></h2></div>
     <textarea id="txt"></textarea>
     <div class="row"><button class="go" id="make" type="button"></button><button class="ghost" id="clr" type="button"></button></div>
     <p class="hint" data-t="s3h"></p>
-  </details>
+  </section>
 
-  <details class="card fold" id="c4" hidden>
-    <summary class="step"><span class="num">4</span><h2 data-t="s4"></h2></summary>
+  <section class="card" id="c4" hidden>
+    <div class="step"><span class="num">4</span><h2 data-t="s4"></h2></div>
     <label class="fl"><span data-t="toLang"></span>
       <select id="tlang"></select></label>
     <label class="chk"><input type="checkbox" id="optSense" checked><span><b data-t="oSense"></b><small data-t="oSenseH"></small></span></label>
     <label class="chk"><input type="checkbox" id="optStruct" checked><span><b data-t="oStruct"></b><small data-t="oStructH"></small></span></label>
     <p class="hint" style="margin:6px 0 10px" data-t="s4h"></p>
     <div class="svc" id="ai"></div>
-  </details>
-  </details>
+  </section>
 
-  <footer>Lingvid · tdbuser.github.io/lingvid · v21.11-20:10</footer>
+  <section class="card" id="out" hidden></section>
+  <footer>Lingvid · tdbuser.github.io/lingvid</footer>
 </div>
 <button id="up" type="button" aria-label="Yuqoriga" hidden>↑</button>
 <div class="toast" id="toast" hidden></div>
-<div class="sheet" id="ocr" hidden role="dialog" aria-modal="true" aria-labelledby="ocrT">
-  <div class="sheetIn">
-    <div class="step" style="margin-bottom:6px"><span class="num">Aa</span><h2 id="ocrT" data-t="ocrT"></h2><button class="ghost" id="ocrX" type="button" style="margin-left:auto;min-height:40px" aria-label="Close">✕</button></div>
-    <p class="hint" style="margin:0 0 10px" data-t="ocrH"></p>
-    <label class="go" style="cursor:pointer"><input type="file" id="ocrFile" accept="image/*" hidden><span data-t="ocrPick"></span></label>
-    <p class="hint" data-t="ocrPaste"></p>
-    <div id="ocrSt" class="hint" role="status"></div>
-    <div id="ocrOut" hidden>
-      <h3 style="margin:12px 0 4px" data-t="ocrTr"></h3><p id="ocrTrT" style="margin:0 0 8px;font-weight:700"></p>
-      <details><summary class="hint" data-t="ocrOrig"></summary><p id="ocrOrT" style="white-space:pre-wrap"></p></details>
-      <div class="row"><button class="go" type="button" id="ocrAdd"></button><button class="ghost" type="button" id="ocrCopy"></button></div>
-    </div>
-  </div>
-</div>
 
 <script>
 {
 const T={
-en:{"moreWays": "Other free ways (DownSub, vidIQ, YouTube) ▸", "setup": "＋ New video / other way to get text","aiBtn": "🧠 Full analysis (AI) — even without subtitles", "aiHint": "Gemini watches the whole video: speech by seconds (any language, incl. Uzbek), text on screen, meaning-based translation, a ready guide. Takes 30–90 s.", "aiWait": "AI is watching the video… 30–90 s", "aiFail": "AI analysis failed", "srt": "Subtitles .srt", "aiSpeech": "What is said", "aiScreen": "Text on screen", "aiGuide": "Guide","msBest": "🎧 Best voices (Microsoft, incl. Uzbek) — free & official", "msWhy": "Microsoft's natural voices are free inside Microsoft's own apps. Lingvid hands the text over to them:", "edgeBtn": "Open this text in Microsoft Edge", "edgeHow": "In Edge tap ··· → «Read aloud» (Ovoz chiqarib o'qish / Читать вслух), choose a voice, e.g. Madina (uz). Edge must be installed (free).", "wordBtn": "Word file to listen", "wordHow": "Open the file in the Word app → ✎ menu → Review → «Read aloud».","listen": "Listen", "engMs": "Neural voices (Microsoft) — best", "engPiper": "Piper — on this device (offline)", "engDev": "Device voice", "play": "▶ Read aloud", "stop": "■ Stop", "voice": "Voice", "ttsFail": "This voice didn't work — try another engine.", "piperLoad": "Downloading the voice (first time ~60 MB)…", "devHint": "Tip for iPhone: Settings → Accessibility → Spoken Content → Voices — download a free «Enhanced/Premium» voice, it sounds much better.", "noVoice": "No voice for this language in this engine.","ocrT": "Text on the screen", "ocrH": "For words shown in the video but not spoken. The video is paused. Take a screenshot (iPhone: side + volume up; Android: power + volume down), then choose it below — the text is read and translated right here.", "ocrPick": "📷 Choose screenshot", "ocrPaste": "On a computer you can also press Ctrl+V to paste a screenshot.", "ocrTr": "Translation", "ocrOrig": "Original text", "ocrAdd": "Add to the text at this moment", "ocrRead": "Reading the text… (first time takes ~20 s)", "ocrNone": "No text found in this picture.", "ocrFail": "Couldn't read the picture.","lead": "A YouTube video and its text on one page: contents, folding sections, time buttons, live highlighting, Word file. Free, no sign-up.", "s1": "Paste a YouTube link", "open": "▶ Open", "s2": "Get the text", "s2h": "These services don't allow being shown inside other sites, so they open in a new tab. The link is copied automatically — paste it there, copy the text and come back here.", "s3": "Paste your own text", "make": "Organize", "clr": "Clear", "s3h": "If the text has times ([0:12] or 0:12), time buttons play the video from that moment. Text with headings (#, 1., -) is split into sections.", "s4": "Translate with AI (optional)", "s4h": "Press a button: the task and the text are copied and the AI opens (short text is pasted automatically). Paste the answer back into step 3 — it will be split into sections.", "toLang": "Into which language", "oSense": "Meaning-based translation", "oSenseH": "On: natural, by meaning. Off: word for word, precise.", "oStruct": "Split into sections", "oStructH": "On: title, summary, sections. Off: only the full translation with times.", "follow": "Follow the video", "copyAll": "Copy all text", "toc": "Contents", "back": "↑ Contents", "top": "↑ Top", "sum": "Summary", "full": "Full text", "open2": "Expand all", "close": "Collapse all", "word": "Word (.docx)", "copy": "Copy", "tg": "Telegram", "find": "Search in text…", "hide": "▴ Hide", "show": "▾ Show video", "copied": "Copied ✓", "linkCopied": "Link copied — paste it there", "promptCopied": "Task and text copied — paste them there", "badLink": "Paste a YouTube link", "noText": "Paste the text first", "part": "Part", "text": "Text", "auto": "⚡ Get text automatically", "tl": "Translate into: {lang}", "autoWait": "Getting the text…", "autoFail": "Couldn't get the text for this video. Use the services below.", "autoTr": "Done — Google translation", "autoTrWait": "Translating…", "autoNoTr": "Translation failed — showing the original text", "autoOrig": "Done — original language", "siteLang": "Site language", "uiWait": "Translating the site…", "types": {"other": "Video text"}, "svc": [["DownSub", "Text + auto-translation into 100+ languages"], ["vidIQ Transcript", "Full text with times"], ["YouTube", "«…more» → «Show transcript»"]], "aiName": [["ChatGPT", "OpenAI, free"], ["Claude", "Anthropic, free"], ["Gemini", "Google, free"]]},
-uz:{"moreWays": "Boshqa bepul usullar (DownSub, vidIQ, YouTube) ▸", "setup": "＋ Yangi video / matnni boshqa usulda olish","aiBtn": "🧠 To'liq tahlil (AI) — subtitrsiz ham", "aiHint": "Gemini butun videoni ko'radi: soniyalar bo'yicha nutq (har qanday til, o'zbekcha ham), ekrandagi yozuvlar, ma'noli tarjima, tayyor yo'riqnoma. 30–90 soniya.", "aiWait": "AI videoni ko'rmoqda… 30–90 soniya", "aiFail": "AI tahlili ishlamadi", "srt": "Subtitr .srt", "aiSpeech": "Nima deyilgan", "aiScreen": "Ekrandagi yozuvlar", "aiGuide": "Yo'riqnoma","msBest": "🎧 Eng yaxshi ovozlar (Microsoft, o'zbekcha ham) — bepul va rasmiy", "msWhy": "Microsoft'ning tabiiy ovozlari Microsoft ilovalarida bepul. Lingvid matnni ularga uzatadi:", "edgeBtn": "Matnni Microsoft Edge'da ochish", "edgeHow": "Edge'da ··· → «Ovoz chiqarib o'qish» ni bosing, ovozni tanlang, masalan Madina (uz). Edge o'rnatilgan bo'lishi kerak (bepul).", "wordBtn": "Tinglash uchun Word fayl", "wordHow": "Faylni Word ilovasida oching → ✎ menyu → Taqriz → «Ovoz chiqarib o'qish».",listen:"Tinglash",engMs:"Neyron ovozlar (Microsoft) — eng yaxshisi",engPiper:"Piper — shu qurilmada (oflayn)",engDev:"Qurilma ovozi",play:"▶ Ovoz chiqarib o'qish",stop:"■ To'xtatish",voice:"Ovoz",ttsFail:"Bu ovoz ishlamadi — boshqa usulni tanlang.",piperLoad:"Ovoz yuklanmoqda (birinchi marta ~60 MB)…",devHint:"iPhone uchun: Sozlamalar → Universal kirish → Nutq tarkibi → Ovozlar — bepul «Yaxshilangan/Premium» ovozni yuklang.",noVoice:"Bu usulda shu til uchun ovoz yo'q.",ocrT:"Ekrandagi yozuv",ocrH:"Videoda ko'rsatilgan, lekin aytilmagan yozuvlar uchun. Video to'xtatildi. Skrinshot oling (iPhone: yon tugma + ovoz baland; Android: quvvat + ovoz past) va pastdan tanlang — yozuv shu yerda o'qiladi va tarjima qilinadi.",ocrPick:"📷 Skrinshotni tanlash",ocrPaste:"Kompyuterda Ctrl+V bilan ham qo'yish mumkin.",ocrTr:"Tarjima",ocrOrig:"Asl yozuv",ocrAdd:"Matnga shu vaqtga qo'shish",ocrRead:"Yozuv o'qilmoqda… (birinchi marta ~20 soniya)",ocrNone:"Rasmda yozuv topilmadi.",ocrFail:"Rasmni o'qib bo'lmadi.",top:"↑ Boshiga",sum:"Qisqacha",full:"To'liq matn",siteLang:"Sayt tili",uiWait:"Sayt tarjima qilinmoqda…",lead:"YouTube video va uning matni bir sahifada: mundarija, ochiladigan bo'limlar, vaqt tugmalari, Word fayl. Bepul, ro'yxatdan o'tishsiz.",
- s1:"YouTube havolasini qo'ying",open:"▶ Ochish",
- s2:"Matnni oling",s2h:"Bu servislar o'z sahifasini boshqa saytlar ichida ko'rsatishga ruxsat bermaydi, shuning uchun yangi oynada ochiladi. Havola avtomatik nusxalanadi — u yerga qo'ying, matnni nusxalab, shu sahifaga qayting.",
- s3:"O'z matningizni qo'yish",make:"Tartibga solish",clr:"Tozalash",s3h:"Vaqtli matn ([0:12] yoki 0:12) bo'lsa — vaqt tugmalari videoni aynan shu joydan qo'yadi. Sarlavhali matn (#, 1., -) bo'limlarga ajratiladi.",
+en:{"lead": "A YouTube video and its text on one page: contents, folding sections, time buttons, live highlighting, Word file. Free, no sign-up.", "s1": "Paste a YouTube link", "open": "▶ Open video", "s2": "Get the video text", "s2h": "These services don't allow being shown inside other sites, so they open in a new tab. The link is copied automatically — paste it there, copy the text and come back here.", "s3": "Paste the text here", "make": "Organize", "clr": "Clear", "s3h": "If the text has times ([0:12] or 0:12), time buttons play the video from that moment. Text with headings (#, 1., -) is split into sections.", "s4": "Translate with AI (optional)", "s4h": "Press a button: the task and the text are copied and the AI opens (short text is pasted automatically). Paste the answer back into step 3 — it will be split into sections.", "toLang": "Into which language", "oSense": "Meaning-based translation", "oSenseH": "On: natural, by meaning. Off: word for word, precise.", "oStruct": "Split into sections", "oStructH": "On: title, summary, sections. Off: only the full translation with times.", "follow": "Follow the video", "copyAll": "Copy all text", "toc": "Contents", "back": "↑ Contents", "top": "↑ Top", "sum": "Summary", "full": "Full text", "open2": "Expand all", "close": "Collapse all", "word": "Word (.docx)", "copy": "Copy", "tg": "Telegram", "find": "Search in text…", "hide": "▴ Hide", "show": "▾ Show video", "copied": "Copied ✓", "linkCopied": "Link copied — paste it there", "promptCopied": "Task and text copied — paste them there", "badLink": "Paste a YouTube link", "noText": "Paste the text first", "part": "Part", "text": "Text", "auto": "⚡ Get text automatically", "tl": "Translate into: {lang}", "autoWait": "Getting the text…", "autoFail": "Couldn't get the text for this video. Use the services below.", "autoTr": "Done — Google translation", "autoTrWait": "Translating…", "autoNoTr": "Translation failed — showing the original text", "autoOrig": "Done — original language", "siteLang": "Site language", "uiWait": "Translating the site…", "types": {"other": "Video text"}, "svc": [["DownSub", "Text + auto-translation into 100+ languages"], ["vidIQ Transcript", "Full text with times"], ["YouTube", "«…more» → «Show transcript»"]], "aiName": [["ChatGPT", "OpenAI, free"], ["Claude", "Anthropic, free"], ["Gemini", "Google, free"]]},
+uz:{top:"↑ Boshiga",sum:"Qisqacha",full:"To'liq matn",siteLang:"Sayt tili",uiWait:"Sayt tarjima qilinmoqda…",lead:"YouTube video va uning matni bir sahifada: mundarija, ochiladigan bo'limlar, vaqt tugmalari, Word fayl. Bepul, ro'yxatdan o'tishsiz.",
+ s1:"YouTube havolasini qo'ying",open:"▶ Videoni ochish",
+ s2:"Video matnini oling (bepul servislar)",s2h:"Bu servislar o'z sahifasini boshqa saytlar ichida ko'rsatishga ruxsat bermaydi, shuning uchun yangi oynada ochiladi. Havola avtomatik nusxalanadi — u yerga qo'ying, matnni nusxalab, shu sahifaga qayting.",
+ s3:"Matnni shu yerga qo'ying",make:"Tartibga solish",clr:"Tozalash",s3h:"Vaqtli matn ([0:12] yoki 0:12) bo'lsa — vaqt tugmalari videoni aynan shu joydan qo'yadi. Sarlavhali matn (#, 1., -) bo'limlarga ajratiladi.",
  s4:"Sun'iy intellekt orqali tarjima (ixtiyoriy)",s4h:"Tugmani bosing: topshiriq va matn nusxalanadi va sun'iy intellekt ochiladi (qisqa matn avtomatik qo'yiladi). Javobni 3-qadamga qaytarib qo'ysangiz — bo'limlarga ajratiladi.",toLang:"Qaysi tilga",oSense:"Ma'noli tarjima",oSenseH:"Yoqilgan: tabiiy, ma'nosi bo'yicha. O'chirilgan: so'zma-so'z, aniq.",oStruct:"Bo'limlarga ajratish",oStructH:"Yoqilgan: sarlavha, qisqacha, bo'limlar. O'chirilgan: faqat to'liq tarjima, vaqtlar bilan.",follow:"Video bilan birga kuzatish",copyAll:"Butun matnni nusxalash",
  toc:"Mundarija",back:"↑ Mundarijaga",open2:"Hammasini ochish",close:"Hammasini yopish",word:"Word (.docx)",copy:"Nusxa olish",tg:"Telegram",find:"Matndan qidirish…",
  hide:"▴ Yashirish",show:"▾ Videoni ko'rsatish",copied:"Nusxalandi ✓",linkCopied:"Havola nusxalandi — u yerga qo'ying",promptCopied:"Topshiriq va matn nusxalandi — u yerga qo'ying",badLink:"YouTube havolasini qo'ying",noText:"Avval matnni qo'ying",
@@ -199,10 +161,10 @@ uz:{"moreWays": "Boshqa bepul usullar (DownSub, vidIQ, YouTube) ▸", "setup": "
  svc:[["DownSub","Matn + o'zbekchaga avto-tarjima"],["vidIQ Transcript","To'liq matn, vaqtlar bilan"],["YouTube","«…ещё» → «Показать текст видео»"]],
  aiName:[["ChatGPT","OpenAI, bepul"],["Claude","Anthropic, bepul"],["Gemini","Google, bepul"]],
  prompt:"Quyidagi YouTube video matnini o'zbek tilida (lotin) to'liq, tushunarli matnga aylantiring. So'zma-so'z emas, MA'NOSI bo'yicha tarjima qiling. Hech narsa o'ylab topmang. Tuzilishi: # Sarlavha, keyin ## Qisqacha (3-5 gap), ## bo'limlar (retsept bo'lsa: ## Masalliqlar — ro'yxat '- nomi — miqdori', ## Tayyorlash — '1. qadam'; yo'riqnoma bo'lsa: ## Kerakli narsalar, ## Qadamlar; boshqa bo'lsa: ## Asosiy fikrlar, ## Videoda nima bo'ladi, ## Xulosa). Agar matnda vaqtlar bo'lsa, har qadam boshida [m:ss] qoldiring.\n\nVIDEO: "},
-ru:{"moreWays": "Другие бесплатные способы (DownSub, vidIQ, YouTube) ▸", "setup": "＋ Новое видео / другой способ получить текст","aiBtn": "🧠 Полный разбор (ИИ) — даже без субтитров", "aiHint": "Gemini смотрит всё видео: речь по секундам (любой язык, включая узбекский), надписи на экране, перевод по смыслу, готовую инструкцию. 30–90 секунд.", "aiWait": "ИИ смотрит видео… 30–90 секунд", "aiFail": "ИИ-разбор не сработал", "srt": "Субтитры .srt", "aiSpeech": "Что говорят", "aiScreen": "Надписи на экране", "aiGuide": "Инструкция","msBest": "🎧 Лучшие голоса (Microsoft, есть узбекский) — бесплатно и официально", "msWhy": "Естественные голоса Microsoft бесплатны внутри приложений Microsoft. Lingvid передаёт им текст:", "edgeBtn": "Открыть этот текст в Microsoft Edge", "edgeHow": "В Edge нажмите ··· → «Читать вслух», выберите голос, например Madina (uz). Edge должен быть установлен (бесплатно).", "wordBtn": "Word-файл для прослушивания", "wordHow": "Откройте файл в приложении Word → меню ✎ → Рецензирование → «Прочесть вслух».",listen:"Слушать",engMs:"Нейроголоса (Microsoft) — лучшие",engPiper:"Piper — на этом устройстве (офлайн)",engDev:"Голос устройства",play:"▶ Читать вслух",stop:"■ Стоп",voice:"Голос",ttsFail:"Этот голос не сработал — выберите другой способ.",piperLoad:"Скачиваю голос (первый раз ~60 МБ)…",devHint:"Совет для iPhone: Настройки → Универсальный доступ → Устный контент → Голоса — скачайте бесплатный «Улучшенный/Premium» голос, он звучит намного лучше.",noVoice:"В этом способе нет голоса для этого языка.",ocrT:"Надпись на экране",ocrH:"Для надписей, которые показаны в видео, но не озвучены. Видео на паузе. Сделайте скриншот (iPhone: боковая + громкость вверх; Android: питание + громкость вниз) и выберите его ниже — надпись прочитается и переведётся прямо здесь.",ocrPick:"📷 Выбрать скриншот",ocrPaste:"На компьютере можно вставить скриншот через Ctrl+V.",ocrTr:"Перевод",ocrOrig:"Оригинал надписи",ocrAdd:"Добавить в текст на это время",ocrRead:"Читаю надпись… (первый раз ~20 секунд)",ocrNone:"На картинке не найден текст.",ocrFail:"Не удалось прочитать картинку.",top:"↑ В начало",sum:"Кратко",full:"Полный текст",siteLang:"Язык сайта",uiWait:"Перевожу сайт…",lead:"Видео YouTube и его текст на одной странице: содержание, раскрывающиеся разделы, кнопки времени, файл Word. Бесплатно, без регистрации.",
- s1:"Вставьте ссылку YouTube",open:"▶ Открыть",
- s2:"Получите текст",s2h:"Эти сервисы не разрешают показывать себя внутри других сайтов, поэтому открываются в новой вкладке. Ссылка копируется автоматически — вставьте её там, скопируйте текст и вернитесь сюда.",
- s3:"Вставить свой текст",make:"Разложить по полочкам",clr:"Очистить",s3h:"Если в тексте есть время ([0:12] или 0:12) — кнопки времени включают видео с этого места. Текст с заголовками (#, 1., -) делится на разделы.",
+ru:{top:"↑ В начало",sum:"Кратко",full:"Полный текст",siteLang:"Язык сайта",uiWait:"Перевожу сайт…",lead:"Видео YouTube и его текст на одной странице: содержание, раскрывающиеся разделы, кнопки времени, файл Word. Бесплатно, без регистрации.",
+ s1:"Вставьте ссылку YouTube",open:"▶ Открыть видео",
+ s2:"Получите текст видео (бесплатные сервисы)",s2h:"Эти сервисы не разрешают показывать себя внутри других сайтов, поэтому открываются в новой вкладке. Ссылка копируется автоматически — вставьте её там, скопируйте текст и вернитесь сюда.",
+ s3:"Вставьте текст сюда",make:"Разложить по полочкам",clr:"Очистить",s3h:"Если в тексте есть время ([0:12] или 0:12) — кнопки времени включают видео с этого места. Текст с заголовками (#, 1., -) делится на разделы.",
  s4:"Перевод через ИИ (по желанию)",s4h:"Нажмите кнопку: задание и текст скопируются и откроется ИИ (короткий текст вставится сам). Ответ верните в шаг 3 — он разложится по разделам.",toLang:"На какой язык",oSense:"Смысловой перевод",oSenseH:"Включено: естественно, по смыслу. Выключено: дословно, точно.",oStruct:"Разложить по разделам",oStructH:"Включено: заголовок, кратко, разделы. Выключено: только полный перевод со временем.",follow:"Следить за видео",copyAll:"Скопировать весь текст",
  toc:"Содержание",back:"↑ К содержанию",open2:"Открыть все",close:"Свернуть все",word:"Word (.docx)",copy:"Копировать",tg:"Telegram",find:"Поиск по тексту…",
  hide:"▴ Скрыть",show:"▾ Показать видео",copied:"Скопировано ✓",linkCopied:"Ссылка скопирована — вставьте её там",promptCopied:"Задание и текст скопированы — вставьте там",badLink:"Вставьте ссылку YouTube",noText:"Сначала вставьте текст",
@@ -257,71 +219,40 @@ function ui(){
   $("ai").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{const pr=buildPrompt();copy(pr);toast(t.promptCopied);
     const i=+a.dataset.i;if(i<2&&pr.length<6000)a.href=A[i][0]+"?q="+encodeURIComponent(pr);else a.href=A[i][0]}));
   const sel=$("tlang"),keep=sel.value||L;sel.innerHTML=LANGS.map(([c,n])=>`<option value="${c}">${esc(n)}</option>`).join("");sel.value=keep;
-  $("auto").hidden=!WORKER;$("autoBtn").textContent=t.auto;$("aiBtn").textContent=t.aiBtn;$("aiHint").textContent=t.aiHint;$("tlT").textContent=t.tl.replace("{lang}",(UIL.find(x=>x[0]===L)||[0,L])[1]);
+  $("auto").hidden=!WORKER;$("autoBtn").textContent=t.auto;$("tlT").textContent=t.tl.replace("{lang}",(UIL.find(x=>x[0]===L)||[0,L])[1]);
   if(cur)render();
   if(!$("top").hidden)$("mn").textContent=$("top").classList.contains("min")?t.show:t.hide;
 }
-// Translate many short strings with Google (free, in the visitor's browser). Robust: several methods, never all-or-nothing.
-async function gtMany(list,tl,sl){
-  const out=new Array(list.length).fill(null);
-  const asText=x=>Array.isArray(x)?asText(x[0]):(typeof x==="string"?x:null);
-  // method 1: translate_a/t with many q= (one result per string)
-  for(let i=0;i<list.length;i+=25){
-    const part=list.slice(i,i+25);
-    try{
-      const body=part.map(s=>"q="+encodeURIComponent(s)).join("&");
-      const r=await fetch("https://translate.googleapis.com/translate_a/t?client=gtx&dt=t&sl="+(sl||"auto")+"&tl="+tl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body});
-      if(r.ok){const d=await r.json();const arr=Array.isArray(d)?d:[d];
-        if(arr.length===part.length)arr.forEach((x,k)=>{const s=asText(x);if(s)out[i+k]=s});
-        else if(part.length===1&&asText(arr))out[i]=asText(arr)}
-    }catch(e){}
-  }
-  // method 2: one string per request for anything still missing (small, sequential)
-  for(let i=0;i<list.length;i++){
-    if(out[i])continue;
-    try{const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl="+(sl||"auto")+"&tl="+tl+"&q="+encodeURIComponent(list[i]));
-      if(r.ok){const d=await r.json();const s=(d[0]||[]).map(p=>p[0]||"").join("").trim();if(s)out[i]=s}}catch(e){}
-  }
-  return out;
-}
 async function translateUI(code){
+  // translate English strings into any language with Google (in the visitor's browser), cache it
   const flat=[];const walk=(o,path)=>{for(const k in o){const v=o[k],pp=path.concat(k);if(typeof v==="string")flat.push([pp,v]);else walk(v,pp)}};walk(T.en,[]);
-  const res=await gtMany(flat.map(x=>x[1]),code,"en");
-  const ok=res.filter(Boolean).length;if(ok<flat.length*0.6)throw new Error("too few "+ok);
-  const o=JSON.parse(JSON.stringify(T.en));
-  flat.forEach(([pp],k)=>{if(!res[k])return;let x=o;for(let q=0;q<pp.length-1;q++)x=x[pp[q]];x[pp[pp.length-1]]=T.en[pp[0]]&&String(T.en[pp[0]]).includes("{lang}")&&!/\{lang\}/.test(res[k])?res[k].replace(/\{[^}]*\}/,"{lang}")+(/\{/.test(res[k])?"":" {lang}"):res[k]});
+  const src=flat.map(x=>x[1].replace(/\n/g," "));const outv=[];let i=0;
+  while(i<src.length){let j=i,len=0;while(j<src.length&&len+src[j].length+1<1500){len+=src[j].length+1;j++}if(j===i)j=i+1;
+    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&dt=t&tl="+code+"&q="+encodeURIComponent(src.slice(i,j).join("\n")));
+    if(!r.ok)throw new Error(r.status);const d=await r.json();const lines=[];let c="";
+    for(const p of d[0]||[]){c+=p[0]||"";if(/\n\s*$/.test(p[1]||"")){lines.push(c.trim());c=""}}if(c.trim())lines.push(c.trim());
+    if(lines.length!==j-i)throw new Error("align");outv.push(...lines);i=j}
+  const o=JSON.parse(JSON.stringify(T.en));flat.forEach(([pp],k)=>{let x=o;for(let q=0;q<pp.length-1;q++)x=x[pp[q]];x[pp[pp.length-1]]=outv[k].replace(/\{ ?lang ?\}/i,"{lang}")});
   ["svc","aiName"].forEach(k=>o[k].forEach((r,n)=>r[0]=T.en[k][n][0]));o.word="Word (.docx)";o.tg="Telegram";
   return o;
 }
 async function setLang(code){
   try{localStorage.setItem("lv_lang",code)}catch(e){}
-  if(!T[code]){toast((T[L]||T.en).uiWait);try{T[code]=await translateUI(code);try{localStorage.setItem("lv_ui_"+code,JSON.stringify(T[code]))}catch(e){}}catch(e){toast("Translation service unavailable right now — English");code="en";try{localStorage.setItem("lv_lang","en")}catch(_){}}}
+  if(!T[code]){toast((T[L]||T.en).uiWait);try{T[code]=await translateUI(code);try{localStorage.setItem("lv_ui_"+code,JSON.stringify(T[code]))}catch(e){}}catch(e){toast("Translation unavailable — English");code="en"}}
   L=code;ui();
 }
 $("uiLang").addEventListener("change",e=>setLang(e.target.value));
 
-/* Official YouTube IFrame Player API: exact current time and play/pause state */
-let ytP=null,ytReady=false;
-function ytApi(){return new Promise(res=>{if(window.YT&&YT.Player)return res();const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{if(prev)prev();res()};if(!document.getElementById("ytapi")){const s=document.createElement("script");s.id="ytapi";s.src="https://www.youtube.com/iframe_api";document.head.appendChild(s)}})}
-async function bindPlayer(){
-  await ytApi();ytReady=false;
-  try{if(ytP&&ytP.destroy){}}catch(e){}
-  ytP=new YT.Player("yt",{events:{onReady:()=>{ytReady=true},onStateChange:e=>{playing=e.data===1;$("pp").textContent=playing?"⏸":"▶";syncClock()},onPlaybackRateChange:e=>{rate=e.data;$("spd").value=String(rate);syncClock()}}});
-}
-function syncClock(){if(ytReady&&ytP.getCurrentTime){const t=ytP.getCurrentTime();curT=t;clk={t,at:performance.now()}}}
-setInterval(()=>{if(ytReady&&ytP&&ytP.getPlayerState){playing=ytP.getPlayerState()===1;syncClock()}},200);
-ytApi();
 function play(v){
   if(!v)return;curVid=v;$("top").hidden=false;$("top").classList.remove("min");
   $("yt").src="https://www.youtube.com/embed/"+v+"?enablejsapi=1&playsinline=1&rel=0&cc_load_policy=1&cc_lang_pref="+L+"&hl="+L+"&origin="+encodeURIComponent(location.origin);
   $("nm").textContent=(cur&&cur.r.title)||"YouTube";$("mn").textContent=T[L].hide;
   try{localStorage.setItem("lv_vid",v)}catch(e){}
-  bindPlayer().catch(()=>{});
 }
 $("mn").onclick=()=>{$("top").classList.toggle("min");$("mn").textContent=$("top").classList.contains("min")?T[L].show:T[L].hide};
 $("open").onclick=()=>{const v=vidOf($("link").value);if(!v){toast(T[L].badLink);return}play(v);ui();scrollTo({top:0})};
 $("link").addEventListener("keydown",e=>{if(e.key==="Enter")$("open").click()});
-function seek(s){if(ytReady&&ytP){$("top").classList.remove("min");ytP.seekTo(s,true);ytP.playVideo();setTimeout(syncClock,80);return}const w=$("yt").contentWindow;if(!w||$("top").hidden)return;$("top").classList.remove("min");$("mn").textContent=T[L].hide;
+function seek(s){const w=$("yt").contentWindow;if(!w||$("top").hidden)return;$("top").classList.remove("min");$("mn").textContent=T[L].hide;
   const send=(f,a)=>w.postMessage(JSON.stringify({event:"command",func:f,args:a||[]}),"*");send("seekTo",[s,true]);send("playVideo")}
 
 const LANGS=[["uz","O'zbekcha (lotin)"],["uz-Cyrl","Ўзбекча (кирилл)"],["ru","Русский"],["en","English"],["tr","Türkçe"],["kk","Қазақша"],["ky","Кыргызча"],["tg","Тоҷикӣ"],["tk","Türkmençe"],["az","Azərbaycanca"],["ar","العربية"],["fa","فارسی"],["de","Deutsch"],["fr","Français"],["es","Español"],["it","Italiano"],["pt","Português"],["zh","中文"],["ja","日本語"],["ko","한국어"],["hi","हिन्दी"],["uk","Українська"]];
@@ -404,44 +335,21 @@ function sectionsFlat(){const s=(cur.r.sections||[]).slice();if(cur.r.summary)s.
 function render(){
   const t=T[L],S=sectionsFlat();
   $("out").innerHTML=`<h2 class="tt">${esc(cur.r.title)}</h2>
-   <div class="bar2" role="toolbar">
-     <button type="button" class="pri" id="dlw">📄 ${t.word}</button>
-     <button type="button" id="cp">📋 ${t.copyAll}</button>
-     <button type="button" id="srtB">🎬 ${t.srt}</button>
-     <a id="tgl" target="_blank" rel="noopener" href="#">✈️ ${t.tg}</a>
-     <button type="button" id="lsn">🔊 ${t.listen}</button>
-   </div>
-   <details class="tts" id="ttsBox"><summary>🔊 ${t.listen}</summary><div class="in">
-     <select id="ttsEng"><option value="piper">${t.engPiper}</option><option value="dev">${t.engDev}</option></select>
-     <div class="row" style="margin-top:8px"><select id="ttsVoice" aria-label="${t.voice}" style="flex:1 1 160px"></select><select id="ttsRate" aria-label="speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option></select></div>
-     <div class="row" style="margin-top:8px"><button class="go" type="button" id="ttsPlay">${t.play}</button><button class="ghost" type="button" id="ttsStop">${t.stop}</button></div>
-     <p class="hint" id="ttsSt"></p>
-     <details class="ms"><summary><b>${t.msBest}</b></summary>
-       <p class="hint">${t.msWhy}</p>
-       <div class="row"><a class="go" id="edgeOpen" href="#" style="flex:1 1 100%">${t.edgeBtn}</a></div>
-       <p class="hint">${t.edgeHow}</p>
-       <div class="row"><button class="ghost" type="button" id="wordListen">${t.wordBtn}</button></div>
-       <p class="hint">${t.wordHow}</p>
-     </details></div></details>
-   <div class="find"><input type="text" id="q" placeholder="🔍 ${esc(t.find)}"><label class="follow"><input type="checkbox" id="fol" checked><span>${t.follow}</span></label></div>
+   <input type="text" id="q" placeholder="${esc(t.find)}" style="margin-bottom:4px">
+   <label class="follow"><input type="checkbox" id="fol" checked><span>${t.follow}</span></label>
    <nav class="toc" id="toc"><b>${t.toc}</b><ol>${S.map((s,i)=>`<li><a href="#s${i}" data-i="${i}">${ico(s.icon)}<span>${i+1}. ${esc(s.title)}</span></a></li>`).join("")}</ol></nav>
    <div class="row" style="margin:0 0 4px"><button class="ghost" type="button" id="tog">${t.open2}</button></div>
    ${S.map((s,i)=>`<details class="sec" id="s${i}"${i===0?" open":""}><summary>${ico(s.icon)}<span>${i+1}. ${esc(s.title)}</span></summary><div class="body">${secBody(s)}<a class="back" href="#toc">${t.back}</a></div></details>`).join("")}
-   <div class="row"><button class="go" type="button" id="cp2" style="flex:1 1 100%;background:var(--ink);color:var(--card)">📋 ${t.copyAll}</button></div>`;
-  $("out").hidden=false;indexLines();ttsSetup();
+   <div class="row">
+     <button class="go" type="button" id="dlw" style="flex:1 1 100%">${svg("text","#fff")} ${t.word}</button>
+     <button class="go" type="button" id="cp" style="flex:1 1 100%;background:var(--ink);color:var(--card)">${t.copyAll}</button>
+     <a class="ghost" id="tgl" target="_blank" rel="noopener" href="#">${t.tg} ↗</a>
+   </div>`;
+  $("out").hidden=false;indexLines();
   if(!$("top").hidden)$("nm").textContent=cur.r.title;
   const plain=asText();
   $("tgl").href="https://t.me/share/url?url="+encodeURIComponent(curVid?"https://youtu.be/"+curVid:location.href)+"&text="+encodeURIComponent(plain.slice(0,3000));
-  $("srtB").onclick=()=>{
-    const items=[];sectionsFlat().forEach(s=>(s.items||[]).forEach(i=>{if(i.parts)i.parts.forEach(p=>{if(p.s!=null)items.push({s:p.s,text:p.text})});else{const x=toSec(i.t);if(x!=null)items.push({s:x,text:i.text})}}));
-    if(cur.ai&&cur.ai.speech&&cur.ai.speech.length){items.length=0;cur.ai.speech.forEach(x=>{const s=toSec(x.t);if(s!=null)items.push({s,text:x.tr||x.orig})})}
-    items.sort((a,b)=>a.s-b.s);for(let i=items.length-1;i>0;i--)if(items[i].s===items[i-1].s)items.splice(i,1);if(!items.length){toast(T[L].noText);return}
-    const tc=x=>{const ms=Math.round(x*1000),h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3),r=ms%1e3;return`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")},${String(r).padStart(3,"0")}`};
-    const srt=items.map((x,i)=>{const e=Math.min(items[i+1]?items[i+1].s:x.s+4,x.s+8);return`${i+1}\n${tc(x.s)} --> ${tc(Math.max(e,x.s+1))}\n${x.text}\n`}).join("\n");
-    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([srt],{type:"text/plain"}));a.download=(cur.r.title||"Lingvid").replace(/[\\/:*?"<>|]+/g," ").slice(0,80)+"."+L+".srt";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)};
-  $("cp").onclick=async()=>{if(await copy(plain))toast(t.copied)};$("cp2").onclick=$("cp").onclick;
-  $("lsn").onclick=()=>{const d=$("ttsBox");d.open=true;scrollUnder(d)};
-  $("setup").classList.add("has");$("setup").open=false;document.querySelector('[data-t="lead"]').hidden=true;
+  $("cp").onclick=async()=>{if(await copy(plain))toast(t.copied)};
   $("dlw").onclick=async()=>{const b=await buildDocx();const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=(cur.r.title||"Lingvid").replace(/[\\/:*?"<>|]+/g," ").slice(0,80)+".docx";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)};
   $("tog").onclick=()=>{const ds=[...$("out").querySelectorAll("details.sec")];const op=!ds.every(d=>d.open);ds.forEach(d=>d.open=op);$("tog").textContent=op?t.close:t.open2};
   $("q").oninput=e=>{const q=e.target.value.trim().toLowerCase();
@@ -531,189 +439,68 @@ async function buildDocx(){
 /* ---------- auto text (Cloudflare helper) ---------- */
 const WORKER="https://lingvid.3307999.workers.dev/";
 async function gtrans(segs,tl){
-  const out=segs.map(x=>({...x}));
-  for(let i=0;i<out.length;i+=100){
-    const part=out.slice(i,i+100);const res=await gtMany(part.map(x=>x.text),tl,"auto");
-    if(res.filter(Boolean).length<part.length*0.5)throw new Error("translate");
-    res.forEach((t,k)=>{if(t)out[i+k].text=t});
-    $("autoSt").textContent=T[L].autoTrWait+" "+Math.round(Math.min(1,(i+100)/out.length)*100)+"%";
+  const out=segs.map(x=>({...x}));let i=0;
+  while(i<out.length){
+    let j=i,len=0;while(j<out.length&&len+out[j].text.length+1<1800){len+=out[j].text.length+1;j++}
+    if(j===i)j=i+1;
+    const q=out.slice(i,j).map(x=>x.text.replace(/\n/g," ")).join("\n");
+    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&dt=t&tl="+tl+"&q="+encodeURIComponent(q));
+    if(!r.ok)throw new Error("translate "+r.status);
+    const d=await r.json();const lines=[];let c="";
+    for(const p of d[0]||[]){c+=p[0]||"";if(/\n\s*$/.test(p[1]||"")||/\n\s*$/.test(p[0]||"")){lines.push(c.trim());c=""}}
+    if(c.trim())lines.push(c.trim());
+    if(lines.length===j-i)lines.forEach((t,k)=>out[i+k].text=t);
+    else{out[i].text=lines.join(" ");for(let k=i+1;k<j;k++)out[k].text=""}
+    i=j;$("autoSt").textContent=T[L].autoTrWait+" "+Math.round(i/out.length*100)+"%";
   }
-  return out;
-}
-/* local cache: up to 30 videos, 7 days — the same video is never downloaded or translated twice */
-const CK="lv_cache_v1",CTTL=7*864e5;
-function cacheGet(k){try{const c=JSON.parse(localStorage.getItem(CK)||"{}");const e=c[k];if(e&&Date.now()-e.at<CTTL)return e.v}catch(e){}return null}
-function cachePut(k,v){try{const c=JSON.parse(localStorage.getItem(CK)||"{}");c[k]={at:Date.now(),v};
-  const keys=Object.keys(c).sort((a,b)=>c[b].at-c[a].at);keys.forEach((x,i)=>{if(i>=60||Date.now()-c[x].at>CTTL)delete c[x]});
-  try{localStorage.setItem(CK,JSON.stringify(c))}catch(e){const ks=Object.keys(c).sort((a,b)=>c[a].at-c[b].at);ks.slice(0,Math.ceil(ks.length/2)).forEach(x=>delete c[x]);localStorage.setItem(CK,JSON.stringify(c))}}catch(e){}}
-async function fetchVideo(v){
-  const hit=cacheGet("v:"+v);if(hit)return hit;
-  let last=null;
-  for(let a=0;a<2;a++){
-    try{const r=await fetch(WORKER+"?v="+v);const d=await r.json();if(d.segments&&d.segments.length){cachePut("v:"+v,d);return d}last=d}catch(e){last={error:e.message||"network"}}
-    await new Promise(r=>setTimeout(r,1500));
-  }
-  return last||{error:"unknown"};
+  return out.filter(x=>x.text);
 }
 async function autoText(){
   const t=T[L];if(!curVid){toast(t.badLink);return}
   const b=$("autoBtn");b.disabled=true;$("autoSt").textContent=t.autoWait;
   try{
-    const d=await fetchVideo(curVid);
-    if(!d.segments||!d.segments.length){$("autoSt").textContent=t.autoFail+(d.error?" ("+d.error+")":"");return}
+    const r=await fetch(WORKER+"?v="+curVid);const d=await r.json();
+    if(!d.segments||!d.segments.length){$("autoSt").textContent=t.autoFail;return}
     let segs=d.segments,tr=false;
     if($("tl").checked&&(d.original||"").split("-")[0]!==L){
-      const tk="t2:"+curVid+":"+L,th=cacheGet(tk);if(th){segs=th;tr=true}else{try{segs=await gtrans(segs,L);tr=true;cachePut(tk,segs)}catch(e){$("autoSt").textContent=t.autoNoTr+" ("+(e&&e.message||e)+")"}}
+      try{segs=await gtrans(segs,L);tr=true}catch(e){$("autoSt").textContent=t.autoNoTr}
     }
     $("txt").value=segs.map(s=>`[${s.t}] ${s.text}`).join("\n");
-    if(!$("autoSt").textContent.startsWith(t.autoNoTr))$("autoSt").textContent=(tr?t.autoTr:t.autoOrig)+" ("+(tr?L:d.original||"?")+")";
-    cur=parse($("txt").value);cur.r.title=d.title||cur.r.title;cur.lang=tr?L:(d.original||L);render();$("c4").hidden=false;
+    if(!tr||$("autoSt").textContent!==t.autoNoTr)$("autoSt").textContent=(tr?t.autoTr:t.autoOrig)+" ("+(tr?L:d.original||"?")+")";
+    cur=parse($("txt").value);cur.r.title=d.title||cur.r.title;render();$("c4").hidden=false;
     try{localStorage.setItem("lv_txt",$("txt").value)}catch(e){}
     $("out").scrollIntoView({block:"start"});
-  }catch(e){$("autoSt").textContent=t.autoFail+" ("+(e&&e.message||e)+")"}
+  }catch(e){$("autoSt").textContent=t.autoFail}
   finally{b.disabled=false}
 }
 $("autoBtn").onclick=autoText;
-async function aiAnalyze(){
-  const t=T[L];if(!curVid){toast(t.badLink);return}
-  const b=$("aiBtn");b.disabled=true;$("autoSt").textContent=t.aiWait;
-  try{
-    const ck="a:"+curVid+":"+L;let d=cacheGet(ck);
-    if(!d){const r=await fetch(WORKER+"analyze?v="+curVid+"&lang="+L);d=await r.json();if(!d.ok)throw new Error((d.error||"")+(d.detail?": "+d.detail:""));cachePut(ck,d)}
-    const sp=(d.speech||[]).filter(x=>x&&(x.tr||x.orig));const os=(d.onscreen||[]).filter(x=>x&&(x.tr||x.orig));
-    let md="# "+(d.title||"")+"\n";
-    if(d.summary)md+="## "+t.sum+"\n"+d.summary+"\n";
-    if(d.guide)md+=d.guide.replace(/^#\s.*$/m,"")+"\n";
-    if(os.length)md+="## 🖼 "+t.aiScreen+"\n"+os.map(x=>"- ["+x.t+"] "+(x.tr||x.orig)+(x.orig&&x.tr&&x.orig!==x.tr?" ("+x.orig+")":"")).join("\n")+"\n";
-    if(sp.length)md+="## 🗣 "+t.aiSpeech+"\n"+sp.map(x=>"["+x.t+"] "+(x.tr||x.orig)).join("\n")+"\n";
-    $("txt").value=md;cur=parse(md);cur.lang=L;cur.ai=d;render();$("c4").hidden=false;
-    try{localStorage.setItem("lv_txt",md)}catch(e){}
-    $("autoSt").textContent="✓";$("out").scrollIntoView({block:"start"});
-  }catch(e){$("autoSt").textContent=t.aiFail+" ("+(e&&e.message||e)+")"}
-  finally{b.disabled=false}
-}
-$("aiBtn").onclick=aiAnalyze;
 /* ---------- player controls: speed, pause, ±5s ---------- */
 let rate=1,playing=false,curT=0;
-const ytCmd=(f,a)=>{if(ytReady&&ytP&&typeof ytP[f]==="function"){ytP[f](...(a||[]));setTimeout(syncClock,50);return}const w=$("yt").contentWindow;if(w)w.postMessage(JSON.stringify({event:"command",func:f,args:a||[]}),"*")};
-$("spd").innerHTML=[0.25,0.5,0.75,1,1.25,1.5,1.75,2].map(r=>`<option value="${r}"${r===1?" selected":""}>${r}×</option>`).join("");
-$("spd").addEventListener("change",e=>{rate=+e.target.value;ytCmd("setPlaybackRate",[rate]);clk={t:nowT(),at:performance.now()}});
+const ytCmd=(f,a)=>{const w=$("yt").contentWindow;if(w)w.postMessage(JSON.stringify({event:"command",func:f,args:a||[]}),"*")};
+$("sp").innerHTML=[0.5,0.75,1,1.25,1.5].map(r=>`<button type="button" data-r="${r}" aria-pressed="${r===1}">${String(r).replace(/^0/,"")}×</button>`).join("");
+$("sp").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;rate=+b.dataset.r;ytCmd("setPlaybackRate",[rate]);
+  $("sp").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
 $("ctl").addEventListener("click",e=>{const b=e.target.closest("button[data-c]");if(!b)return;const c=b.dataset.c;
   if(c==="toggle"){ytCmd(playing?"pauseVideo":"playVideo")}
   else{ytCmd("seekTo",[Math.max(0,curT+(c==="back"?-5:5)),true]);ytCmd("playVideo")}});
-function b64u(s){const b=new TextEncoder().encode(s);let x="";b.forEach(c=>x+=String.fromCharCode(c));return btoa(x).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
-/* ---------- read aloud: Microsoft neural (via helper), Piper (in browser), device ---------- */
-const MSV={uz:[["uz-UZ-MadinaNeural","Madina ♀"],["uz-UZ-SardorNeural","Sardor ♂"]],ru:[["ru-RU-SvetlanaNeural","Svetlana ♀"],["ru-RU-DmitryNeural","Dmitry ♂"],["ru-RU-DariyaNeural","Dariya ♀"]],en:[["en-US-AriaNeural","Aria ♀"],["en-US-GuyNeural","Guy ♂"],["en-US-JennyNeural","Jenny ♀"],["en-GB-SoniaNeural","Sonia ♀ UK"]],tr:[["tr-TR-EmelNeural","Emel ♀"],["tr-TR-AhmetNeural","Ahmet ♂"]],kk:[["kk-KZ-AigulNeural","Aigul ♀"],["kk-KZ-DauletNeural","Daulet ♂"]],az:[["az-AZ-BanuNeural","Banu ♀"],["az-AZ-BabekNeural","Babek ♂"]],uk:[["uk-UA-PolinaNeural","Polina ♀"],["uk-UA-OstapNeural","Ostap ♂"]],ar:[["ar-SA-ZariyahNeural","Zariyah ♀"],["ar-SA-HamedNeural","Hamed ♂"]],fa:[["fa-IR-DilaraNeural","Dilara ♀"],["fa-IR-FaridNeural","Farid ♂"]],de:[["de-DE-KatjaNeural","Katja ♀"],["de-DE-ConradNeural","Conrad ♂"]],fr:[["fr-FR-DeniseNeural","Denise ♀"],["fr-FR-HenriNeural","Henri ♂"]],es:[["es-ES-ElviraNeural","Elvira ♀"],["es-ES-AlvaroNeural","Álvaro ♂"]],it:[["it-IT-ElsaNeural","Elsa ♀"],["it-IT-DiegoNeural","Diego ♂"]],pt:[["pt-BR-FranciscaNeural","Francisca ♀"],["pt-BR-AntonioNeural","Antonio ♂"]],zh:[["zh-CN-XiaoxiaoNeural","Xiaoxiao ♀"],["zh-CN-YunxiNeural","Yunxi ♂"]],ja:[["ja-JP-NanamiNeural","Nanami ♀"],["ja-JP-KeitaNeural","Keita ♂"]],ko:[["ko-KR-SunHiNeural","SunHi ♀"],["ko-KR-InJoonNeural","InJoon ♂"]],hi:[["hi-IN-SwaraNeural","Swara ♀"],["hi-IN-MadhurNeural","Madhur ♂"]],id:[["id-ID-GadisNeural","Gadis ♀"],["id-ID-ArdiNeural","Ardi ♂"]],ka:[["ka-GE-EkaNeural","Eka ♀"],["ka-GE-GiorgiNeural","Giorgi ♂"]],vi:[["vi-VN-HoaiMyNeural","HoaiMy ♀"],["vi-VN-NamMinhNeural","NamMinh ♂"]],pl:[["pl-PL-ZofiaNeural","Zofia ♀"],["pl-PL-MarekNeural","Marek ♂"]],nl:[["nl-NL-ColetteNeural","Colette ♀"],["nl-NL-MaartenNeural","Maarten ♂"]],he:[["he-IL-HilaNeural","Hila ♀"],["he-IL-AvriNeural","Avri ♂"]],th:[["th-TH-PremwadeeNeural","Premwadee ♀"],["th-TH-NiwatNeural","Niwat ♂"]],bn:[["bn-BD-NabanitaNeural","Nabanita ♀"],["bn-BD-PradeepNeural","Pradeep ♂"]],ur:[["ur-PK-UzmaNeural","Uzma ♀"],["ur-PK-AsadNeural","Asad ♂"]],ms:[["ms-MY-YasminNeural","Yasmin ♀"],["ms-MY-OsmanNeural","Osman ♂"]],sw:[["sw-KE-ZuriNeural","Zuri ♀"],["sw-KE-RafikiNeural","Rafiki ♂"]],mn:[["mn-MN-YesuiNeural","Yesui ♀"],["mn-MN-BataaNeural","Bataa ♂"]],ro:[["ro-RO-AlinaNeural","Alina ♀"],["ro-RO-EmilNeural","Emil ♂"]],cs:[["cs-CZ-VlastaNeural","Vlasta ♀"],["cs-CZ-AntoninNeural","Antonin ♂"]],el:[["el-GR-AthinaNeural","Athina ♀"],["el-GR-NestorasNeural","Nestoras ♂"]],sv:[["sv-SE-SofieNeural","Sofie ♀"],["sv-SE-MattiasNeural","Mattias ♂"]],fi:[["fi-FI-NooraNeural","Noora ♀"],["fi-FI-HarriNeural","Harri ♂"]],hu:[["hu-HU-NoemiNeural","Noemi ♀"],["hu-HU-TamasNeural","Tamas ♂"]],hy:[["hy-AM-AnahitNeural","Anahit ♀"],["hy-AM-HaykNeural","Hayk ♂"]]};
-const PIV={en:[["en_US-hfc_female-medium","HFC ♀"],["en_US-lessac-medium","Lessac"]],ru:[["ru_RU-irina-medium","Irina ♀"],["ru_RU-denis-medium","Denis ♂"],["ru_RU-dmitri-medium","Dmitri ♂"]],kk:[["kk_KZ-issai-high","Issai"]],de:[["de_DE-thorsten-medium","Thorsten ♂"]],fr:[["fr_FR-siwis-medium","Siwis ♀"]],es:[["es_ES-davefx-medium","Davefx ♂"]],tr:[["tr_TR-dfki-medium","DFKI"]],uk:[["uk_UA-ukrainian_tts-medium","Ukrainian TTS"]],ka:[["ka_GE-natia-medium","Natia ♀"]],ar:[["ar_JO-kareem-medium","Kareem ♂"]],zh:[["zh_CN-huayan-medium","Huayan ♀"]],pl:[["pl_PL-gosia-medium","Gosia ♀"]],fa:[["fa_IR-amir-medium","Amir ♂"]],vi:[["vi_VN-vais1000-medium","Vais ♀"]],it:[["it_IT-riccardo-x_low","Riccardo ♂"]],pt:[["pt_BR-faber-medium","Faber ♂"]],nl:[["nl_NL-mls-medium","MLS"]]};
-let ttsRun=0,audioEl=null,piperMod=null;
-const tlang=()=>((cur&&cur.lang)||L||"en").split("-")[0].toLowerCase();
-function ttsVoices(){
-  const t=T[L],eng=$("ttsEng").value,lg=tlang(),sel=$("ttsVoice");let list=[];
-  if(eng==="ms")list=MSV[lg]||[];
-  else if(eng==="piper")list=PIV[lg]||[];
-  else{const vs=speechSynthesis.getVoices().filter(v=>v.lang.toLowerCase().startsWith(lg));
-    vs.sort((a,b)=>(/premium|enhanced|natural|neural|google/i.test(b.name)?1:0)-(/premium|enhanced|natural|neural|google/i.test(a.name)?1:0));
-    list=vs.map(v=>[v.name,v.name])}
-  sel.innerHTML=list.map(([v,n])=>`<option value="${esc(v)}">${esc(n)}</option>`).join("");
-  $("ttsSt").textContent=!list.length?t.noVoice:(eng==="dev"?t.devHint:"");
-  const md=document.querySelector(".tts .ms");if(md&&!list.length)md.open=true;
-  try{const k=localStorage.getItem("lv_v_"+eng+"_"+lg);if(k&&list.some(x=>x[0]===k))sel.value=k}catch(e){}
-}
-function ttsSetup(){
-  if(!$("ttsEng"))return;
-  try{const e=localStorage.getItem("lv_eng");if(e)$("ttsEng").value=e}catch(_){}
-  if(!$("ttsEng").value||$("ttsEng").value==="ms")$("ttsEng").value=PIV[tlang()]?"piper":"dev";
-  ttsVoices();
-  $("ttsEng").onchange=()=>{try{localStorage.setItem("lv_eng",$("ttsEng").value)}catch(_){}ttsVoices()};
-  $("ttsVoice").onchange=()=>{try{localStorage.setItem("lv_v_"+$("ttsEng").value+"_"+tlang(),$("ttsVoice").value)}catch(_){}};
-  if("speechSynthesis" in window)speechSynthesis.onvoiceschanged=()=>{if($("ttsEng")&&$("ttsEng").value==="dev")ttsVoices()};
-  $("ttsPlay").onclick=readAll;$("ttsStop").onclick=stopTTS;
-  const pageUrl=location.origin+location.pathname+"#d="+b64u(JSON.stringify({v:curVid,L,r:cur.r,full:cur.full||null}));
-  $("edgeOpen").href=(/iPhone|iPad|Android/i.test(navigator.userAgent)?"microsoft-edge-":"")+pageUrl;
-  $("wordListen").onclick=()=>$("dlw").click();
-}
-function stopTTS(){ttsRun++;if(audioEl){audioEl.pause();audioEl=null}try{speechSynthesis.cancel()}catch(e){}document.querySelectorAll(".reading").forEach(e=>e.classList.remove("reading"))}
-const plain=el=>{const c=el.cloneNode(true);c.querySelectorAll(".ts").forEach(x=>x.remove());return c.textContent.replace(/\s+/g," ").trim()};
-function chunks(s){const out=[];while(s.length>1800){let k=s.lastIndexOf(". ",1800);if(k<600)k=s.lastIndexOf(" ",1800);out.push(s.slice(0,k+1));s=s.slice(k+1)}if(s.trim())out.push(s);return out}
-async function synth(text,eng,voice,rate){
-  if(eng==="ms"){const r=await fetch(WORKER+"tts?voice="+encodeURIComponent(voice)+"&rate="+Math.round((rate-1)*100)+"&text="+encodeURIComponent(text));if(!r.ok)throw new Error("ms "+r.status);return {blob:await r.blob(),rate:1}}
-  if(eng==="piper"){if(!piperMod){$("ttsSt").textContent=T[L].piperLoad;piperMod=await import("https://cdn.jsdelivr.net/npm/@diffusionstudio/vits-web@1.0.3/+esm")}
-    const wav=await piperMod.predict({text,voiceId:voice});$("ttsSt").textContent="";return {blob:wav,rate}}
-  return null;
-}
-function playBlob(b,rate,run){return new Promise((res,rej)=>{if(run!==ttsRun)return res();const a=new Audio(URL.createObjectURL(b.blob));a.playbackRate=b.rate===1?1:rate;audioEl=a;a.onended=()=>{URL.revokeObjectURL(a.src);res()};a.onerror=()=>rej(new Error("audio"));a.play().catch(rej)})}
-function speakDev(text,voice,rate,run){return new Promise(res=>{if(run!==ttsRun)return res();const u=new SpeechSynthesisUtterance(text);const v=speechSynthesis.getVoices().find(x=>x.name===voice);if(v){u.voice=v;u.lang=v.lang}u.rate=rate;u.onend=res;u.onerror=res;speechSynthesis.speak(u)})}
-async function readAll(){
-  stopTTS();const run=++ttsRun,t=T[L];
-  const eng=$("ttsEng").value,voice=$("ttsVoice").value,rate=+$("ttsRate").value;if(!voice){$("ttsSt").textContent=t.noVoice;return}
-  const els=[...$("out").querySelectorAll(".body p,.body li")].filter(e=>plain(e));
-  const jobs=[];els.forEach(el=>chunks(plain(el)).forEach(c=>jobs.push({el,c})));
-  let next=jobs.length&&eng!=="dev"?synth(jobs[0].c,eng,voice,rate):null;
-  for(let i=0;i<jobs.length&&run===ttsRun;i++){
-    const j=jobs[i];document.querySelectorAll(".reading").forEach(e=>e.classList.remove("reading"));j.el.classList.add("reading");
-    const d2=j.el.closest("details");if(d2&&!d2.open)d2.open=true;scrollUnder(j.el);
-    try{
-      if(eng==="dev"){await speakDev(j.c,voice,rate,run);continue}
-      const b=await next;next=i+1<jobs.length?synth(jobs[i+1].c,eng,voice,rate):null;if(next)next.catch(()=>{});
-      await playBlob(b,rate,run);
-    }catch(e){if(run===ttsRun){$("ttsSt").textContent=t.ttsFail;stopTTS()}return}
-  }
-  if(run===ttsRun)document.querySelectorAll(".reading").forEach(e=>e.classList.remove("reading"));
-}
-/* ---------- text on screen (OCR in the browser, free) ---------- */
-let tess=null,ocrAt=0,ocrText="";
-const TL={en:"eng",ru:"rus",uz:"uzb",tr:"tur",kk:"kaz",ky:"kir",tg:"tgk",az:"aze",uk:"ukr",ar:"ara",fa:"fas",de:"deu",fr:"fra",es:"spa",pt:"por",it:"ita",zh:"chi_sim",ja:"jpn",ko:"kor",hi:"hin"};
-function loadTess(){return tess||(tess=new Promise((res,rej)=>{if(window.Tesseract)return res(window.Tesseract);const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";s.onload=()=>res(window.Tesseract);s.onerror=()=>{tess=null;rej(new Error("load"))};document.head.appendChild(s)}))}
-function openOcr(){ocrAt=curT;ytCmd("pauseVideo");$("ocr").hidden=false;$("ocrOut").hidden=true;$("ocrSt").textContent="";$("ocrFile").value=""}
-$("ocrBtn").onclick=openOcr;$("ocrX").onclick=()=>$("ocr").hidden=true;
-$("ocr").addEventListener("click",e=>{if(e.target===$("ocr"))$("ocr").hidden=true});
-async function runOcr(file){
-  const t=T[L];$("ocrSt").textContent=t.ocrRead;$("ocrOut").hidden=true;
-  try{
-    const Ts=await loadTess();
-    const langs=[...new Set(["eng","rus",TL[(L||"en").split("-")[0]]].filter(Boolean))].join("+");
-    const r=await Ts.recognize(file,langs);
-    ocrText=(r.data.text||"").replace(/[ \t]+/g," ").replace(/\n{2,}/g,"\n").trim();
-    if(!ocrText){$("ocrSt").textContent=t.ocrNone;return}
-    let tr=ocrText;
-    try{const q=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&dt=t&tl="+L+"&q="+encodeURIComponent(ocrText.slice(0,4000)));const d=await q.json();tr=(d[0]||[]).map(p=>p[0]||"").join("").trim()||ocrText}catch(e){}
-    $("ocrTrT").textContent=tr;$("ocrOrT").textContent=ocrText;$("ocrSt").textContent="";$("ocrOut").hidden=false;
-    $("ocrAdd").textContent=t.ocrAdd+" ("+fmt(ocrAt)+")";$("ocrCopy").textContent=t.copy;
-    $("ocrCopy").onclick=async()=>{if(await copy(tr))toast(t.copied)};
-    $("ocrAdd").onclick=()=>{
-      const line="["+fmt(ocrAt)+"] 🖼 "+tr.replace(/\n/g," ");
-      const ls=$("txt").value.split("\n");let k=ls.length;
-      for(let i=0;i<ls.length;i++){const m=ls[i].match(TS);if(m&&toSec(m[1])>ocrAt){k=i;break}}
-      ls.splice(k,0,line);$("txt").value=ls.join("\n");$("ocr").hidden=true;$("make").click();toast(t.copied.replace(/.*/,"✓"));
-    };
-  }catch(e){$("ocrSt").textContent=t.ocrFail}
-}
-$("ocrFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)runOcr(f)});
-addEventListener("paste",e=>{if($("ocr").hidden)return;const it=[...(e.clipboardData||{}).items||[]].find(x=>x.type.startsWith("image/"));if(it){e.preventDefault();runOcr(it.getAsFile())}});
 /* ---------- follow the video (karaoke) ---------- */
-let lastNow=null,lastLn=null,lastW=null,clk={t:0,at:0},lines=[],segList=[];
+let lastNow=null,lastLn=null,lastW=null,clk={t:0,at:0},lines=[];
 function indexLines(){
   lines=[...$("out").querySelectorAll(".ln")].map(el=>({el,a:+el.dataset.a,w:[...el.querySelectorAll(".wd")]}));
-  lines.forEach((x,i)=>{const n=lines[i+1];const need=Math.max(1.2,x.w.reduce((s,w)=>s+w.textContent.length,0)*0.075+x.w.length*0.12);x.b=n&&n.a>x.a?Math.min(n.a,x.a+need):x.a+need});
+  lines.forEach((x,i)=>{const n=lines[i+1];x.b=n&&n.a>x.a?n.a:x.a+Math.max(2,x.w.length*0.45)});
   lines.forEach(x=>{const total=x.w.reduce((s,w)=>s+w.textContent.length+1,0)||1;let acc=0;x.ws=x.w.map(w=>{const s=x.a+(x.b-x.a)*acc/total;acc+=w.textContent.length+1;return s})});
-  segList=[...$("out").querySelectorAll(".seg")];lastNow=lastLn=lastW=null;
+  lastNow=lastLn=lastW=null;
 }
-const nowT=()=>clk.t+(playing?Math.min(0.6,(performance.now()-clk.at)/1000)*rate:0);
+const nowT=()=>clk.t+(playing?(performance.now()-clk.at)/1000*rate:0);
 function scrollUnder(el){const topH=$("top").hidden?0:$("top").offsetHeight;const y=el.getBoundingClientRect().top+scrollY-topH-10;scrollTo({top:Math.max(0,y),behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"})}
-let userScrollUntil=0;
-["touchstart","wheel"].forEach(ev=>addEventListener(ev,()=>{userScrollUntil=performance.now()+4000},{passive:true}));
-const followOn=()=>$("fol")&&$("fol").checked&&performance.now()>userScrollUntil;
-function keepVisible(el){const topH=$("top").hidden?0:$("top").offsetHeight;const r=el.getBoundingClientRect();if(r.top<topH+4||r.bottom>innerHeight-70)scrollUnder(el)}
-let dbgAt=0;
 function tick(){
   requestAnimationFrame(tick);
-  if(performance.now()-dbgAt>250){dbgAt=performance.now();const d=$("dbg");if(d)d.textContent=(clk.at?fmt(nowT()):"--:--")+(playing?" ▶":" ⏸")+(ytReady?" ✓":(clk.at?" ~":" ✗"))}
   if($("out").hidden||!clk.at)return;
   const ct=nowT();
   // paragraph highlight (yellow)
-  const segs=segList;let best=null,bs=-1;
+  const segs=$("out").querySelectorAll(".seg");let best=null,bs=-1;
   for(const s of segs){const v=+s.dataset.sec;if(v<=ct+0.3&&v>=bs){bs=v;best=s}}
-  if(best!==lastNow){if(lastNow)lastNow.classList.remove("now");lastNow=best;if(best){best.classList.add("now");const d2=best.closest("details");if(followOn()){if(d2&&!d2.open)d2.open=true;scrollUnder(best)}}}
+  if(best!==lastNow){if(lastNow)lastNow.classList.remove("now");lastNow=best;if(best){best.classList.add("now");const d2=best.closest("details");if($("fol")&&$("fol").checked&&d2&&!d2.open)d2.open=true}}
   // line + word highlight
   if(!lines.length)return;
   let ln=null;for(const x of lines){if(x.a<=ct+0.15)ln=x;else break}
@@ -721,7 +508,7 @@ function tick(){
   if(ln!==lastLn){
     if(lastLn){lastLn.el.classList.remove("cur");lastLn.w.forEach(w=>w.classList.remove("cw","nw","pw"))}
     lastLn=ln;lastW=null;
-    if(ln){ln.el.classList.add("cur");if(followOn()){const par=lastNow&&lastNow.contains(ln.el)?lastNow:null;const room=innerHeight-($("top").hidden?0:$("top").offsetHeight)-80;if(!par||par.offsetHeight>room)setTimeout(()=>keepVisible(ln.el),700)}}
+    if(ln){ln.el.classList.add("cur");if($("fol")&&$("fol").checked){const d2=ln.el.closest("details");if(d2&&!d2.open)d2.open=true;scrollUnder(ln.el)}}
   }
   if(!ln)return;
   let k=0;for(let i=0;i<ln.ws.length;i++){if(ln.ws[i]<=ct)k=i;else break}
@@ -735,10 +522,10 @@ $("yt").addEventListener("load",()=>{listen();setTimeout(listen,1000);setTimeout
 addEventListener("message",e=>{
   if(!/youtube(-nocookie)?\.com$/.test(new URL(e.origin).hostname))return;
   let d;try{d=typeof e.data==="string"?JSON.parse(e.data):e.data}catch(_){return}
-  if(!ytReady&&d&&d.info&&typeof d.info.playerState==="number"){playing=d.info.playerState===1;$("pp").textContent=playing?"⏸":"▶"}
-  if(d&&d.info&&typeof d.info.playbackRate==="number"&&d.info.playbackRate!==rate){rate=d.info.playbackRate;$("spd").value=String(rate)}
+  if(d&&d.info&&typeof d.info.playerState==="number"){playing=d.info.playerState===1;$("pp").textContent=playing?"⏸":"▶"}
+  if(d&&d.info&&typeof d.info.playbackRate==="number"&&d.info.playbackRate!==rate){rate=d.info.playbackRate;$("sp").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(+x.dataset.r===rate)))}
   const ct=d&&d.info&&typeof d.info.currentTime==="number"?d.info.currentTime:null;
-  if(ct!=null&&!ytReady){if(Math.abs(ct-clk.t)>0.01||!clk.at){curT=ct;clk={t:ct,at:performance.now()}}}
+  if(ct!=null){curT=ct;clk={t:ct,at:performance.now()}}
 });
 /* ---------- fixed player spacer ---------- */
 const fitTop=()=>{const h=$("top").hidden?0:$("top").offsetHeight;$("spacer").style.height=h+"px";document.documentElement.style.scrollPaddingTop=(h+10)+"px"};
