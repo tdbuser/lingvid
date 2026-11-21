@@ -65,6 +65,30 @@ async function captions(baseUrl, ua, tlang) {
   return out;
 }
 
+// Fallback: Google Translate public endpoint (free, no key). Translates in chunks, keeps line order.
+async function gtranslate(segments, tl) {
+  const out = segments.map(x => ({ ...x }));
+  let i = 0;
+  while (i < out.length) {
+    let j = i, len = 0;
+    while (j < out.length && len + out[j].text.length + 1 < 3500) { len += out[j].text.length + 1; j++; }
+    if (j === i) j = i + 1;
+    const q = out.slice(i, j).map(x => x.text.replace(/\n/g, " ")).join("\n");
+    const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&dt=t&tl=" + encodeURIComponent(tl), {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+      body: "q=" + encodeURIComponent(q),
+    });
+    if (!r.ok) throw new Error("gt " + r.status);
+    const d = await r.json();
+    const lines = (d[0] || []).map(p => p[0] || "").join("").split("\n");
+    if (lines.length === j - i) lines.forEach((t, k) => { out[i + k].text = t.trim(); });
+    else throw new Error("gt lines");
+    i = j;
+  }
+  return out;
+}
+
 export default {
   async fetch(req) {
     if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
@@ -89,6 +113,10 @@ export default {
       try { segments = await captions(tr.baseUrl, p.ua, ""); } catch (e) {}
     }
     if (!segments || !segments.length) return json({ ...base, error: "captions_blocked", segments: [] }, 200);
-    return json({ ...base, lang: translated ? lang : own, original: own, translated, segments });
+    let via = translated ? "youtube" : "";
+    if (lang && lang !== own && !translated) {
+      try { segments = await gtranslate(segments, lang); translated = true; via = "google"; } catch (e) {}
+    }
+    return json({ ...base, lang: translated ? lang : own, original: own, translated, via, segments });
   },
 };
