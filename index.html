@@ -502,21 +502,14 @@ async function buildDocx(){
 /* ---------- auto text (Cloudflare helper) ---------- */
 const WORKER="https://lingvid.3307999.workers.dev/";
 async function gtrans(segs,tl){
-  const out=segs.map(x=>({...x}));let i=0;
-  while(i<out.length){
-    let j=i,len=0;while(j<out.length&&len+out[j].text.length+1<1800){len+=out[j].text.length+1;j++}
-    if(j===i)j=i+1;
-    const q=out.slice(i,j).map(x=>x.text.replace(/\n/g," ")).join("\n");
-    const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&dt=t&tl="+tl+"&q="+encodeURIComponent(q));
-    if(!r.ok)throw new Error("translate "+r.status);
-    const d=await r.json();const lines=[];let c="";
-    for(const p of d[0]||[]){c+=p[0]||"";if(/\n\s*$/.test(p[1]||"")||/\n\s*$/.test(p[0]||"")){lines.push(c.trim());c=""}}
-    if(c.trim())lines.push(c.trim());
-    if(lines.length===j-i)lines.forEach((t,k)=>out[i+k].text=t);
-    else{out[i].text=lines.join(" ");for(let k=i+1;k<j;k++)out[k].text=""}
-    i=j;$("autoSt").textContent=T[L].autoTrWait+" "+Math.round(i/out.length*100)+"%";
+  const out=segs.map(x=>({...x}));
+  for(let i=0;i<out.length;i+=100){
+    const part=out.slice(i,i+100);const res=await gtMany(part.map(x=>x.text),tl,"auto");
+    if(res.filter(Boolean).length<part.length*0.5)throw new Error("translate");
+    res.forEach((t,k)=>{if(t)out[i+k].text=t});
+    $("autoSt").textContent=T[L].autoTrWait+" "+Math.round(Math.min(1,(i+100)/out.length)*100)+"%";
   }
-  return out.filter(x=>x.text);
+  return out;
 }
 /* local cache: up to 30 videos, 7 days — the same video is never downloaded or translated twice */
 const CK="lv_cache_v1",CTTL=7*864e5;
@@ -541,7 +534,7 @@ async function autoText(){
     if(!d.segments||!d.segments.length){$("autoSt").textContent=t.autoFail+(d.error?" ("+d.error+")":"");return}
     let segs=d.segments,tr=false;
     if($("tl").checked&&(d.original||"").split("-")[0]!==L){
-      const tk="t:"+curVid+":"+L,th=cacheGet(tk);if(th){segs=th;tr=true}else{try{segs=await gtrans(segs,L);tr=true;cachePut(tk,segs)}catch(e){$("autoSt").textContent=t.autoNoTr+" ("+(e&&e.message||e)+")"}}
+      const tk="t2:"+curVid+":"+L,th=cacheGet(tk);if(th){segs=th;tr=true}else{try{segs=await gtrans(segs,L);tr=true;cachePut(tk,segs)}catch(e){$("autoSt").textContent=t.autoNoTr+" ("+(e&&e.message||e)+")"}}
     }
     $("txt").value=segs.map(s=>`[${s.t}] ${s.text}`).join("\n");
     if(!$("autoSt").textContent.startsWith(t.autoNoTr))$("autoSt").textContent=(tr?t.autoTr:t.autoOrig)+" ("+(tr?L:d.original||"?")+")";
@@ -669,12 +662,12 @@ async function runOcr(file){
 $("ocrFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)runOcr(f)});
 addEventListener("paste",e=>{if($("ocr").hidden)return;const it=[...(e.clipboardData||{}).items||[]].find(x=>x.type.startsWith("image/"));if(it){e.preventDefault();runOcr(it.getAsFile())}});
 /* ---------- follow the video (karaoke) ---------- */
-let lastNow=null,lastLn=null,lastW=null,clk={t:0,at:0},lines=[];
+let lastNow=null,lastLn=null,lastW=null,clk={t:0,at:0},lines=[],segList=[];
 function indexLines(){
   lines=[...$("out").querySelectorAll(".ln")].map(el=>({el,a:+el.dataset.a,w:[...el.querySelectorAll(".wd")]}));
-  lines.forEach((x,i)=>{const n=lines[i+1];x.b=n&&n.a>x.a?n.a:x.a+Math.max(2,x.w.length*0.45)});
+  lines.forEach((x,i)=>{const n=lines[i+1];const need=Math.max(1.2,x.w.reduce((s,w)=>s+w.textContent.length,0)*0.075+x.w.length*0.12);x.b=n&&n.a>x.a?Math.min(n.a,x.a+need):x.a+need});
   lines.forEach(x=>{const total=x.w.reduce((s,w)=>s+w.textContent.length+1,0)||1;let acc=0;x.ws=x.w.map(w=>{const s=x.a+(x.b-x.a)*acc/total;acc+=w.textContent.length+1;return s})});
-  lastNow=lastLn=lastW=null;
+  segList=[...$("out").querySelectorAll(".seg")];lastNow=lastLn=lastW=null;
 }
 const nowT=()=>clk.t+(playing?(performance.now()-clk.at)/1000*rate:0);
 function scrollUnder(el){const topH=$("top").hidden?0:$("top").offsetHeight;const y=el.getBoundingClientRect().top+scrollY-topH-10;scrollTo({top:Math.max(0,y),behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"})}
@@ -683,7 +676,7 @@ function tick(){
   if($("out").hidden||!clk.at)return;
   const ct=nowT();
   // paragraph highlight (yellow)
-  const segs=$("out").querySelectorAll(".seg");let best=null,bs=-1;
+  const segs=segList;let best=null,bs=-1;
   for(const s of segs){const v=+s.dataset.sec;if(v<=ct+0.3&&v>=bs){bs=v;best=s}}
   if(best!==lastNow){if(lastNow)lastNow.classList.remove("now");lastNow=best;if(best){best.classList.add("now");const d2=best.closest("details");if($("fol")&&$("fol").checked&&d2&&!d2.open)d2.open=true}}
   // line + word highlight
@@ -710,7 +703,7 @@ addEventListener("message",e=>{
   if(d&&d.info&&typeof d.info.playerState==="number"){playing=d.info.playerState===1;$("pp").textContent=playing?"⏸":"▶"}
   if(d&&d.info&&typeof d.info.playbackRate==="number"&&d.info.playbackRate!==rate){rate=d.info.playbackRate;$("spd").value=String(rate)}
   const ct=d&&d.info&&typeof d.info.currentTime==="number"?d.info.currentTime:null;
-  if(ct!=null){curT=ct;clk={t:ct,at:performance.now()}}
+  if(ct!=null){curT=ct;clk={t:ct,at:performance.now()};if(typeof d.info.playerState!=="number"&&ct>0)playing=true}
 });
 /* ---------- fixed player spacer ---------- */
 const fitTop=()=>{const h=$("top").hidden?0:$("top").offsetHeight;$("spacer").style.height=h+"px";document.documentElement.style.scrollPaddingTop=(h+10)+"px"};
